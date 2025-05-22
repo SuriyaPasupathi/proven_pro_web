@@ -191,25 +191,6 @@ export function SignUpForm() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email<span className="text-destructive">*</span></FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter your email"
-                        {...field}
-                        disabled={isLoading}
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="username"
                 render={({ field }) => (
                   <FormItem>
@@ -222,6 +203,33 @@ export function SignUpForm() {
                         className="w-full"
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email<span className="text-destructive">*</span></FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        {...field}
+                        disabled={isLoading}
+                        className="w-full"
+                        autoComplete="email"
+                        list="email-suggestions"
+                      />
+                    </FormControl>
+                    <datalist id="email-suggestions">
+                      <option value="@gmail.com" />
+                      <option value="@yahoo.com" />
+                      <option value="@hotmail.com" />
+                      <option value="@outlook.com" />
+                    </datalist>
                     <FormMessage />
                   </FormItem>
                 )}
