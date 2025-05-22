@@ -37,7 +37,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { error, loading } = useSelector((state: RootState) => state.login);
+  const { error } = useSelector((state: RootState) => state.login);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

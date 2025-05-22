@@ -59,7 +59,7 @@ export function SignUpForm() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
-  const { error, verificationSent } = useSelector((state: RootState) => state.register);
+  const { error } = useSelector((state: RootState) => state.register);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -191,13 +191,14 @@ export function SignUpForm() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="username"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username<span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>Email<span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Choose a username"
+                        type="email"
+                        placeholder="Enter your email"
                         {...field}
                         disabled={isLoading}
                         className="w-full"
@@ -209,14 +210,13 @@ export function SignUpForm() {
               />
               <FormField
                 control={form.control}
-                name="email"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email<span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>Username<span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input
-                        type="email"
-                        placeholder="Enter your email"
+                        placeholder="Choose a username"
                         {...field}
                         disabled={isLoading}
                         className="w-full"

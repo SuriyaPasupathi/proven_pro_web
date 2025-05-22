@@ -3,13 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store/store';
 import { getProfile } from '../../../store/Services/CreateProfileService';
 import ProfileNav from '../ProfileNav';
-import logo from '../../assets/logo.png';
 import { Button } from '@/components/ui/button';
 
 const Verification = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { profileData, loading, error } = useSelector((state: RootState) => state.createProfile);
+  const { loading, error } = useSelector((state: RootState) => state.createProfile);
 
   useEffect(() => {
     dispatch(getProfile());

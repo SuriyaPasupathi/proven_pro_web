@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ProfileNav from '../ProfileNav';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../store/store';
@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const MembershipPlans = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { profileData, loading, error } = useSelector((state: RootState) => state.createProfile);
+  const { profileData } = useSelector((state: RootState) => state.createProfile);
   const navigate = useNavigate();
 
   useEffect(() => {

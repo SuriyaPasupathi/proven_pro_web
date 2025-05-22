@@ -10,9 +10,6 @@ import toast from "react-hot-toast";
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 2;
 
-// Get the base URL from environment variable
-const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
 const ProfileImg: React.FC = () => {
   const [form, setForm] = useState({
     profile_pic: null as File | null,
