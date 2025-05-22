@@ -16,14 +16,14 @@ import {
 } from '@/components/ui/dialog';
 
 // Mock: get email from localStorage (replace with Redux or API as needed)
-const getUserEmail = () => localStorage.getItem('user_email') || 'john_doe@gmail.com';
+const getUserEmail = () => localStorage.getItem('user_email');
 
 const AccountSettings: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // Email state
   const [email, setEmail] = useState(getUserEmail());
   const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [newEmail, setNewEmail] = useState(email);
+  const [newEmail, setNewEmail] = useState(email || '');
   const [emailLoading, setEmailLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [emailSuccess, setEmailSuccess] = useState('');
@@ -46,7 +46,9 @@ const AccountSettings: React.FC = () => {
     // TODO: Replace with real API call
     setTimeout(() => {
       setEmail(newEmail);
-      localStorage.setItem('user_email', newEmail);
+      if (newEmail) {
+        localStorage.setItem('user_email', newEmail);
+      }
       setEmailSuccess('Email updated successfully!');
       setEmailLoading(false);
       setShowEmailDialog(false);

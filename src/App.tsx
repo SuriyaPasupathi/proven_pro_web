@@ -24,7 +24,7 @@ import VerifiedEmail from './pages/authpages/VerifiedEmail';
 import Profile from './pages/ProfilePages/Profile';
 import Plans from './pages/landingpages/LandingPreview/Plans';
 import AccountSettings from './pages/ProfilePages/Accounts/AccountSettings';
-import MyProfile from './pages/ProfilePages/Accounts/Myprofile';
+// import MyProfile from './pages/ProfilePages/Accounts/Myprofile';
 import Verification from './pages/ProfilePages/Accounts/Verification';
 import MembershipPlans from './pages/ProfilePages/Accounts/MembershipPlans';
 function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -77,7 +77,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
 
             <Route path="/profile/account-settings" element={<AccountSettings />} />
-            <Route path="/profile/my-profile" element={<MyProfile />} />    
+            {/* <Route path="/profile/my-profile" element={<MyProfile />} />     */}
             <Route path="/profile/verification" element={<Verification />} />
             <Route path="/profile/membership-plans" element={<MembershipPlans />} />
 

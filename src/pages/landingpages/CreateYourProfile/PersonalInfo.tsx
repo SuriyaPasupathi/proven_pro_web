@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 1;
@@ -16,6 +18,7 @@ interface PersonalInfoForm {
   last_name: string;
   profile_mail: string;
   mobile: string;
+  countryCode: string;
   bio: string;
   rating: string;
   profile_url: string;
@@ -27,6 +30,7 @@ const PersonalInfo: React.FC = () => {
     last_name: "",
     profile_mail: "",
     mobile: "",
+    countryCode: "",
     bio: "",
     rating: "",
     profile_url: "",
@@ -50,6 +54,16 @@ const PersonalInfo: React.FC = () => {
     const newForm = { ...form, [e.target.name]: e.target.value };
     setForm(newForm);
     // Save to localStorage whenever form changes
+    localStorage.setItem('personalInfo', JSON.stringify(newForm));
+  };
+
+  const handlePhoneChange = (value: string, data: any) => {
+    const newForm = { 
+      ...form, 
+      mobile: value,
+      countryCode: data.countryCode
+    };
+    setForm(newForm);
     localStorage.setItem('personalInfo', JSON.stringify(newForm));
   };
 
@@ -98,6 +112,7 @@ const PersonalInfo: React.FC = () => {
         last_name: form.last_name ? form.last_name.trim() : '',
         profile_mail: form.profile_mail ? form.profile_mail.trim().toLowerCase() : '',
         mobile: formattedPhone,
+        countryCode: form.countryCode,
         bio: form.bio ? form.bio.trim() : undefined,
         rating: form.rating ? form.rating.trim() : undefined,
         profile_url: form.profile_url ? form.profile_url.trim() : undefined
@@ -205,14 +220,18 @@ const PersonalInfo: React.FC = () => {
           <label htmlFor="mobile" className="block font-medium mb-1 text-sm">
             Phone Number
           </label>
-          <Input
-            id="mobile"
-            name="mobile"
-            placeholder="Enter your phone number"
+          <PhoneInput
+            country={'us'}
             value={form.mobile}
-            onChange={handleChange}
-            className="bg-gray-50"
-            required
+            onChange={handlePhoneChange}
+            inputClass="w-full h-9 rounded-md border border-input bg-gray-50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            buttonClass="border-input bg-gray-50"
+            containerClass="w-full"
+            inputProps={{
+              name: 'mobile',
+              required: true,
+              id: 'mobile'
+            }}
           />
         </div>
 
