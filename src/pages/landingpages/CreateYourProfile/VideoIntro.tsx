@@ -48,10 +48,14 @@ const VideoIntro: React.FC = () => {
         toast.error("Please upload a valid video file");
         return;
       }
+      
+      // Create a URL for preview
+      const videoUrl = URL.createObjectURL(selectedFile);
+      
       setForm({
         ...form,
         video_intro: selectedFile,
-        video_intro_url: URL.createObjectURL(selectedFile)
+        video_intro_url: videoUrl
       });
     }
   };
@@ -64,14 +68,15 @@ const VideoIntro: React.FC = () => {
     e.preventDefault();
     
     try {
-      const profileData = {
-        subscription_type: "premium" as const,
-        video_intro: form.video_intro || undefined,
-        video_intro_url: form.video_intro_url,
-        video_description: form.video_description
-      };
+      const formData = new FormData();
+      formData.append('subscription_type', 'premium');
+      if (form.video_intro) {
+        formData.append('video_intro', form.video_intro);
+      }
+      formData.append('video_intro_url', form.video_intro_url);
+      formData.append('video_description', form.video_description);
 
-      const result = await dispatch(createUserProfile(profileData)).unwrap();
+      const result = await dispatch(createUserProfile(formData)).unwrap();
       
       if (result) {
         toast.success("Profile created successfully!");

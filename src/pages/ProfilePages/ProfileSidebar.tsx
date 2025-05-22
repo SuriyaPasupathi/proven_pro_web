@@ -10,16 +10,14 @@ interface ProfileSidebarProps {
 }
 
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
-  // Debug logging
-  console.log('Profile Data:', profileData);
-  console.log('Profile Pic URL:', profileData.profile_pic_url);
-  console.log('Profile Pic:', profileData.profile_pic);
-
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
-    return `${baseUrl}${url}`;
+    
+    // Remove any leading slashes to prevent double slashes
+    const cleanPath = url.replace(/^\/+/, '');
+    return `${baseUrl}/${cleanPath}`;
   };
 
   // Ensure services_categories is an array
@@ -38,14 +36,23 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               alt={`${profileData.first_name || ''} ${profileData.last_name || ''}`}
               className="w-full aspect-square object-cover"
               onError={(e) => {
-                console.error('Image load error:', e);
                 const target = e.target as HTMLImageElement;
-                target.src = 'https://via.placeholder.com/400x400?text=No+Image';
+                // Replace the image with a div containing initials
+                const parent = target.parentElement;
+                if (parent) {
+                  const initials = `${profileData.first_name?.[0] || ''}${profileData.last_name?.[0] || ''}`.toUpperCase();
+                  const fallbackDiv = document.createElement('div');
+                  fallbackDiv.className = 'w-full aspect-square bg-gray-200 flex items-center justify-center text-2xl font-semibold text-gray-600';
+                  fallbackDiv.textContent = initials || '?';
+                  parent.replaceChild(fallbackDiv, target);
+                }
               }}
             />
           ) : (
             <div className="w-full aspect-square bg-gray-200 flex items-center justify-center">
-              <span className="text-gray-400">No profile image</span>
+              <span className="text-2xl font-semibold text-gray-600">
+                {`${profileData.first_name?.[0] || ''}${profileData.last_name?.[0] || ''}`.toUpperCase() || '?'}
+              </span>
             </div>
           )}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-900/80 to-transparent h-1/4"></div>
@@ -74,9 +81,12 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           
           <div className="relative bg-gray-200 rounded-lg aspect-video overflow-hidden">
             <video 
-              src={profileData.video_intro_url || profileData.video_intro}
+              src={getFullImageUrl(profileData.video_intro_url || profileData.video_intro)}
               className="w-full h-full object-cover"
               controls
+              preload="metadata"
+              controlsList="nodownload"
+              playsInline
             />
             {profileData.video_description && (
               <p className="text-sm text-gray-600 mt-2">{profileData.video_description}</p>

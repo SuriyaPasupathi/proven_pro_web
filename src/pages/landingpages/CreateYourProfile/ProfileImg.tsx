@@ -83,25 +83,27 @@ const ProfileImg: React.FC = () => {
           URL.revokeObjectURL(form.profile_pic_url);
         }
 
-        // Update the profile data in Redux with the full URL
+        // Store the raw URL from the server
         if (result.profile_pic_url) {
-          const fullUrl = result.profile_pic_url.startsWith('http') 
-            ? result.profile_pic_url 
-            : `${baseUrl}${result.profile_pic_url}`;
-          result.profile_pic_url = fullUrl;
+          result.profile_pic_url = result.profile_pic_url;
         }
 
         toast.success("Profile image saved successfully!");
         navigate("/create-profile/services-offer");
       }
     } catch (err) {
-      console.error('Upload error:', err);
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to save profile image");
     }
   };
 
   const progressPercent = Math.round((CURRENT_STEP / TOTAL_STEPS) * 100);
+
+  // Add debug logging for the form state
+  console.log('Current form state:', {
+    hasFile: !!form.profile_pic,
+    previewUrl: form.profile_pic_url
+  });
 
   return (
     <div className="min-h-screen bg-white px-4 sm:px-6 md:px-8 py-6 flex flex-col">

@@ -41,8 +41,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         {toolsArray.map((tool, index) => (
           <span 
             key={index}
-            className="text-sm bg-purple-100 text-purple-800 px-3 py-1 rounded-full hover:bg-purple-200 transition-colors"
-          >
+            className="text-gray-600 mb-4"          >
             {tool}
           </span>
         ))}
