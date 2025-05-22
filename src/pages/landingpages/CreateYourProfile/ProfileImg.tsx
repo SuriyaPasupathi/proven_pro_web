@@ -187,7 +187,7 @@ const ProfileImg: React.FC = () => {
             className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
             disabled={loading}
           >
-            {loading ? "Saving..." : "Continue"}
+            {loading ? "Saving..." : "Save and Continue"}
           </Button>
         </div>
       </form>

@@ -304,7 +304,7 @@ const PersonalInfo: React.FC = () => {
               handleSubmit(e);
             }}
           >
-            {loading ? "Saving..." : "Continue"}
+            {loading ? "Saving..." : "Save and Continue"}
           </Button>
         </div>
       </form>
