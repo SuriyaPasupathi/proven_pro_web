@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
+import { Search,ChevronDown, Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AccountDropdown from './AccountDropdown';
 import logo from '../../assets/logo.png';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import NotificationSheet from "@/components/layout/notificationsheet";
 
 interface NavbarProps {
   isMenuOpen: boolean;
@@ -64,9 +65,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             <Button variant="link" className="text-gray-800 hover:text-blue-700">
               Contact Us
             </Button>
-            <Button variant="ghost" size="icon" aria-label="Notifications">
-              <Bell className="h-5 w-5 text-gray-600" />
-            </Button>
+            <NotificationSheet />
 
             {/* Account */}
             <div className="relative" ref={dropdownRef}>
