@@ -17,6 +17,7 @@ import logo from '@/assets/logo.png';
 import herosectionImg from '@/assets/herosection.png';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import { Eye, EyeOff } from 'lucide-react';
 // import { GoogleSignIn } from '@/components/auth/google-sign-in';
 
 const formSchema = z.object({
@@ -33,6 +34,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { error, loading } = useSelector((state: RootState) => state.login);
@@ -135,13 +137,22 @@ export function LoginForm() {
             </div>
             <div>
               <label className="block mb-1 font-medium">Password</label>
-              <Input
-                type="password"
-                placeholder="Password"
-                {...form.register('password')}
-                disabled={isLoading}
-                className="w-full"
-              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  {...form.register('password')}
+                  disabled={isLoading}
+                  className="w-full pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center ">
