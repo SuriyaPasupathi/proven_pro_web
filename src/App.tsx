@@ -2,6 +2,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { useEffect } from 'react';
 import { useTheme } from './hooks/useTheme';
+import { Toaster } from 'sonner';
 import LandingPage from './pages/landingpages/landingpage';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignUpForm from './pages/authpages/SignupPage'; // adjust path as needed
@@ -43,7 +44,7 @@ function App() {
     <Provider store={store}>
       <ThemeProvider>
         <BrowserRouter>
-        
+          <Toaster richColors position="top-center" />
           <Routes>
             <Route path="/" element={<LandingPage />} />
 

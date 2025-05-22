@@ -62,15 +62,25 @@ export function LoginForm() {
         const profileStatus = await dispatch(checkProfileStatus()).unwrap();
         
         if (profileStatus.has_profile) {
-          toast.success('Successfully logged in!');
+          toast.success('Welcome back! Successfully logged in.', {
+            description: 'Redirecting to your profile...',
+            duration: 3000,
+          });
           navigate("/profile");
         } else {
-          toast.info('Please select a plan to continue');
+          toast.info('Please select a plan to continue', {
+            description: 'You need to choose a plan to access all features.',
+            duration: 4000,
+          });
           navigate("/plans");
         }
       }
     } catch (error: any) {
       console.error('Login error:', error);
+      toast.error('Login failed', {
+        description: error.message || 'Please check your credentials and try again.',
+        duration: 4000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +89,10 @@ export function LoginForm() {
   // Google Sign In
   const handleGoogleLogin = async (credentialsResponse: any) => {
     if (!credentialsResponse.credential) {
-      toast.error("Failed to get credentials from Google");
+      toast.error("Google Sign In Failed", {
+        description: "Failed to get credentials from Google. Please try again.",
+        duration: 4000,
+      });
       return;
     }
 
@@ -100,15 +113,25 @@ export function LoginForm() {
         const profileStatus = await dispatch(checkProfileStatus()).unwrap();
         
         if (profileStatus.has_profile) {
-          toast.success('Successfully logged in!');
+          toast.success('Welcome back! Successfully logged in with Google.', {
+            description: 'Redirecting to your profile...',
+            duration: 3000,
+          });
           navigate("/profile");
         } else {
-          toast.info('Please select a plan to continue');
+          toast.info('Please select a plan to continue', {
+            description: 'You need to choose a plan to access all features.',
+            duration: 4000,
+          });
           navigate("/plans");
         }
       }
     } catch (error: any) {
       console.error('Google login error:', error);
+      toast.error('Google Sign In Failed', {
+        description: error.message || 'Please try again later.',
+        duration: 4000,
+      });
     }
   };
 

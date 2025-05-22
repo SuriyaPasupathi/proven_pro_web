@@ -85,11 +85,17 @@ export function SignUpForm() {
       dispatch(verifyOTP({ email, otp }))
         .unwrap()
         .then(() => {
-          toast.success('Registration verified successfully!');
+          toast.success('Email verified successfully!', {
+            description: 'You can now log in to your account.',
+            duration: 4000,
+          });
           navigate('/login');
         })
         .catch((error) => {
-          toast.error(error.message || 'Verification failed');
+          toast.error('Verification failed', {
+            description: error.message || 'Please try verifying your email again.',
+            duration: 4000,
+          });
         });
     }
   }, [searchParams, dispatch, navigate]);
@@ -105,12 +111,18 @@ export function SignUpForm() {
       })).unwrap();
 
       if (result) {
-        toast.success('Verification email sent. Please check your inbox.');
+        toast.success('Account created successfully!', {
+          description: 'Please check your email for verification.',
+          duration: 4000,
+        });
         form.reset();
         navigate('/email-verify');
       }
     } catch (error: any) {
-      toast.error(error.message || 'Registration failed. Please try again.');
+      toast.error('Registration failed', {
+        description: error.message || 'Please check your information and try again.',
+        duration: 4000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +131,10 @@ export function SignUpForm() {
   // Google Sign Up
   const handleGoogleSignup = async (credentialsResponse: any) => {
     if (!credentialsResponse.credential) {
-      toast.error("Failed to get credentials from Google");
+      toast.error("Google Sign Up Failed", {
+        description: "Failed to get credentials from Google. Please try again.",
+        duration: 4000,
+      });
       return;
     }
 
@@ -136,11 +151,18 @@ export function SignUpForm() {
       const result = await dispatch(postUserCredentials(payload)).unwrap();
       
       if (result) {
-        toast.success('Account created successfully!');
+        toast.success('Account created successfully!', {
+          description: 'Redirecting you to select a plan...',
+          duration: 3000,
+        });
         navigate("/plans");
       }
     } catch (error: any) {
       console.error('Google signup error:', error);
+      toast.error('Google Sign Up Failed', {
+        description: error.message || 'Please try again later.',
+        duration: 4000,
+      });
     }
   };
 
@@ -169,14 +191,13 @@ export function SignUpForm() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="email"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email<span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>Username<span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input
-                        type="email"
-                        placeholder="Enter your email"
+                        placeholder="Choose a username"
                         {...field}
                         disabled={isLoading}
                         className="w-full"
@@ -188,13 +209,14 @@ export function SignUpForm() {
               />
               <FormField
                 control={form.control}
-                name="username"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username<span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>Email<span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Choose a username"
+                        type="email"
+                        placeholder="Enter your email"
                         {...field}
                         disabled={isLoading}
                         className="w-full"

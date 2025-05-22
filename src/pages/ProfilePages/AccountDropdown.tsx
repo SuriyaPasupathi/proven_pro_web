@@ -5,6 +5,7 @@ import { RootState, useAppDispatch } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
 import { ProfileData } from './Profile';
 import { logout } from '../../store/Services/CreateProfileService';
+import { toast } from 'sonner';
 
 const AccountDropdown = () => {
   const dispatch = useAppDispatch();
@@ -20,6 +21,12 @@ const AccountDropdown = () => {
       // Clear any other stored data
       localStorage.removeItem('user');
       localStorage.removeItem('user_email');
+      
+      toast.success('Logged out successfully', {
+        description: 'You have been logged out of your account.',
+        duration: 3000,
+      });
+      
       // Redirect to login
       navigate('/login');
     } catch (error) {
@@ -29,6 +36,12 @@ const AccountDropdown = () => {
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
       localStorage.removeItem('user_email');
+      
+      toast.error('Logout failed', {
+        description: 'There was an error logging out. Please try again.',
+        duration: 4000,
+      });
+      
       navigate('/login');
     }
   };
