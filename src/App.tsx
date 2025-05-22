@@ -37,6 +37,7 @@ const { theme } = useTheme();
   return <>{children}</>;
 }
 
+
 function App() {
   return (
     <Provider store={store}>
@@ -48,6 +49,8 @@ function App() {
 
             {/* Plan Pages */}
             <Route path="/plans" element={<Plans />} />
+
+            
 
             {/* Auth Pages */}
             <Route path="/signup" element={<SignUpForm />} />
