@@ -19,6 +19,9 @@ import {
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
+// Add this constant at the top of the file after imports
+const PLACEHOLDER_IMAGE = 'https://placehold.co/400x400/e2e8f0/64748b?text=No+Image';
+
 interface PortfolioItem {
   project_title: string;
   project_description: string;
@@ -46,6 +49,21 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
     project_image_url: "",
   });
 
+  // Initialize form with current values when dialog opens
+  useEffect(() => {
+    if (isDialogOpen && editingItem) {
+      setForm(editingItem);
+    } else if (isDialogOpen) {
+      setForm({
+        project_title: "",
+        project_description: "",
+        project_url: "",
+        project_image: "",
+        project_image_url: "",
+      });
+    }
+  }, [isDialogOpen, editingItem]);
+
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
     if (!url) return '';
@@ -59,14 +77,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
 
   const handleEdit = (item: PortfolioItem) => {
     setEditingItem(item);
-    setForm(item);
     setIsDialogOpen(true);
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -168,13 +186,6 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
               className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
               onClick={() => {
                 setEditingItem(null);
-                setForm({
-                  project_title: "",
-                  project_description: "",
-                  project_url: "",
-                  project_image: "",
-                  project_image_url: "",
-                });
                 setIsDialogOpen(true);
               }}
             >
@@ -183,6 +194,78 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
           )}
         </div>
         <p className="text-gray-600">No portfolio items available.</p>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>
+                {editingItem ? 'Edit Portfolio Item' : 'Add Portfolio Item'}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="project_title" className="block font-medium mb-1 text-sm">
+                  Project Title
+                </label>
+                <Input
+                  id="project_title"
+                  name="project_title"
+                  placeholder="Enter project name"
+                  value={form.project_title}
+                  onChange={handleChange}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="project_description" className="block font-medium mb-1 text-sm">
+                  Project Description
+                </label>
+                <Textarea
+                  id="project_description"
+                  name="project_description"
+                  placeholder="Describe your project..."
+                  value={form.project_description}
+                  onChange={handleChange}
+                  className="bg-gray-50 min-h-[120px]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="project_url" className="block font-medium mb-1 text-sm">
+                  Project URL
+                </label>
+                <Input
+                  id="project_url"
+                  name="project_url"
+                  placeholder="https://..."
+                  value={form.project_url}
+                  onChange={handleChange}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                >
+                  {editingItem ? 'Save Changes' : 'Add Item'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -197,13 +280,6 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
             className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
             onClick={() => {
               setEditingItem(null);
-              setForm({
-                project_title: "",
-                project_description: "",
-                project_url: "",
-                project_image: "",
-                project_image_url: "",
-              });
               setIsDialogOpen(true);
             }}
           >
@@ -215,7 +291,6 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {parsedPortfolio.slice(0, 3).map((item: PortfolioItem, index: number) => {
           const imageUrl = getFullImageUrl(item.project_image_url || item.project_image);
-          console.log(`Portfolio Section - Item ${index} Image URL:`, imageUrl);
           
           return (
             <div 
@@ -229,9 +304,8 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
                   alt={item.project_title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   onError={(e) => {
-                    console.error('Portfolio Section - Image load error:', e);
                     const target = e.target as HTMLImageElement;
-                    target.src = 'https://via.placeholder.com/400x400?text=No+Image';
+                    target.src = PLACEHOLDER_IMAGE;
                   }}
                 />
               </div>
@@ -267,9 +341,8 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
                 alt={parsedPortfolio[selectedItem].project_title}
                 className="w-full h-auto max-h-[60vh] object-contain"
                 onError={(e) => {
-                  console.error('Portfolio Section - Modal Image load error:', e);
                   const target = e.target as HTMLImageElement;
-                  target.src = 'https://via.placeholder.com/400x400?text=No+Image';
+                  target.src = PLACEHOLDER_IMAGE;
                 }}
               />
               <div className="p-4">
@@ -297,7 +370,6 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
         </div>
       )}
 
-      {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
