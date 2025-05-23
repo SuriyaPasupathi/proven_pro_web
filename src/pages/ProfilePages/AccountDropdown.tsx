@@ -20,13 +20,22 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
 
   const handleLogout = async () => {
     try {
-      await dispatch(logout());
-      // Clear auth tokens
+      // Clear auth tokens and user data first
+      const refreshToken = localStorage.getItem('refresh_token');
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
-      // Clear any other stored data
       localStorage.removeItem('user');
       localStorage.removeItem('user_email');
+      
+      // Only attempt API call if we have a refresh token
+      if (refreshToken) {
+        try {
+          await dispatch(logout());
+        } catch (apiError) {
+          console.error('API logout failed:', apiError);
+          // Continue with local logout even if API call fails
+        }
+      }
       
       toast.success('Logged out successfully', {
         description: 'You have been logged out of your account.',
@@ -37,7 +46,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
-      // Even if the API call fails, we should still clear local storage and redirect
+      // Ensure we still clear everything and redirect even if there's an error
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');

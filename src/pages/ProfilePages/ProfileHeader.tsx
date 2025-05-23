@@ -1,13 +1,16 @@
-import { Copy, Star } from 'lucide-react';
+import { Copy, Star, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ProfileData } from './Profile';
+import { useEditMode } from '../../context/EditModeContext';
 
 interface ProfileHeaderProps {
   profileData: ProfileData;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
+  const { isEditMode } = useEditMode();
+
   const copyToClipboard = () => {
     const profileUrl = profileData.profile_url || "https://www.mytrustworld.com/profile-d-ae111378";
     navigator.clipboard.writeText(profileUrl);
@@ -19,9 +22,19 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold">
-              {profileData.first_name} {profileData.last_name}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl md:text-4xl font-bold">
+                {profileData.first_name} {profileData.last_name}
+              </h1>
+              {isEditMode && (
+                <Button 
+                  variant="ghost" 
+                  className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
             <p className="text-muted-foreground text-lg">{profileData.bio}</p>
             <p className="text-muted-foreground">{profileData.profile_mail}</p>
           </div>

@@ -1,7 +1,20 @@
 import { ChevronDown, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store/store';
+import { updateProfile } from '../../store/Services/CreateProfileService';
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import toast from 'react-hot-toast';
 
 interface ServicesSectionProps {
   services_categories?: string[] | string;
@@ -17,16 +30,65 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   availability 
 }) => {
   const { isEditMode } = useEditMode();
+  const dispatch = useDispatch<AppDispatch>();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [form, setForm] = useState({
+    services_categories: '',
+    services_description: '',
+    rate_range: '',
+    availability: '',
+  });
 
-  // Debug logging for raw props
+  // Initialize form with current values when dialog opens
   useEffect(() => {
-    console.log('Services Section - Raw Props:', {
-      services_categories,
-      services_description,
-      rate_range,
-      availability
-    });
-  }, [services_categories, services_description, rate_range, availability]);
+    if (isDialogOpen) {
+      setForm({
+        services_categories: Array.isArray(services_categories) 
+          ? services_categories.join(', ')
+          : services_categories || '',
+        services_description: services_description || '',
+        rate_range: rate_range || '',
+        availability: availability || '',
+      });
+    }
+  }, [isDialogOpen, services_categories, services_description, rate_range, availability]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      // Convert services_categories string to array
+      const servicesCategories = form.services_categories
+        .split(',')
+        .map(category => category.trim())
+        .filter(category => category.length > 0);
+
+      const profileData = {
+        subscription_type: 'premium' as const,
+        services_categories: servicesCategories,
+        services_description: form.services_description,
+        rate_range: form.rate_range,
+        availability: form.availability,
+      };
+
+      const result = await dispatch(updateProfile(profileData)).unwrap();
+      
+      if (result) {
+        toast.success("Services information updated successfully!");
+        setIsDialogOpen(false);
+      }
+    } catch (err) {
+      console.error('Services update error:', err);
+      const error = err as { message: string; code?: string };
+      toast.error(error.message || "Failed to update services information");
+    }
+  };
 
   // Ensure services_categories is an array
   const servicesCategories = Array.isArray(services_categories) 
@@ -34,13 +96,6 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     : typeof services_categories === 'string'
       ? services_categories.split(',').map(category => category.trim()).filter(Boolean)
       : [];
-
-  // Debug logging for processed data
-  useEffect(() => {
-    console.log('Services Section - Processed Categories:', servicesCategories);
-    console.log('Services Section - Type of services_categories:', typeof services_categories);
-    console.log('Services Section - Is Array?', Array.isArray(services_categories));
-  }, [servicesCategories, services_categories]);
 
   if (!services_description && servicesCategories.length === 0 && !rate_range && !availability) {
     return (
@@ -51,12 +106,100 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
             <Button 
               variant="ghost" 
               className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+              onClick={() => setIsDialogOpen(true)}
             >
               <Pencil className="w-4 h-4" />
             </Button>
           )}
         </div>
         <p className="text-gray-600">No services information available.</p>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Edit Services</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="services_categories" className="block text-sm font-medium text-gray-700 mb-1">
+                  Main Service Category
+                </label>
+                <Input
+                  id="services_categories"
+                  name="services_categories"
+                  placeholder="e.g., Web Development, Design, Marketing"
+                  value={form.services_categories}
+                  onChange={handleChange}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="services_description" className="block text-sm font-medium text-gray-700 mb-1">
+                  Service Description
+                </label>
+                <Textarea
+                  id="services_description"
+                  name="services_description"
+                  placeholder="Describe your main services and expertise..."
+                  value={form.services_description}
+                  onChange={handleChange}
+                  className="bg-gray-50 min-h-[120px]"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="rate_range" className="block text-sm font-medium text-gray-700 mb-1">
+                    Rate Range
+                  </label>
+                  <Input
+                    id="rate_range"
+                    name="rate_range"
+                    placeholder="e.g., $50-100/hour"
+                    value={form.rate_range}
+                    onChange={handleChange}
+                    className="bg-gray-50"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="availability" className="block text-sm font-medium text-gray-700 mb-1">
+                    Availability
+                  </label>
+                  <Input
+                    id="availability"
+                    name="availability"
+                    placeholder="e.g., Full-time, Part-time, Weekends only"
+                    value={form.availability}
+                    onChange={handleChange}
+                    className="bg-gray-50"
+                    required
+                  />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                >
+                  Save Changes
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -69,6 +212,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
           <Button 
             variant="ghost" 
             className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+            onClick={() => setIsDialogOpen(true)}
           >
             <Pencil className="w-4 h-4" />
           </Button>
@@ -114,6 +258,93 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         <span>Show all services</span>
         <ChevronDown className="ml-1 h-4 w-4" />
       </Button>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Services</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="services_categories" className="block text-sm font-medium text-gray-700 mb-1">
+                Main Service Category
+              </label>
+              <Input
+                id="services_categories"
+                name="services_categories"
+                placeholder="e.g., Web Development, Design, Marketing"
+                value={form.services_categories}
+                onChange={handleChange}
+                className="bg-gray-50"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="services_description" className="block text-sm font-medium text-gray-700 mb-1">
+                Service Description
+              </label>
+              <Textarea
+                id="services_description"
+                name="services_description"
+                placeholder="Describe your main services and expertise..."
+                value={form.services_description}
+                onChange={handleChange}
+                className="bg-gray-50 min-h-[120px]"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="rate_range" className="block text-sm font-medium text-gray-700 mb-1">
+                  Rate Range
+                </label>
+                <Input
+                  id="rate_range"
+                  name="rate_range"
+                  placeholder="e.g., $50-100/hour"
+                  value={form.rate_range}
+                  onChange={handleChange}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="availability" className="block text-sm font-medium text-gray-700 mb-1">
+                  Availability
+                </label>
+                <Input
+                  id="availability"
+                  name="availability"
+                  placeholder="e.g., Full-time, Part-time, Weekends only"
+                  value={form.availability}
+                  onChange={handleChange}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+              >
+                Save Changes
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

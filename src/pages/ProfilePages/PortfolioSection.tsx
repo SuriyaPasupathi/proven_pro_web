@@ -2,6 +2,19 @@ import { useState, useEffect } from 'react';
 import { Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { updateProfile } from '../../store/Services/CreateProfileService';
+import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
+import { toast } from 'sonner';
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -21,6 +34,17 @@ interface PortfolioSectionProps {
 const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) => {
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const { isEditMode } = useEditMode();
+  const dispatch = useAppDispatch();
+  const { profileData } = useAppSelector((state) => state.createProfile);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<PortfolioItem | null>(null);
+  const [form, setForm] = useState<PortfolioItem>({
+    project_title: "",
+    project_description: "",
+    project_url: "",
+    project_image: "",
+    project_image_url: "",
+  });
 
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
@@ -31,6 +55,92 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
 
   const handleItemClick = (id: number) => {
     setSelectedItem(id === selectedItem ? null : id);
+  };
+
+  const handleEdit = (item: PortfolioItem) => {
+    setEditingItem(item);
+    setForm(item);
+    setIsDialogOpen(true);
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      let updatedPortfolio: PortfolioItem[];
+      
+      if (editingItem) {
+        // Update existing portfolio item
+        updatedPortfolio = portfolio.map(item => 
+          item === editingItem ? form : item
+        );
+      } else {
+        // Add new portfolio item
+        updatedPortfolio = [...portfolio, form];
+      }
+
+      // Create FormData object
+      const formData = new FormData();
+      formData.append('subscription_type', profileData?.subscription_type || 'premium');
+      formData.append('portfolio', JSON.stringify(updatedPortfolio));
+
+      // Add other profile data
+      if (profileData) {
+        Object.entries(profileData).forEach(([key, value]) => {
+          if (key !== 'portfolio' && key !== 'subscription_type' && value !== undefined) {
+            if (Array.isArray(value)) {
+              formData.append(key, JSON.stringify(value));
+            } else if (value instanceof File) {
+              formData.append(key, value);
+            } else if (typeof value === 'string') {
+              formData.append(key, value);
+            }
+          }
+        });
+      }
+
+      const result = await dispatch(updateProfile(formData)).unwrap();
+      
+      if (result) {
+        // Update Redux store
+        dispatch(updateProfileData({
+          ...profileData,
+          portfolio: updatedPortfolio
+        }));
+
+        toast.success(editingItem ? "Portfolio item updated successfully!" : "Portfolio item added successfully!");
+        setIsDialogOpen(false);
+        setEditingItem(null);
+        setForm({
+          project_title: "",
+          project_description: "",
+          project_url: "",
+          project_image: "",
+          project_image_url: "",
+        });
+      }
+    } catch (err) {
+      const error = err as { message: string; code?: string };
+      toast.error(error.message || "Failed to update portfolio");
+    }
+  };
+
+  const handleCancel = () => {
+    setIsDialogOpen(false);
+    setEditingItem(null);
+    setForm({
+      project_title: "",
+      project_description: "",
+      project_url: "",
+      project_image: "",
+      project_image_url: "",
+    });
   };
 
   // Debug logging
@@ -56,6 +166,17 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
             <Button 
               variant="ghost" 
               className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+              onClick={() => {
+                setEditingItem(null);
+                setForm({
+                  project_title: "",
+                  project_description: "",
+                  project_url: "",
+                  project_image: "",
+                  project_image_url: "",
+                });
+                setIsDialogOpen(true);
+              }}
             >
               <Pencil className="w-4 h-4" />
             </Button>
@@ -74,6 +195,17 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
           <Button 
             variant="ghost" 
             className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+            onClick={() => {
+              setEditingItem(null);
+              setForm({
+                project_title: "",
+                project_description: "",
+                project_url: "",
+                project_image: "",
+                project_image_url: "",
+              });
+              setIsDialogOpen(true);
+            }}
           >
             <Pencil className="w-4 h-4" />
           </Button>
@@ -109,6 +241,18 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
                   <p className="text-sm">{item.project_description}</p>
                 </div>
               </div>
+              {isEditMode && (
+                <Button
+                  variant="ghost"
+                  className="absolute top-2 right-2 p-2 h-auto bg-white/80 hover:bg-white text-[#3C5979] hover:text-[#3C5979] rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(item);
+                  }}
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           );
         })}
@@ -152,6 +296,79 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
           </div>
         </div>
       )}
+
+      {/* Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>
+              {editingItem ? 'Edit Portfolio Item' : 'Add Portfolio Item'}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="project_title" className="block font-medium mb-1 text-sm">
+                Project Title
+              </label>
+              <Input
+                id="project_title"
+                name="project_title"
+                placeholder="Enter project name"
+                value={form.project_title}
+                onChange={handleChange}
+                className="bg-gray-50"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="project_description" className="block font-medium mb-1 text-sm">
+                Project Description
+              </label>
+              <Textarea
+                id="project_description"
+                name="project_description"
+                placeholder="Describe your project..."
+                value={form.project_description}
+                onChange={handleChange}
+                className="bg-gray-50 min-h-[120px]"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="project_url" className="block font-medium mb-1 text-sm">
+                Project URL
+              </label>
+              <Input
+                id="project_url"
+                name="project_url"
+                placeholder="https://..."
+                value={form.project_url}
+                onChange={handleChange}
+                className="bg-gray-50"
+                required
+              />
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+              >
+                {editingItem ? 'Save Changes' : 'Add Item'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
