@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile } from '../Services/CreateProfileService';
 
 interface ProfileError {
   message: string;
@@ -170,6 +170,22 @@ const createProfileSlice = createSlice({
       })
       .addCase(checkProfileStatus.rejected, (state, action) => {
         state.profileStatusLoading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.profileData = {
+          ...state.profileData,
+          ...action.payload
+        };
+        state.error = null;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload as ProfileError;
       });
   },

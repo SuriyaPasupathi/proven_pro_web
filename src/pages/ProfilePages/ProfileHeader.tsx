@@ -67,15 +67,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
           
           <div className="w-full md:max-w-[240px] space-y-1.5">
             {[
-              { label: "5-star", value: 100 },
-              { label: "4-star", value: 0 },
-              { label: "3-star", value: 0 },
-              { label: "2-star", value: 0 },
-              { label: "1-star", value: 0 },
+              { label: "5-star", value: 70 },
+              { label: "4-star", value: 20 },
+              { label: "3-star", value: 5 },
+              { label: "2-star", value: 3 },
+              { label: "1-star", value: 2 },
             ].map((rating, index) => (
-              <div key={index} className="flex items-center gap-2">
+              <div key={index} className="flex items-center gap-2 ">
                 <span className="text-sm min-w-[46px]">{rating.label}</span>
-                <Progress value={rating.value} className="h-2 flex-1" />
+                <Progress value={rating.value} className="h-2 flex-1 bg-[#bad3eb]" />
               </div>
             ))}
           </div>
@@ -84,7 +84,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
       </div>
 
       <div className="border-t pt-6">
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button className="bg-[#70a4d8] hover:bg-[#3C5979] text-white">
           Write a Review
         </Button>
       </div>

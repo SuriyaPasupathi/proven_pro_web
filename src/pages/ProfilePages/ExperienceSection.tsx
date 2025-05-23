@@ -1,5 +1,6 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useEditMode } from '../../context/EditModeContext';
 
 interface Experience {
   company_name: string;
@@ -14,9 +15,21 @@ interface ExperienceSectionProps {
 }
 
 const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] }) => {
+  const { isEditMode } = useEditMode();
+
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Experience</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Experience</h2>
+        {isEditMode && (
+          <Button 
+            variant="ghost" 
+            className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
       
       <div className="space-y-6">
         {experiences.map((exp, index) => (
@@ -35,7 +48,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
       
       <Button 
         variant="link" 
-        className="mt-6 text-blue-600 hover:text-blue-800 flex items-center p-0"
+        className="mt-6 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
       >
         <span>Show all experiences</span>
         <ChevronDown className="ml-1 h-4 w-4" />

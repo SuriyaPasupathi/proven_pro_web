@@ -1,5 +1,6 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useEditMode } from '../../context/EditModeContext';
 
 interface SkillsSectionProps {
   technical_skills?: string[];
@@ -12,6 +13,8 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   soft_skills = [],
   skills_description 
 }) => {
+  const { isEditMode } = useEditMode();
+
   // Ensure both skills arrays are actually arrays
   const technicalSkillsArray = Array.isArray(technical_skills) 
     ? technical_skills 
@@ -23,7 +26,17 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Skills</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Skills</h2>
+        {isEditMode && (
+          <Button 
+            variant="ghost" 
+            className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
       
       {skills_description && (
         <p className="text-gray-600 mb-4">{skills_description}</p>
@@ -63,7 +76,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       
       <Button 
         variant="link" 
-        className="mt-4 text-blue-600 hover:text-blue-800 flex items-center p-0"
+        className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
       >
         <span>Show all skills</span>
         <ChevronDown className="ml-1 h-4 w-4" />

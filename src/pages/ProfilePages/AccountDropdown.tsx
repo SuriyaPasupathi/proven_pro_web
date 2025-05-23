@@ -1,16 +1,22 @@
 import { Button } from "@/components/ui/button";
-import { User, ShieldCheck, Users, Settings, LogOut } from 'lucide-react';
+import { User, ShieldCheck, Users, Settings, LogOut, Edit } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
 import { ProfileData } from './Profile';
 import { logout } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
+import { useEditMode } from '../../context/EditModeContext';
 
-const AccountDropdown = () => {
+interface AccountDropdownProps {
+  closeDropdown: () => void;
+}
+
+const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { profileData } = useSelector((state: RootState) => state.createProfile);
+  const { setIsEditMode } = useEditMode();
 
   const handleLogout = async () => {
     try {
@@ -46,6 +52,11 @@ const AccountDropdown = () => {
     }
   };
 
+  const handleEditProfile = () => {
+    setIsEditMode(true);
+    navigate('/profile');
+  };
+
   const userData = profileData as ProfileData;
   const userEmail = localStorage.getItem('user_email') || '';
 
@@ -62,15 +73,31 @@ const AccountDropdown = () => {
       
       <div className="py-2">
         <Button variant="ghost" className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
-          onClick={() => navigate('/profile')}
+          onClick={() => {
+            setIsEditMode(false);
+            navigate('/profile');
+            closeDropdown();
+          }}
         >
           <User className="mr-2 h-4 w-4" />
           <span>My Profile</span>
         </Button>
+        <Button variant="ghost" className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
+          onClick={() => {
+            handleEditProfile();
+            closeDropdown();
+          }}
+        >
+          <Edit className="mr-2 h-4 w-4" />
+          <span>Edit Profile</span>
+        </Button>
         <Button 
           variant="ghost" 
           className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
-          onClick={() => navigate('/profile/verification')}
+          onClick={() => {
+            navigate('/profile/verification');
+            closeDropdown();
+          }}
         >
           <ShieldCheck className="mr-2 h-4 w-4" />
           <span>Verification</span>
@@ -78,7 +105,10 @@ const AccountDropdown = () => {
         <Button 
           variant="ghost" 
           className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
-          onClick={() => navigate('/profile/membership-plans')}
+          onClick={() => {
+            navigate('/profile/membership-plans');
+            closeDropdown();
+          }}
         >
           <Users className="mr-2 h-4 w-4" />
           <span>Membership Plan</span>
@@ -86,7 +116,10 @@ const AccountDropdown = () => {
         <Button
           variant="ghost"
           className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
-          onClick={() => navigate('/profile/account-settings')}
+          onClick={() => {
+            navigate('/profile/account-settings');
+            closeDropdown();
+          }}
         >
           <Settings className="mr-2 h-4 w-4" />
           <span>Account Settings</span>
@@ -97,7 +130,10 @@ const AccountDropdown = () => {
         <Button 
           variant="ghost" 
           className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
-          onClick={handleLogout}
+          onClick={() => {
+            handleLogout();
+            closeDropdown();
+          }}
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>

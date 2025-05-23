@@ -25,9 +25,10 @@ import VerifiedEmail from './pages/authpages/VerifiedEmail';
 import Profile from './pages/ProfilePages/Profile';
 import Plans from './pages/landingpages/LandingPreview/Plans';
 import AccountSettings from './pages/ProfilePages/Accounts/AccountSettings';
-// import MyProfile from './pages/ProfilePages/Accounts/Myprofile';
 import Verification from './pages/ProfilePages/Accounts/Verification';
 import MembershipPlans from './pages/ProfilePages/Accounts/MembershipPlans';
+import { EditModeProvider } from './context/EditModeContext';
+
 function ThemeProvider({ children }: { children: React.ReactNode }) {
 const { theme } = useTheme();
   
@@ -42,52 +43,53 @@ const { theme } = useTheme();
 function App() {
   return (
     <Provider store={store}>
-      <ThemeProvider>
-        <BrowserRouter>
-          <Toaster richColors position="top-center" />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
+      <EditModeProvider>
+        <ThemeProvider>
+          <BrowserRouter>
+            <Toaster richColors position="top-center" />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
 
-            {/* Plan Pages */}
-            <Route path="/plans" element={<Plans />} />
+              {/* Plan Pages */}
+              <Route path="/plans" element={<Plans />} />
 
-            
+              
 
-            {/* Auth Pages */}
-            <Route path="/signup" element={<SignUpForm />} />
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/forget-password" element={<ForgetPassword />} />
-            <Route path="/check-email" element={<CheckEmail />} />
-            <Route path="/set-password" element={<SetPassword />} />
-            <Route path="/reset-success" element={<ResetSuccess />} />
-            <Route path="/email-verify" element={<EmailVerify />} />
-            <Route path="/check-email-code" element={<CheckEmailCode />} />
-            <Route path="/verified-email" element={<VerifiedEmail />} />
+              {/* Auth Pages */}
+              <Route path="/signup" element={<SignUpForm />} />
+              <Route path="/login" element={<LoginForm />} />
+              <Route path="/forget-password" element={<ForgetPassword />} />
+              <Route path="/check-email" element={<CheckEmail />} />
+              <Route path="/set-password" element={<SetPassword />} />
+              <Route path="/reset-success" element={<ResetSuccess />} />
+              <Route path="/email-verify" element={<EmailVerify />} />
+              <Route path="/check-email-code" element={<CheckEmailCode />} />
+              <Route path="/verified-email" element={<VerifiedEmail />} />
 
-            {/* Create Your Profile */}
-            <Route path="/create-profile/personal-info" element={<PersonalInfo />} />
-            <Route path="/create-profile/profile-img" element={<ProfileImg />} />
-            <Route path="/create-profile/services-offer" element={<ServicesOffer />} />
-            <Route path="/create-profile/work-exp" element={<WorkExp />} />
-            <Route path="/create-profile/tool-skills" element={<ToolSkills />} />
-            <Route path="/create-profile/portfolio" element={<Portfolio />} />
-            <Route path="/create-profile/licenses" element={<Licenses />} />
-            <Route path="/create-profile/video-intro" element={<VideoIntro />} />
+              {/* Create Your Profile */}
+              <Route path="/create-profile/personal-info" element={<PersonalInfo />} />
+              <Route path="/create-profile/profile-img" element={<ProfileImg />} />
+              <Route path="/create-profile/services-offer" element={<ServicesOffer />} />
+              <Route path="/create-profile/work-exp" element={<WorkExp />} />
+              <Route path="/create-profile/tool-skills" element={<ToolSkills />} />
+              <Route path="/create-profile/portfolio" element={<Portfolio />} />
+              <Route path="/create-profile/licenses" element={<Licenses />} />
+              <Route path="/create-profile/video-intro" element={<VideoIntro />} />
 
-            {/* Profile Pages */}
-            <Route path="/profile" element={<Profile />} />
+              {/* Profile Pages */}
+              <Route path="/profile" element={<Profile />} />
 
-            <Route path="/profile/account-settings" element={<AccountSettings />} />
-            {/* <Route path="/profile/my-profile" element={<MyProfile />} />     */}
-            <Route path="/profile/verification" element={<Verification />} />
-            <Route path="/profile/membership-plans" element={<MembershipPlans />} />
+              <Route path="/profile/account-settings" element={<AccountSettings />} />
+              <Route path="/profile/verification" element={<Verification />} />
+              <Route path="/profile/membership-plans" element={<MembershipPlans />} />
 
-            
+              
 
 
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
+            </Routes>
+          </BrowserRouter>
+        </ThemeProvider>
+      </EditModeProvider>
     </Provider>
   );
 }

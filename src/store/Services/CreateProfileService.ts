@@ -231,3 +231,55 @@ export const checkProfileStatus = createAsyncThunk(
     }
   }
 );
+
+export const updateProfile = createAsyncThunk(
+  'profile/updateProfile',
+  async (payload: ProfilePayload | FormData, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const formData = payload instanceof FormData ? payload : new FormData();
+      
+      // If payload is not FormData, convert it to FormData
+      if (!(payload instanceof FormData)) {
+        // Add all non-file fields to formData
+        Object.entries(payload).forEach(([key, value]) => {
+          // Skip file fields and undefined values
+          if (key === 'profile_pic' || key === 'video_intro' || value === undefined) {
+            return;
+          }
+
+          // Handle array fields
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              formData.append(key, JSON.stringify(value));
+            }
+          } else if (value !== null && value !== '') {
+            // Only add non-empty string values
+            formData.append(key, value);
+          }
+        });
+
+        // Add file fields only if they exist and are not null
+        if (payload.profile_pic instanceof File) {
+          formData.append('profile_pic', payload.profile_pic);
+        }
+        if (payload.video_intro instanceof File) {
+          formData.append('video_intro', payload.video_intro);
+        }
+      }
+
+      const response = await axios.put(`${baseUrl}profile/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Profile update error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);

@@ -1,6 +1,7 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect } from 'react';
+import { useEditMode } from '../../context/EditModeContext';
 
 interface ServicesSectionProps {
   services_categories?: string[] | string;
@@ -15,6 +16,8 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   rate_range,
   availability 
 }) => {
+  const { isEditMode } = useEditMode();
+
   // Debug logging for raw props
   useEffect(() => {
     console.log('Services Section - Raw Props:', {
@@ -42,7 +45,17 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   if (!services_description && servicesCategories.length === 0 && !rate_range && !availability) {
     return (
       <div>
-        <h2 className="text-2xl font-bold mb-6">Services</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Services</h2>
+          {isEditMode && (
+            <Button 
+              variant="ghost" 
+              className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+            >
+              <Pencil className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
         <p className="text-gray-600">No services information available.</p>
       </div>
     );
@@ -50,7 +63,17 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Services</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Services</h2>
+        {isEditMode && (
+          <Button 
+            variant="ghost" 
+            className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
       
       {services_description && (
         <p className="text-gray-600 mb-4">{services_description}</p>
@@ -86,7 +109,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       
       <Button 
         variant="link" 
-        className="mt-4 text-blue-600 hover:text-blue-800 flex items-center p-0"
+        className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
       >
         <span>Show all services</span>
         <ChevronDown className="ml-1 h-4 w-4" />

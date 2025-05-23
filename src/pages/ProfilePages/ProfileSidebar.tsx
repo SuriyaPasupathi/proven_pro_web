@@ -1,6 +1,8 @@
-import { Video, Award, Tag } from 'lucide-react';
+import { Video, Award, Tag, Pencil } from 'lucide-react';
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ProfileData } from './Profile';
+import { useEditMode } from '../../context/EditModeContext';
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -10,6 +12,8 @@ interface ProfileSidebarProps {
 }
 
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
+  const { isEditMode } = useEditMode();
+  
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
     if (!url) return '';
@@ -59,7 +63,17 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         </div>
 
         <div className="mt-4 text-center mb-6">
-          <h2 className="text-xl font-bold">{profileData.first_name} {profileData.last_name}</h2>
+          <div className="flex justify-center items-center gap-2">
+            <h2 className="text-xl font-bold">{profileData.first_name} {profileData.last_name}</h2>
+            {isEditMode && (
+              <Button 
+                variant="ghost" 
+                className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">{profileData.bio}</p>
           <p className="text-sm text-muted-foreground">{profileData.profile_mail}</p>
         </div>
@@ -75,7 +89,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       {(profileData.video_intro || profileData.video_intro_url) && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Video className="h-5 w-5 text-blue-600" />
+            <Video className="h-5 w-5 text-[#70a4d8]" />
             <h3 className="font-semibold">Video Introduction</h3>
           </div>
           
@@ -99,7 +113,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       {profileData.certifications && profileData.certifications.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Award className="h-5 w-5 text-blue-600" />
+            <Award className="h-5 w-5 text-[#70a4d8]" />
             <h3 className="font-semibold">Certifications</h3>
           </div>
           

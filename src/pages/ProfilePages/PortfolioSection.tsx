@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Pencil } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { useEditMode } from '../../context/EditModeContext';
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -17,6 +20,7 @@ interface PortfolioSectionProps {
 
 const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) => {
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
+  const { isEditMode } = useEditMode();
 
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
@@ -46,7 +50,17 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
   if (!parsedPortfolio || parsedPortfolio.length === 0) {
     return (
       <div>
-        <h2 className="text-2xl font-bold mb-6">Portfolio</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Portfolio</h2>
+          {isEditMode && (
+            <Button 
+              variant="ghost" 
+              className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+            >
+              <Pencil className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
         <p className="text-gray-600">No portfolio items available.</p>
       </div>
     );
@@ -54,7 +68,17 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Portfolio</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Portfolio</h2>
+        {isEditMode && (
+          <Button 
+            variant="ghost" 
+            className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {parsedPortfolio.slice(0, 3).map((item: PortfolioItem, index: number) => {

@@ -56,13 +56,13 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4">
-            <Button variant="link" className="text-gray-800 hover:text-blue-700 underline underline-offset-4 decoration-blue-700">
+            <Button variant="link" className="text-[#70a4d8] hover:text-[#597999] underline underline-offset-4 decoration-[#70a4d8]">
               Write a Review
             </Button>
-            <Button variant="link" className="text-gray-800 hover:text-blue-700">
+            <Button variant="link" className="text-[#70a4d8] hover:text-[#597999]">
               Pricing
             </Button>
-            <Button variant="link" className="text-gray-800 hover:text-blue-700">
+            <Button variant="link" className="text-[#70a4d8] hover:text-[#597999]">
               Contact Us
             </Button>
             <NotificationSheet />
@@ -87,7 +87,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                 )}
                 <ChevronDown className="h-4 w-4" />
               </Button>
-              {isAccountOpen && <AccountDropdown />}
+                {isAccountOpen && <AccountDropdown closeDropdown={() => setIsAccountOpen(false)} />}
             </div>
           </nav>
 
