@@ -43,8 +43,12 @@ const PersonalInfo: React.FC = () => {
   // Load saved data from localStorage on component mount
   useEffect(() => {
     const savedData = localStorage.getItem('personalInfo');
-    if (savedData) {
+    const isFromPreviousStep = sessionStorage.getItem('fromPreviousStep');
+    
+    if (savedData && isFromPreviousStep) {
       setForm(JSON.parse(savedData));
+      // Clear the flag after loading
+      sessionStorage.removeItem('fromPreviousStep');
     }
   }, []);
 
@@ -290,7 +294,10 @@ const PersonalInfo: React.FC = () => {
             type="button"
             variant="outline"
             className="w-full sm:w-auto hover:bg-[#5A8DB8] text-black"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              sessionStorage.setItem('fromPreviousStep', 'true');
+              navigate(-1);
+            }}
             disabled={loading}
           >
             Back

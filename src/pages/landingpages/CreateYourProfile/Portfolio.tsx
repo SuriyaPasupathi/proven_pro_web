@@ -7,17 +7,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
+import { X } from "lucide-react";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 6;
+
+interface ProjectImage {
+  file: File;
+  previewUrl: string;
+}
 
 const Portfolio: React.FC = () => {
   const [form, setForm] = useState({
     project_title: "",
     project_description: "",
     project_url: "",
-    project_image: null as File | null,
-    project_image_url: "",
+    project_images: [] as ProjectImage[],
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -32,30 +37,45 @@ const Portfolio: React.FC = () => {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
       
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
-        return;
+      // Validate each file
+      for (const file of newFiles) {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`${file.name} is too large. Max size is 5MB`);
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          toast.error(`${file.name} is not a valid image file`);
+          return;
+        }
       }
 
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please upload a valid image file');
-        return;
-      }
+      // Create preview URLs for new files
+      const newImages = newFiles.map(file => ({
+        file,
+        previewUrl: URL.createObjectURL(file)
+      }));
 
-      // Create a preview URL
-      const previewUrl = URL.createObjectURL(file);
-      
-      setForm({
-        ...form,
-        project_image: file,
-        project_image_url: previewUrl
-      });
+      setForm(prev => ({
+        ...prev,
+        project_images: [...prev.project_images, ...newImages]
+      }));
     }
+  };
+
+  const removeImage = (index: number) => {
+    setForm(prev => {
+      const newImages = [...prev.project_images];
+      // Revoke the object URL to prevent memory leaks
+      URL.revokeObjectURL(newImages[index].previewUrl);
+      newImages.splice(index, 1);
+      return { ...prev, project_images: newImages };
+    });
   };
 
   const handleUploadClick = () => {
@@ -66,8 +86,8 @@ const Portfolio: React.FC = () => {
     e.preventDefault();
     
     try {
-      if (!form.project_image) {
-        toast.error('Please upload a project image');
+      if (form.project_images.length === 0) {
+        toast.error('Please upload at least one project image');
         return;
       }
 
@@ -79,22 +99,22 @@ const Portfolio: React.FC = () => {
         project_title: form.project_title,
         project_description: form.project_description,
         project_url: form.project_url,
-        project_image: form.project_image,
-        project_image_url: form.project_image_url
       };
       
       // Append the portfolio item as a JSON string
       formData.append('portfolio', JSON.stringify([portfolioItem]));
       
-      // Append the image file separately
-      formData.append('project_image', form.project_image);
+      // Append all image files
+      form.project_images.forEach((image, index) => {
+        formData.append(`project_image_${index}`, image.file);
+      });
 
       // Debug logging
       console.log('Uploading portfolio:', portfolioItem);
       console.log('FormData contents:', {
         subscription_type: formData.get('subscription_type'),
         portfolio: formData.get('portfolio'),
-        project_image: formData.get('project_image')
+        images: form.project_images.map(img => img.file.name)
       });
 
       const result = await dispatch(createUserProfile(formData)).unwrap();
@@ -103,10 +123,10 @@ const Portfolio: React.FC = () => {
       console.log('Upload result:', result);
       
       if (result) {
-        // Clean up the preview URL
-        if (form.project_image_url) {
-          URL.revokeObjectURL(form.project_image_url);
-        }
+        // Clean up all preview URLs
+        form.project_images.forEach(image => {
+          URL.revokeObjectURL(image.previewUrl);
+        });
         toast.success("Portfolio saved successfully!");
         navigate("/create-profile/licenses");
       }
@@ -197,25 +217,50 @@ const Portfolio: React.FC = () => {
         </div>
 
         {/* Image Upload */}
-        <div className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-6 md:px-8 text-center">
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            className="hidden"
-            onChange={handleImageChange}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            className="mb-2"
-            onClick={handleUploadClick}
-          >
-            Upload Project Image
-          </Button>
-          <p className="text-gray-500 text-sm">
-            Upload a project image (max 5MB)
-          </p>
+        <div className="space-y-4">
+          <div className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-6 md:px-8 text-center">
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleImageChange}
+              multiple
+            />
+            <Button
+              type="button"
+              variant="outline"
+              className="mb-2"
+              onClick={handleUploadClick}
+            >
+              Upload Project Images
+            </Button>
+            <p className="text-gray-500 text-sm">
+              Upload project images (max 5MB each)
+            </p>
+          </div>
+
+          {/* Image Previews */}
+          {form.project_images.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {form.project_images.map((image, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={image.previewUrl}
+                    alt={`Project preview ${index + 1}`}
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Error Message */}
