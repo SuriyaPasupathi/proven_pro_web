@@ -41,6 +41,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
   const { profileData } = useAppSelector((state) => state.createProfile);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<PortfolioItem | null>(null);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [form, setForm] = useState<PortfolioItem>({
     project_title: "",
     project_description: "",
@@ -48,6 +49,13 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
     project_image: "",
     project_image_url: "",
   });
+
+  // Initialize portfolio items when component mounts or portfolio prop changes
+  useEffect(() => {
+    const parsedPortfolio = Array.isArray(portfolio) ? portfolio : 
+      typeof portfolio === 'string' ? JSON.parse(portfolio) : [];
+    setPortfolioItems(parsedPortfolio);
+  }, [portfolio]);
 
   // Initialize form with current values when dialog opens
   useEffect(() => {
@@ -66,7 +74,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
 
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
-    if (!url) return '';
+    if (!url) return PLACEHOLDER_IMAGE;
     if (url.startsWith('http')) return url;
     return `${baseUrl}${url}`;
   };
@@ -95,12 +103,12 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
       
       if (editingItem) {
         // Update existing portfolio item
-        updatedPortfolio = portfolio.map(item => 
+        updatedPortfolio = portfolioItems.map(item => 
           item === editingItem ? form : item
         );
       } else {
         // Add new portfolio item
-        updatedPortfolio = [...portfolio, form];
+        updatedPortfolio = [...portfolioItems, form];
       }
 
       // Create FormData object
@@ -132,6 +140,9 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
           portfolio: updatedPortfolio
         }));
 
+        // Update local state
+        setPortfolioItems(updatedPortfolio);
+
         toast.success(editingItem ? "Portfolio item updated successfully!" : "Portfolio item added successfully!");
         setIsDialogOpen(false);
         setEditingItem(null);
@@ -161,21 +172,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
     });
   };
 
-  // Debug logging
-  useEffect(() => {
-    console.log('Portfolio Section - Raw Portfolio Data:', portfolio);
-    console.log('Portfolio Section - Portfolio Length:', portfolio.length);
-    if (portfolio.length > 0) {
-      console.log('Portfolio Section - First Portfolio Item:', portfolio[0]);
-      console.log('Portfolio Section - First Item Image URL:', getFullImageUrl(portfolio[0].project_image_url || portfolio[0].project_image));
-    }
-  }, [portfolio]);
-
-  // Parse portfolio data if it's a string
-  const parsedPortfolio = Array.isArray(portfolio) ? portfolio : 
-    typeof portfolio === 'string' ? JSON.parse(portfolio) : [];
-
-  if (!parsedPortfolio || parsedPortfolio.length === 0) {
+  if (!portfolioItems || portfolioItems.length === 0) {
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
@@ -289,7 +286,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {parsedPortfolio.slice(0, 3).map((item: PortfolioItem, index: number) => {
+        {portfolioItems.map((item: PortfolioItem, index: number) => {
           const imageUrl = getFullImageUrl(item.project_image_url || item.project_image);
           
           return (
@@ -337,8 +334,8 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
           <div className="bg-white rounded-lg overflow-hidden max-w-3xl w-full max-h-[80vh]" onClick={(e) => e.stopPropagation()}>
             <div className="relative">
               <img 
-                src={getFullImageUrl(parsedPortfolio[selectedItem].project_image_url || parsedPortfolio[selectedItem].project_image)} 
-                alt={parsedPortfolio[selectedItem].project_title}
+                src={getFullImageUrl(portfolioItems[selectedItem].project_image_url || portfolioItems[selectedItem].project_image)} 
+                alt={portfolioItems[selectedItem].project_title}
                 className="w-full h-auto max-h-[60vh] object-contain"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -346,11 +343,11 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
                 }}
               />
               <div className="p-4">
-                <h3 className="text-xl font-semibold mb-2">{parsedPortfolio[selectedItem].project_title}</h3>
-                <p className="text-gray-600 mb-4">{parsedPortfolio[selectedItem].project_description}</p>
-                {parsedPortfolio[selectedItem].project_url && (
+                <h3 className="text-xl font-semibold mb-2">{portfolioItems[selectedItem].project_title}</h3>
+                <p className="text-gray-600 mb-4">{portfolioItems[selectedItem].project_description}</p>
+                {portfolioItems[selectedItem].project_url && (
                   <a 
-                    href={parsedPortfolio[selectedItem].project_url}
+                    href={portfolioItems[selectedItem].project_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-800"

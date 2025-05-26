@@ -28,7 +28,7 @@ import AccountSettings from './pages/ProfilePages/Accounts/AccountSettings';
 import Verification from './pages/ProfilePages/Accounts/Verification';
 import MembershipPlans from './pages/ProfilePages/Accounts/MembershipPlans';
 import { EditModeProvider } from './context/EditModeContext';
-
+import Contact from './pages/landingpages/LandingPreview/Contact';
 function ThemeProvider({ children }: { children: React.ReactNode }) {
 const { theme } = useTheme();
   
@@ -52,6 +52,7 @@ function App() {
 
               {/* Plan Pages */}
               <Route path="/plans" element={<Plans />} />
+              <Route path="/contact" element={<Contact />} />
 
               
 

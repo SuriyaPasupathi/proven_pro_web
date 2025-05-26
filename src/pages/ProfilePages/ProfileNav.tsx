@@ -7,6 +7,7 @@ import logo from '../../assets/logo.png';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import NotificationSheet from "@/components/layout/notificationsheet";
+import { useNavigate } from 'react-router-dom';
 
 interface NavbarProps {
   isMenuOpen: boolean;
@@ -17,6 +18,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { profileData } = useSelector((state: RootState) => state.createProfile);
+  const navigate = useNavigate();
 
   // Get user initials
   const getUserInitials = () => {
@@ -56,13 +58,21 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4">
-            <Button variant="link" className="text-[#70a4d8] hover:text-[#597999] underline underline-offset-4 decoration-[#70a4d8]">
+            <Button variant="link" className="text-[#70a4d8] hover:text-[#597999]">
               Write a Review
             </Button>
-            <Button variant="link" className="text-[#70a4d8] hover:text-[#597999]">
+            <Button 
+              variant="link" 
+              className="text-[#70a4d8] hover:text-[#597999]"
+              onClick={() => navigate('/plans')}
+            >
               Pricing
             </Button>
-            <Button variant="link" className="text-[#70a4d8] hover:text-[#597999]">
+            <Button 
+              variant="link" 
+              className="text-[#70a4d8] hover:text-[#597999]"
+              onClick={() => navigate('/contact')}
+            >
               Contact Us
             </Button>
             <NotificationSheet />
@@ -122,10 +132,18 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
               <Button variant="ghost" className="text-left text-gray-800 hover:text-blue-700">
                 Write a Review
               </Button>
-              <Button variant="ghost" className="text-left text-gray-800 hover:text-blue-700">
+              <Button 
+                variant="ghost" 
+                className="text-left text-gray-800 hover:text-blue-700"
+                onClick={() => navigate('/plans')}
+              >
                 Pricing
               </Button>
-              <Button variant="ghost" className="text-left text-gray-800 hover:text-blue-700">
+              <Button 
+                variant="ghost" 
+                className="text-left text-gray-800 hover:text-blue-700"
+                onClick={() => navigate('/contact')}
+              >
                 Contact Us
               </Button>
               <Button variant="ghost" className="text-left text-gray-800 hover:text-blue-700">
