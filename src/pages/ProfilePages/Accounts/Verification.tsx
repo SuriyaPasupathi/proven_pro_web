@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store/store';
-import { getProfile } from '../../../store/Services/CreateProfileService';
+import { getProfile, uploadVerificationDocument } from '../../../store/Services/CreateProfileService';
 import ProfileNav from '../ProfileNav';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -36,6 +36,10 @@ const Verification = () => {
   const [countdown, setCountdown] = useState(0);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewType, setPreviewType] = useState<'gov_id' | 'address' | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
   useEffect(() => {
     dispatch(getProfile());
   }, [dispatch]);
@@ -58,6 +62,12 @@ const Verification = () => {
       }
 
       setSelectedFile(file);
+      // Create preview URL for image files
+      if (file.type.startsWith('image/')) {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+        setPreviewType('gov_id');
+      }
       toast.success('File selected successfully');
     }
   };
@@ -80,6 +90,12 @@ const Verification = () => {
       }
 
       setSelectedAddressFile(file);
+      // Create preview URL for image files
+      if (file.type.startsWith('image/')) {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+        setPreviewType('address');
+      }
       toast.success('Address document selected successfully');
     }
   };
@@ -92,25 +108,12 @@ const Verification = () => {
 
     setIsUploading(true);
     try {
-      // Create a FormData object
-      const formData = new FormData();
-      formData.append('government_id', selectedFile);
+      const result = await dispatch(uploadVerificationDocument({
+        document: selectedFile,
+        document_type: 'gov_id'
+      })).unwrap();
 
-      // Here you would typically make an API call to upload the file
-      // For now, we'll just simulate a successful upload
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-
-      // Store file info in localStorage
-      const fileInfo = {
-        name: selectedFile.name,
-        type: selectedFile.type,
-        size: selectedFile.size,
-        lastModified: selectedFile.lastModified,
-        uploadDate: new Date().toISOString()
-      };
-      localStorage.setItem('government_id_verification', JSON.stringify(fileInfo));
-
-      toast.success('File uploaded successfully');
+      toast.success(result.message);
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -130,25 +133,12 @@ const Verification = () => {
 
     setIsAddressUploading(true);
     try {
-      // Create a FormData object
-      const formData = new FormData();
-      formData.append('address_document', selectedAddressFile);
+      const result = await dispatch(uploadVerificationDocument({
+        document: selectedAddressFile,
+        document_type: 'address'
+      })).unwrap();
 
-      // Here you would typically make an API call to upload the file
-      // For now, we'll just simulate a successful upload
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-
-      // Store file info in localStorage
-      const fileInfo = {
-        name: selectedAddressFile.name,
-        type: selectedAddressFile.type,
-        size: selectedAddressFile.size,
-        lastModified: selectedAddressFile.lastModified,
-        uploadDate: new Date().toISOString()
-      };
-      localStorage.setItem('address_verification', JSON.stringify(fileInfo));
-
-      toast.success('Address document uploaded successfully');
+      toast.success(result.message);
       setSelectedAddressFile(null);
       if (addressFileInputRef.current) {
         addressFileInputRef.current.value = '';
@@ -165,7 +155,11 @@ const Verification = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    localStorage.removeItem('government_id_verification');
+    if (previewUrl && previewType === 'gov_id') {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+      setPreviewType(null);
+    }
     toast.success('Government ID document removed');
   };
 
@@ -174,7 +168,11 @@ const Verification = () => {
     if (addressFileInputRef.current) {
       addressFileInputRef.current.value = '';
     }
-    localStorage.removeItem('address_verification');
+    if (previewUrl && previewType === 'address') {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+      setPreviewType(null);
+    }
     toast.success('Address document removed');
   };
 
@@ -287,6 +285,15 @@ const Verification = () => {
     }
   };
 
+  // Cleanup preview URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -344,14 +351,29 @@ const Verification = () => {
                           {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50 text-xs sm:text-sm"
-                        onClick={handleRemoveFile}
-                      >
-                        Remove
-                      </Button>
+                      <div className="flex gap-2">
+                        {selectedFile.type.startsWith('image/') && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 text-xs sm:text-sm"
+                            onClick={() => {
+                              setPreviewType('gov_id');
+                              setIsPreviewOpen(true);
+                            }}
+                          >
+                            Preview
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 text-xs sm:text-sm"
+                          onClick={handleRemoveFile}
+                        >
+                          Remove
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -408,14 +430,29 @@ const Verification = () => {
                           {(selectedAddressFile.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50 text-xs sm:text-sm"
-                        onClick={handleRemoveAddressFile}
-                      >
-                        Remove
-                      </Button>
+                      <div className="flex gap-2">
+                        {selectedAddressFile.type.startsWith('image/') && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 text-xs sm:text-sm"
+                            onClick={() => {
+                              setPreviewType('address');
+                              setIsPreviewOpen(true);
+                            }}
+                          >
+                            Preview
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 text-xs sm:text-sm"
+                          onClick={handleRemoveAddressFile}
+                        >
+                          Remove
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -521,6 +558,37 @@ const Verification = () => {
               className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white text-sm sm:text-base"
             >
               Verify
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Document Preview Dialog */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="sm:max-w-[600px] p-4 sm:p-6">
+          <DialogHeader>
+            <DialogTitle className="text-lg sm:text-xl">
+              {previewType === 'gov_id' ? 'Government ID Preview' : 'Address Document Preview'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            {previewUrl && (
+              <div className="relative w-full h-[400px] flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
+                <img
+                  src={previewUrl}
+                  alt="Document preview"
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsPreviewOpen(false)}
+              className="text-sm sm:text-base"
+            >
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

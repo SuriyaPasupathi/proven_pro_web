@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument } from '../Services/CreateProfileService';
 
 interface ProfileError {
   message: string;
@@ -69,6 +69,9 @@ interface ProfileData {
 
   // Reviews
   reviews?: any[];
+
+  // Verification
+  verification_status?: string;
 }
 
 interface CreateProfileState {
@@ -185,6 +188,24 @@ const createProfileSlice = createSlice({
         state.error = null;
       })
       .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(uploadVerificationDocument.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(uploadVerificationDocument.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        if (state.profileData) {
+          state.profileData = {
+            ...state.profileData,
+            verification_status: action.payload.verification_status
+          };
+        }
+      })
+      .addCase(uploadVerificationDocument.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as ProfileError;
       });

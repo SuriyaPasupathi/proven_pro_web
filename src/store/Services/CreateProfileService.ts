@@ -283,3 +283,28 @@ export const updateProfile = createAsyncThunk(
     }
   }
 );
+
+export const uploadVerificationDocument = createAsyncThunk(
+  'profile/uploadVerificationDocument',
+  async (payload: { document: File; document_type: 'gov_id' | 'address' }, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const formData = new FormData();
+      formData.append('document', payload.document);
+      formData.append('document_type', payload.document_type);
+
+      const response = await axios.post(`${baseUrl}upload-verification-document/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Document upload error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
