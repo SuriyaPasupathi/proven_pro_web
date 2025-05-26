@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search,ChevronDown, Menu } from 'lucide-react';
+import { Search,ChevronDown, Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AccountDropdown from './AccountDropdown';
 import logo from '../../assets/logo.png';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState, useAppDispatch } from '../../store/store';
 import NotificationSheet from "@/components/layout/notificationsheet";
 import { useNavigate } from 'react-router-dom';
+import { logout } from '../../store/Services/CreateProfileService';
+import { toast } from 'sonner';
 
 interface NavbarProps {
   isMenuOpen: boolean;
@@ -16,9 +18,49 @@ interface NavbarProps {
 
 const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { profileData } = useSelector((state: RootState) => state.createProfile);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const handleLogout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('user_email');
+      
+      if (refreshToken) {
+        try {
+          await dispatch(logout());
+        } catch (apiError) {
+          console.error('API logout failed:', apiError);
+        }
+      }
+      
+      toast.success('Logged out successfully', {
+        description: 'You have been logged out of your account.',
+        duration: 3000,
+      });
+      
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('user_email');
+      
+      toast.error('Logout failed', {
+        description: 'There was an error logging out. Please try again.',
+        duration: 4000,
+      });
+      
+      navigate('/login');
+    }
+  };
 
   // Get user initials
   const getUserInitials = () => {
@@ -43,7 +85,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center w-full md:w-auto gap-4">
             {/* Logo Section */}
-            <div className="flex items-center gap-2 shrink-0 cursor-pointer">
+            <div className="flex items-center gap-2 shrink-0 cursor-pointer" onClick={() => navigate('/')}>
               <img src={logo} alt="ProvenPro Logo" className="w-8 h-8" />
               <span className="text-lg font-semibold text-blue-900">
                 Proven<span className="font-light">Pro</span>
@@ -101,8 +143,17 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             </div>
           </nav>
 
-          {/* Mobile Menu Toggle */}
-          <div className="md:hidden">
+          {/* Mobile Actions */}
+          <div className="md:hidden flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-600"
+              onClick={() => setIsSearchVisible(!isSearchVisible)}
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -110,45 +161,117 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
             >
-              <Menu className="w-6 h-6" />
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
           </div>
         </div>
+
+        {/* Mobile Search - Slides down when active */}
+        {isSearchVisible && (
+          <div className="md:hidden px-4 py-3 border-t">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="pl-9 bg-gray-100 border-gray-200 w-full"
+                autoFocus
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t shadow-sm">
           <div className="max-w-screen-xl mx-auto px-4 py-4 space-y-4">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                type="search"
-                placeholder="Search"
-                className="pl-8 bg-gray-100 border-gray-200 w-full"
-              />
-            </div>
             <nav className="flex flex-col space-y-2">
-              <Button variant="ghost" className="text-left text-gray-800 hover:text-blue-700">
+              <Button variant="ghost" className="text-left text-gray-800 hover:text-blue-700 justify-start">
                 Write a Review
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-left text-gray-800 hover:text-blue-700"
-                onClick={() => navigate('/plans')}
+                className="text-left text-gray-800 hover:text-blue-700 justify-start"
+                onClick={() => {
+                  navigate('/plans');
+                  setIsMenuOpen(false);
+                }}
               >
                 Pricing
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-left text-gray-800 hover:text-blue-700"
-                onClick={() => navigate('/contact')}
+                className="text-left text-gray-800 hover:text-blue-700 justify-start"
+                onClick={() => {
+                  navigate('/contact');
+                  setIsMenuOpen(false);
+                }}
               >
                 Contact Us
               </Button>
-              <Button variant="ghost" className="text-left text-gray-800 hover:text-blue-700">
-                Account
-              </Button>
+              
+              {/* Mobile Account Section */}
+              <div className="pt-2 border-t">
+                <div className="px-4 py-2">
+                  <div className="font-medium">
+                    {profileData?.first_name && profileData?.last_name 
+                      ? `${profileData.first_name} ${profileData.last_name}`
+                      : 'User'}
+                  </div>
+                  <div className="text-sm text-gray-500">{localStorage.getItem('user_email') || ''}</div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  onClick={() => {
+                    navigate('/profile');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  My Profile
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  onClick={() => {
+                    navigate('/profile/verification');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Verification
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  onClick={() => {
+                    navigate('/profile/membership-plans');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Membership Plan
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  onClick={() => {
+                    navigate('/profile/account-settings');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Account Settings
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-red-600 hover:text-red-700"
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Log out
+                </Button>
+              </div>
             </nav>
           </div>
         </div>

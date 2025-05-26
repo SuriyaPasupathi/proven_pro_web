@@ -70,17 +70,17 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
   const userEmail = localStorage.getItem('user_email') || '';
 
   return (
-    <div className="absolute right-0 mt-2 w-64 bg-white border rounded-md shadow-lg z-50 overflow-hidden">
+    <div className="absolute right-0 mt-2 w-64 bg-white border rounded-md shadow-lg z-50 overflow-hidden transform origin-top-right transition-all duration-200 ease-in-out">
       <div className="p-4 border-b">
-        <div className="font-medium">
+        <div className="font-medium truncate">
           {userData?.first_name && userData?.last_name 
             ? `${userData.first_name} ${userData.last_name}`
             : 'User'}
         </div>
-        <div className="text-sm text-gray-500">{userEmail}</div>
+        <div className="text-sm text-gray-500 truncate">{userEmail}</div>
       </div>
       
-      <div className="py-2">
+      <div className="py-2 max-h-[calc(100vh-200px)] overflow-y-auto">
         <Button variant="ghost" className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
           onClick={() => {
             setIsEditMode(false);
@@ -88,8 +88,8 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
             closeDropdown();
           }}
         >
-          <User className="mr-2 h-4 w-4" />
-          <span>My Profile</span>
+          <User className="mr-2 h-4 w-4 shrink-0" />
+          <span className="truncate">My Profile</span>
         </Button>
         <Button variant="ghost" className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
           onClick={() => {
@@ -97,8 +97,8 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
             closeDropdown();
           }}
         >
-          <Edit className="mr-2 h-4 w-4" />
-          <span>Edit Profile</span>
+          <Edit className="mr-2 h-4 w-4 shrink-0" />
+          <span className="truncate">Edit Profile</span>
         </Button>
         <Button 
           variant="ghost" 
@@ -108,8 +108,8 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
             closeDropdown();
           }}
         >
-          <ShieldCheck className="mr-2 h-4 w-4" />
-          <span>Verification</span>
+          <ShieldCheck className="mr-2 h-4 w-4 shrink-0" />
+          <span className="truncate">Verification</span>
         </Button>
         <Button 
           variant="ghost" 
@@ -119,8 +119,8 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
             closeDropdown();
           }}
         >
-          <Users className="mr-2 h-4 w-4" />
-          <span>Membership Plan</span>
+          <Users className="mr-2 h-4 w-4 shrink-0" />
+          <span className="truncate">Membership Plan</span>
         </Button>
         <Button
           variant="ghost"
@@ -130,22 +130,22 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
             closeDropdown();
           }}
         >
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Account Settings</span>
+          <Settings className="mr-2 h-4 w-4 shrink-0" />
+          <span className="truncate">Account Settings</span>
         </Button>
       </div>
       
       <div className="border-t py-2">
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
+          className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50 text-red-600 hover:text-red-700"
           onClick={() => {
             handleLogout();
             closeDropdown();
           }}
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <LogOut className="mr-2 h-4 w-4 shrink-0" />
+          <span className="truncate">Log out</span>
         </Button>
       </div>
     </div>
