@@ -111,12 +111,12 @@ function App() {
         <div className="w-11/12 mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mt-6 md:mt-8">
             {/* Sidebar - takes 3 columns on large screens, full width on mobile */}
-            <div className="lg:col-span-3 order-2 lg:order-1">
+            <div className="lg:col-span-3 order-1">
               <ProfileSidebar profileData={profile} />
             </div>
             
             {/* Main content - takes 9 columns on large screens */}
-            <div className="lg:col-span-9 order-1 lg:order-2">
+            <div className="lg:col-span-9 order-2">
               <ProfileHeader profileData={profile} />
               
               <div className="space-y-8 md:space-y-12 mt-6 md:mt-8">

@@ -10,6 +10,7 @@ import NotificationSheet from "@/components/layout/notificationsheet";
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
+import { useEditMode } from '../../context/EditModeContext';
 
 interface NavbarProps {
   isMenuOpen: boolean;
@@ -23,6 +24,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
   const { profileData } = useSelector((state: RootState) => state.createProfile);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { setIsEditMode } = useEditMode();
 
   const handleLogout = async () => {
     try {
@@ -223,11 +225,25 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                   variant="ghost" 
                   className="w-full justify-start text-gray-800 hover:text-blue-700"
                   onClick={() => {
-                    navigate('/profile');
                     setIsMenuOpen(false);
+                    setIsEditMode(false);
+                    navigate('/profile');
                   }}
                 >
                   My Profile
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setIsEditMode(true);
+                    setTimeout(() => {
+                      navigate('/profile');
+                    }, 0);
+                  }}
+                >
+                  Edit Profile
                 </Button>
                 <Button 
                   variant="ghost" 
