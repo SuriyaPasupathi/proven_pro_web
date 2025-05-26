@@ -156,91 +156,103 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl md:text-4xl font-bold">
-                {profileData.first_name} {profileData.last_name}
-              </h1>
-              {isEditMode && (
-                <Button 
-                  variant="ghost" 
-                  className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-                  onClick={() => setIsEditDialogOpen(true)}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
-            <p className="text-muted-foreground text-lg">{profileData.bio}</p>
-            <p className="text-muted-foreground">{profileData.profile_mail}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-              Profile Verified 100%
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="flex flex-col">
-          <h2 className="text-xl font-semibold mb-4">Public profile & URL</h2>
-          <div className="flex items-center gap-2 max-w-md">
-            <input
-              type="text"
-              value={profileData.profile_url || "https://www.mytrustworld.com/profile-d-ae111378"}
-              readOnly
-              className="flex-1 p-2 border rounded-md text-sm bg-gray-50"
-            />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={copyToClipboard}
-                    className={`flex-shrink-0 transition-colors ${isCopied ? 'bg-green-50 text-green-600 border-green-200' : ''}`}
+            <div className="flex flex-col gap-4">
+              {/* Top Section: Name and Edit Button */}
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl md:text-4xl font-bold">
+                  {profileData.first_name} {profileData.last_name}
+                </h1>
+                {isEditMode && (
+                  <Button
+                    variant="ghost"
+                    className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+                    onClick={() => setIsEditDialogOpen(true)}
                   >
-                    <Copy className={`h-4 w-4 ${isCopied ? 'text-green-600' : ''}`} />
+                    <Pencil className="w-4 h-4" />
                   </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{isCopied ? 'Copied!' : 'Copy to clipboard'}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
+                )}
+              </div>
 
-        <div className="flex flex-col md:items-end">
-          <div className="flex items-baseline gap-2 md:mb-3">
-            <h2 className="text-4xl font-bold">{profileData.rating?.toFixed(1) || "5.0"}</h2>
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-              ))}
+              {/* Below Section: Verification */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+               
+
+                <div className="flex items-center">
+                  <div className="text-green-700  rounded-full text-base font-medium w-[360px] h-[89px] flex items-center sm:w-[360px] md:w-[360px] lg:w-[360px]">
+                    Profile Verified 100%
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <p className="text-muted-foreground mb-3">Exceptional</p>
-          
-          <div className="w-full md:max-w-[240px] space-y-1.5">
-            {[
-              { label: "5-star", value: 70 },
-              { label: "4-star", value: 20 },
-              { label: "3-star", value: 5 },
-              { label: "2-star", value: 3 },
-              { label: "1-star", value: 2 },
-            ].map((rating, index) => (
-              <div key={index} className="flex items-center gap-2 ">
-                <span className="text-sm min-w-[46px]">{rating.label}</span>
-                <Progress value={rating.value} className="h-2 flex-1 bg-[#bad3eb]" />
-              </div>
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground mt-2">{profileData.reviews?.length || 0} reviews</p>
         </div>
       </div>
 
-      <div className="border-t pt-6">
+      <div className="border-t-2 border-b-2 border-gray-200 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col">
+            <h2 className="text-xl font-semibold mb-4">Public profile & URL</h2>
+            <div className="flex items-center gap-2 max-w-md">
+              <input
+                type="text"
+                value={profileData.profile_url || "https://www.mytrustworld.com/profile-d-ae111378"}
+                readOnly
+                className="flex-1 p-2 border rounded-md text-sm bg-gray-50"
+              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      onClick={copyToClipboard}
+                      className={`flex-shrink-0 transition-colors ${isCopied ? 'bg-green-50 text-green-600 border-green-200' : ''}`}
+                    >
+                      <Copy className={`h-4 w-4 ${isCopied ? 'text-green-600' : ''}`} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isCopied ? 'Copied!' : 'Copy to clipboard'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </div>
+
+          <div className="w-full flex justify-center">
+            <div className="flex flex-row items-center bg-white shadow-md rounded-xl p-6 w-full max-w-2xl">
+              {/* Left: Rating, label, stars, reviews */}
+              <div className="flex flex-col items-start flex-1 min-w-[160px]">
+                <span className="text-5xl font-extrabold leading-tight">{profileData.rating?.toFixed(1) || "5.0"}</span>
+                <span className="text-lg font-semibold mt-1 mb-1">Exceptional</span>
+                <div className="flex items-center mb-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <span className="text-base text-muted-foreground">{profileData.reviews?.length || 0} reviews</span>
+              </div>
+              {/* Right: Rating bars */}
+              <div className="flex flex-col flex-1 md:max-w-[240px] space-y-1.5 ml-8">
+                {[
+                  { label: "5-star", value: 70 },
+                  { label: "4-star", value: 20 },
+                  { label: "3-star", value: 5 },
+                  { label: "2-star", value: 3 },
+                  { label: "1-star", value: 2 },
+                ].map((rating, index) => (
+                  <div key={index} className="flex items-center gap-2 ">
+                    <span className="text-sm min-w-[46px]">{rating.label}</span>
+                    <Progress value={rating.value} className="h-2 flex-1 bg-[#bad3eb]" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
         <Button className="bg-[#70a4d8] hover:bg-[#3C5979] text-white">
           Write a Review
         </Button>

@@ -284,7 +284,6 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               </Button>
             )}
           </div>
-          <p className="text-sm text-muted-foreground">{profileData.bio}</p>
           <p className="text-sm text-muted-foreground">{profileData.profile_mail}</p>
         </div>
 

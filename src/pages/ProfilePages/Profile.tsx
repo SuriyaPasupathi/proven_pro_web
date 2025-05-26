@@ -108,7 +108,7 @@ function App() {
       <div className="min-h-screen bg-background">
         <ProfileNav isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
         
-        <div className="container mx-auto px-4 py-8">
+        <div className="w-11/12 mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mt-6 md:mt-8">
             {/* Sidebar - takes 3 columns on large screens, full width on mobile */}
             <div className="lg:col-span-3 order-2 lg:order-1">
