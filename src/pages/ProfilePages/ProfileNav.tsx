@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { logout } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
 import { useEditMode } from '../../context/EditModeContext';
+import ReviewDialog from '@/pages/ProfilePages/ReviewDialog';
+import { createReview } from '../../store/Services/ReviewService';
 
 interface NavbarProps {
   isMenuOpen: boolean;
@@ -20,6 +22,7 @@ interface NavbarProps {
 const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { profileData } = useSelector((state: RootState) => state.createProfile);
   const navigate = useNavigate();
@@ -79,6 +82,22 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleReviewSubmit = async (review: { rating: number; content: string; name: string; company: string }) => {
+    try {
+      await createReview(review);
+      toast.success('Review submitted successfully!', {
+        description: 'Thank you for your feedback.',
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast.error('Failed to submit review', {
+        description: 'Please try again later.',
+        duration: 4000,
+      });
+    }
+  };
+
   return (
     <header className="border-b bg-white sticky top-0 z-50 w-full">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -100,7 +119,11 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4">
-            <Button variant="link" className="text-[#70a4d8] hover:text-[#597999]">
+            <Button 
+              variant="link" 
+              className="text-[#70a4d8] hover:text-[#597999]"
+              onClick={() => setIsReviewDialogOpen(true)}
+            >
               Write a Review
             </Button>
             <Button 
@@ -187,7 +210,14 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
         <div className="md:hidden bg-white border-t shadow-sm">
           <div className="max-w-screen-xl mx-auto px-4 py-4 space-y-4">
             <nav className="flex flex-col space-y-2">
-              <Button variant="ghost" className="text-left text-gray-800 hover:text-blue-700 justify-start">
+              <Button 
+                variant="ghost" 
+                className="text-left text-gray-800 hover:text-blue-700 justify-start"
+                onClick={() => {
+                  setIsReviewDialogOpen(true);
+                  setIsMenuOpen(false);
+                }}
+              >
                 Write a Review
               </Button>
               <Button 
@@ -290,6 +320,12 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
           </div>
         </div>
       )}
+
+      <ReviewDialog
+        isOpen={isReviewDialogOpen}
+        onClose={() => setIsReviewDialogOpen(false)}
+        onSubmit={handleReviewSubmit}
+      />
     </header>
   );
 };

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,12 +14,21 @@ interface Review {
 
 interface ReviewCarouselProps {
   reviews?: Review[];
+  onNewReview?: (review: Omit<Review, 'id'>) => void;
 }
 
-const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews = [] }) => {
+const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews = [], onNewReview }) => {
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [activeIndex, setActiveIndex] = useState(0);
   const visibleReviews = 3; // Number of reviews visible at once on desktop
   const totalReviews = reviews.length;
+
+  // Only update reviews when initialReviews changes and they are different
+  useEffect(() => {
+    if (JSON.stringify(initialReviews) !== JSON.stringify(reviews)) {
+      setReviews(initialReviews);
+    }
+  }, [initialReviews]);
 
   const goToPrevious = () => {
     setActiveIndex((prevIndex) => (prevIndex === 0 ? totalReviews - 1 : prevIndex - 1));
