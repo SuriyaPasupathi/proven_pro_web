@@ -1,10 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus } from '../Services/CreateProfileService';
 
 interface ProfileError {
   message: string;
   status?: number;
   code?: string;
+}
+
+interface VerificationDetails {
+  government_id: {
+    uploaded: boolean;
+    verified: boolean;
+    percentage: number;
+  };
+  address_proof: {
+    uploaded: boolean;
+    verified: boolean;
+    percentage: number;
+  };
+  mobile: {
+    provided: boolean;
+    verified: boolean;
+    percentage: number;
+  };
 }
 
 interface ProfileData {
@@ -72,6 +90,12 @@ interface ProfileData {
 
   // Verification
   verification_status?: string;
+  gov_id_verified?: boolean;
+  address_verified?: boolean;
+  mobile_verified?: boolean;
+  has_gov_id_document?: boolean;
+  has_address_document?: boolean;
+  verification_details?: VerificationDetails;
 }
 
 interface CreateProfileState {
@@ -206,6 +230,55 @@ const createProfileSlice = createSlice({
         }
       })
       .addCase(uploadVerificationDocument.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(requestMobileVerification.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(requestMobileVerification.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(requestMobileVerification.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(verifyMobileOTP.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyMobileOTP.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        if (state.profileData) {
+          state.profileData = {
+            ...state.profileData,
+            verification_status: action.payload.verification_status,
+            mobile_verified: true
+          };
+        }
+      })
+      .addCase(verifyMobileOTP.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(getVerificationStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getVerificationStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        if (state.profileData) {
+          state.profileData = {
+            ...state.profileData,
+            ...action.payload
+          };
+        }
+      })
+      .addCase(getVerificationStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as ProfileError;
       });

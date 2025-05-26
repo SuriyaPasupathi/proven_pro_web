@@ -308,3 +308,71 @@ export const uploadVerificationDocument = createAsyncThunk(
     }
   }
 );
+
+export const requestMobileVerification = createAsyncThunk(
+  'profile/requestMobileVerification',
+  async (mobile: string, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${baseUrl}request-mobile-verification/`,
+        { mobile },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Mobile verification request error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
+
+export const verifyMobileOTP = createAsyncThunk(
+  'profile/verifyMobileOTP',
+  async (otp: string, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${baseUrl}verify-mobile-otp/`,
+        { otp },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Mobile OTP verification error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
+
+export const getVerificationStatus = createAsyncThunk(
+  'profile/getVerificationStatus',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.get(
+        `${baseUrl}verification-status/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Verification status fetch error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);

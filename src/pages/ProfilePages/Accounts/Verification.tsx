@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store/store';
-import { getProfile, uploadVerificationDocument } from '../../../store/Services/CreateProfileService';
+import { getProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus } from '../../../store/Services/CreateProfileService';
 import ProfileNav from '../ProfileNav';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -42,6 +42,7 @@ const Verification = () => {
 
   useEffect(() => {
     dispatch(getProfile());
+    dispatch(getVerificationStatus());
   }, [dispatch]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,17 +192,14 @@ const Verification = () => {
     }
 
     try {
-      // Here you would typically make an API call to send OTP
-      // For now, we'll just simulate a successful OTP send
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const result = await dispatch(requestMobileVerification(phoneNumber)).unwrap();
       setIsOtpSent(true);
       setIsOtpDialogOpen(true);
       setCountdown(60);
       startCountdown();
-      toast.success('OTP sent successfully');
+      toast.success(result.message);
     } catch (error) {
-      toast.error('Failed to send OTP');
+      toast.error('Failed to send verification code');
     }
   };
 
@@ -246,22 +244,15 @@ const Verification = () => {
     }
 
     try {
-      // Here you would typically verify the OTP with your API
-      // For now, we'll just simulate a successful verification
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success('Phone number verified successfully');
+      const result = await dispatch(verifyMobileOTP(otpValue)).unwrap();
+      toast.success(result.message);
       setIsOtpDialogOpen(false);
       setOtp(['', '', '', '', '', '']);
       setIsOtpSent(false);
       setCountdown(0);
       
-      // Store verification status in localStorage
-      localStorage.setItem('phone_verification', JSON.stringify({
-        phoneNumber,
-        verified: true,
-        verifiedAt: new Date().toISOString()
-      }));
+      // Refresh verification status
+      dispatch(getVerificationStatus());
     } catch (error) {
       toast.error('Invalid OTP');
     }
@@ -274,12 +265,10 @@ const Verification = () => {
     }
 
     try {
-      // Here you would typically make an API call to resend OTP
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const result = await dispatch(requestMobileVerification(phoneNumber)).unwrap();
       setCountdown(60);
       startCountdown();
-      toast.success('OTP resent successfully');
+      toast.success(result.message);
     } catch (error) {
       toast.error('Failed to resend OTP');
     }
