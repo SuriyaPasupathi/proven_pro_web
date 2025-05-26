@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
@@ -42,6 +42,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<PortfolioItem | null>(null);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const isInitialMount = useRef(true);
   const [form, setForm] = useState<PortfolioItem>({
     project_title: "",
     project_description: "",
@@ -50,25 +51,41 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ portfolio = [] }) =
     project_image_url: "",
   });
 
-  // Initialize portfolio items when component mounts or portfolio prop changes
-  useEffect(() => {
-    const parsedPortfolio = Array.isArray(portfolio) ? portfolio : 
-      typeof portfolio === 'string' ? JSON.parse(portfolio) : [];
-    setPortfolioItems(parsedPortfolio);
-  }, [portfolio]);
+  // Parse portfolio data
+  const parsePortfolio = (data: PortfolioItem[] | string | undefined): PortfolioItem[] => {
+    if (Array.isArray(data)) return data;
+    if (typeof data === 'string') {
+      try {
+        return JSON.parse(data);
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
 
-  // Initialize form with current values when dialog opens
+  // Initialize portfolio items only once on mount
   useEffect(() => {
-    if (isDialogOpen && editingItem) {
-      setForm(editingItem);
-    } else if (isDialogOpen) {
-      setForm({
-        project_title: "",
-        project_description: "",
-        project_url: "",
-        project_image: "",
-        project_image_url: "",
-      });
+    if (isInitialMount.current) {
+      setPortfolioItems(parsePortfolio(portfolio));
+      isInitialMount.current = false;
+    }
+  }, []);
+
+  // Update form when dialog opens/closes
+  useEffect(() => {
+    if (isDialogOpen) {
+      if (editingItem) {
+        setForm(editingItem);
+      } else {
+        setForm({
+          project_title: "",
+          project_description: "",
+          project_url: "",
+          project_image: "",
+          project_image_url: "",
+        });
+      }
     }
   }, [isDialogOpen, editingItem]);
 

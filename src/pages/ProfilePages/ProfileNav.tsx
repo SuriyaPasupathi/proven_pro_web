@@ -26,28 +26,26 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
 
   const handleLogout = async () => {
     try {
-      const refreshToken = localStorage.getItem('refresh_token');
+      // First, attempt to call the logout API
+      await dispatch(logout());
+      
+      // Clear all local storage items
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
       localStorage.removeItem('user_email');
-      
-      if (refreshToken) {
-        try {
-          await dispatch(logout());
-        } catch (apiError) {
-          console.error('API logout failed:', apiError);
-        }
-      }
       
       toast.success('Logged out successfully', {
         description: 'You have been logged out of your account.',
         duration: 3000,
       });
       
+      // Navigate to login page
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
+      
+      // Even if the API call fails, clear local storage and redirect
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');

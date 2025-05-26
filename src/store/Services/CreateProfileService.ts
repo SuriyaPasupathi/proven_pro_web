@@ -39,10 +39,7 @@ const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
 // Get auth token from localStorage
 const getAuthToken = () => {
   const token = localStorage.getItem('access_token');
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-  return token;
+  return token; // Return null if no token exists instead of throwing error
 };
 
 // Custom error handler
@@ -193,16 +190,26 @@ export const logout = createAsyncThunk(
       const token = getAuthToken();
       const refreshToken = localStorage.getItem('refresh_token');
       
-      const response = await axios.post(`${baseUrl}logout/`, 
-        { refresh: refreshToken },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+      // If we have a refresh token, attempt to call the logout API
+      if (refreshToken) {
+        try {
+          const response = await axios.post(`${baseUrl}logout/`, 
+            { refresh: refreshToken },
+            {
+              headers: {
+                'Authorization': token ? `Bearer ${token}` : undefined
+              }
+            }
+          );
+          return response.data;
+        } catch (apiError) {
+          console.warn('Logout API call failed:', apiError);
+          // Continue with local logout even if API call fails
         }
-      );
+      }
 
-      return response.data;
+      // Always return success to ensure local logout completes
+      return { success: true };
     } catch (error) {
       console.error('Logout error:', error);
       const profileError = handleProfileError(error);

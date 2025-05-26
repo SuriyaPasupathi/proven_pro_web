@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import authReducer from './Slice/authSlice';
-import themeReducer from './themeSlice';
+import themeReducer from './Slice/themeSlice';
 import registerReducer from './Slice/RegisterSlice';
 import loginReducer from './Slice/LoginSlice';
 import createProfileReducer from './Slice/CreateProfileSlice';

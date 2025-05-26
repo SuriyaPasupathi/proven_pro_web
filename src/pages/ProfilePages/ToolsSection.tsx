@@ -1,6 +1,6 @@
 import { ChevronDown, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
@@ -26,38 +26,59 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tools, setTools] = useState<string[]>([]);
   const [newTool, setNewTool] = useState('');
+  const isInitialMount = useRef(true);
 
-  // Ensure primary_tools is an array and update local state
+  // Convert tools input to array
+  const getToolsArray = (input: string[] | string): string[] => {
+    if (Array.isArray(input)) return input;
+    if (typeof input === 'string') {
+      return input.split(',').map(tool => tool.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
+  // Initialize tools only once on mount
   useEffect(() => {
-    const toolsArray = Array.isArray(primary_tools) 
-      ? primary_tools 
-      : typeof primary_tools === 'string'
-        ? primary_tools.split(',').map(tool => tool.trim()).filter(Boolean)
-        : [];
-    setTools(toolsArray);
-  }, [primary_tools]);
+    if (isInitialMount.current) {
+      setTools(getToolsArray(primary_tools));
+      isInitialMount.current = false;
+    }
+  }, []);
+
+  // Update tools when dialog closes
+  useEffect(() => {
+    if (!isDialogOpen && !isInitialMount.current) {
+      setTools(getToolsArray(primary_tools));
+    }
+  }, [isDialogOpen]);
 
   const handleAddTool = () => {
     if (newTool.trim()) {
-      setTools([...tools, newTool.trim()]);
+      setTools(prevTools => [...prevTools, newTool.trim()]);
       setNewTool('');
     }
   };
 
   const handleRemoveTool = (index: number) => {
-    setTools(tools.filter((_, i) => i !== index));
+    setTools(prevTools => prevTools.filter((_, i) => i !== index));
+  };
+
+  const handleToolChange = (index: number, value: string) => {
+    setTools(prevTools => {
+      const newTools = [...prevTools];
+      newTools[index] = value;
+      return newTools;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      // Create FormData object
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       formData.append('primary_tools', JSON.stringify(tools));
 
-      // Add other profile data
       if (profileData) {
         Object.entries(profileData).forEach(([key, value]) => {
           if (key !== 'primary_tools' && key !== 'subscription_type' && value !== undefined) {
@@ -75,7 +96,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       const result = await dispatch(updateProfile(formData)).unwrap();
       
       if (result) {
-        // Update Redux store
         dispatch(updateProfileData({
           ...profileData,
           primary_tools: tools
@@ -91,13 +111,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   };
 
   const handleCancel = () => {
-    // Reset to original tools
-    const toolsArray = Array.isArray(primary_tools) 
-      ? primary_tools 
-      : typeof primary_tools === 'string'
-        ? primary_tools.split(',').map(tool => tool.trim()).filter(Boolean)
-        : [];
-    setTools(toolsArray);
+    setTools(getToolsArray(primary_tools));
     setIsDialogOpen(false);
   };
 
@@ -148,11 +162,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                 <div key={index} className="flex items-center gap-2">
                   <Input
                     value={tool}
-                    onChange={(e) => {
-                      const newTools = [...tools];
-                      newTools[index] = e.target.value;
-                      setTools(newTools);
-                    }}
+                    onChange={(e) => handleToolChange(index, e.target.value)}
                     className="bg-gray-50"
                   />
                   <Button
