@@ -14,10 +14,9 @@ interface Review {
 
 interface ReviewCarouselProps {
   reviews?: Review[];
-  onNewReview?: (review: Omit<Review, 'id'>) => void;
 }
 
-const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews = [], onNewReview }) => {
+const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews = [] }) => {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [activeIndex, setActiveIndex] = useState(0);
   const visibleReviews = 3; // Number of reviews visible at once on desktop

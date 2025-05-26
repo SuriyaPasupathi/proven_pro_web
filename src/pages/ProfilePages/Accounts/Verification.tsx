@@ -32,7 +32,6 @@ const Verification = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isOtpDialogOpen, setIsOtpDialogOpen] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [isOtpSent, setIsOtpSent] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -193,7 +192,6 @@ const Verification = () => {
 
     try {
       const result = await dispatch(requestMobileVerification(phoneNumber)).unwrap();
-      setIsOtpSent(true);
       setIsOtpDialogOpen(true);
       setCountdown(60);
       startCountdown();
@@ -248,7 +246,6 @@ const Verification = () => {
       toast.success(result.message);
       setIsOtpDialogOpen(false);
       setOtp(['', '', '', '', '', '']);
-      setIsOtpSent(false);
       setCountdown(0);
       
       // Refresh verification status
