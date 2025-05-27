@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { getProfile } from '../../store/Services/CreateProfileService';
+import { useParams } from 'react-router-dom';
 import ProfileNav from './ProfileNav'
 import ProfileHeader from './ProfileHeader';
 import ProfileSidebar from './ProfileSidebar';
@@ -87,11 +88,14 @@ export interface ProfileData {
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  const { profileId } = useParams();
   const { profileData, loading, error } = useSelector((state: RootState) => state.createProfile);
 
   useEffect(() => {
-    dispatch(getProfile());
-  }, [dispatch]);
+    // If profileId is provided, fetch that specific profile
+    // Otherwise, fetch the current user's profile
+    dispatch(getProfile(profileId));
+  }, [dispatch, profileId]);
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;

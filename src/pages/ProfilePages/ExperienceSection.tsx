@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil } from 'lucide-react';
+import { ChevronDown, Pencil, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -35,6 +35,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
   const [localExperiences, setLocalExperiences] = useState<Experience[]>(experiences);
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState<Experience>({
     company_name: "",
     position: "",
@@ -62,6 +63,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
       let updatedExperiences: Experience[];
@@ -122,6 +124,8 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     } catch (err) {
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to update experience");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -251,14 +255,23 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
+                disabled={isLoading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                disabled={isLoading}
               >
-                {editingExperience ? 'Save Changes' : 'Add Experience'}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {editingExperience ? 'Saving Changes...' : 'Adding Experience...'}
+                  </>
+                ) : (
+                  editingExperience ? 'Save Changes' : 'Add Experience'
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -282,6 +295,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                   variant="ghost"
                   className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
                   onClick={() => handleEdit(exp)}
+                  disabled={isLoading}
                 >
                   <Pencil className="w-4 h-4" />
                 </Button>

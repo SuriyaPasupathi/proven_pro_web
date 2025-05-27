@@ -1,11 +1,12 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-import { createUserProfile } from "../../../store/Services/CreateProfileService";
+import { createUserProfile, updateProfile } from "../../../store/Services/CreateProfileService";
+import { updateProfileData } from "../../../store/Slice/CreateProfileSlice";
 import toast from "react-hot-toast";
 import { Trash2, Edit2 } from "lucide-react";
 
@@ -31,10 +32,11 @@ const WorkExp: React.FC = () => {
     key_responsibilities: "",
   });
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.createProfile);
+  const { loading, error, profileData } = useSelector((state: RootState) => state.createProfile);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -42,15 +44,64 @@ const WorkExp: React.FC = () => {
     setCurrentExperience({ ...currentExperience, [e.target.name]: e.target.value });
   };
 
-  const addOrUpdateExperience = () => {
-    if (editingId) {
-      setExperiences(experiences.map(exp => 
-        exp.id === editingId ? { ...currentExperience, id: editingId } : exp
-      ));
-      setEditingId(null);
-    } else {
-      setExperiences([...experiences, { ...currentExperience, id: Date.now().toString() }]);
+  const updateExperiencesInNetwork = async (updatedExperiences: WorkExperience[]) => {
+    try {
+      setIsUpdating(true);
+      const formData = new FormData();
+      formData.append('subscription_type', profileData?.subscription_type || 'premium');
+      formData.append('work_experiences', JSON.stringify(updatedExperiences));
+
+      // Add other profile data
+      if (profileData) {
+        Object.entries(profileData).forEach(([key, value]) => {
+          if (key !== 'work_experiences' && key !== 'subscription_type' && value !== undefined) {
+            if (Array.isArray(value)) {
+              formData.append(key, JSON.stringify(value));
+            } else if (value instanceof File) {
+              formData.append(key, value);
+            } else if (typeof value === 'string') {
+              formData.append(key, value);
+            }
+          }
+        });
+      }
+
+      const result = await dispatch(updateProfile(formData)).unwrap();
+      
+      if (result) {
+        dispatch(updateProfileData({
+          ...profileData,
+          work_experiences: updatedExperiences
+        }));
+        toast.success("Work experiences updated successfully!");
+      }
+    } catch (err) {
+      const error = err as { message: string; code?: string };
+      toast.error(error.message || "Failed to update work experiences");
+      // Revert to previous state on error
+      setExperiences(experiences);
+    } finally {
+      setIsUpdating(false);
     }
+  };
+
+  const addOrUpdateExperience = async () => {
+    let updatedExperiences: WorkExperience[];
+    
+    if (editingId) {
+      updatedExperiences = experiences.map(exp => 
+        exp.id === editingId ? { ...currentExperience, id: editingId } : exp
+      );
+    } else {
+      updatedExperiences = [...experiences, { ...currentExperience, id: Date.now().toString() }];
+    }
+
+    // Optimistically update UI
+    setExperiences(updatedExperiences);
+    
+    // Update in network
+    await updateExperiencesInNetwork(updatedExperiences);
+
     setCurrentExperience({
       company_name: "",
       position: "",
@@ -58,6 +109,7 @@ const WorkExp: React.FC = () => {
       experience_end_date: "",
       key_responsibilities: "",
     });
+    setEditingId(null);
   };
 
   const editExperience = (experience: WorkExperience) => {
@@ -65,8 +117,14 @@ const WorkExp: React.FC = () => {
     setEditingId(experience.id || null);
   };
 
-  const deleteExperience = (id: string) => {
-    setExperiences(experiences.filter(exp => exp.id !== id));
+  const deleteExperience = async (id: string) => {
+    const updatedExperiences = experiences.filter(exp => exp.id !== id);
+    
+    // Optimistically update UI
+    setExperiences(updatedExperiences);
+    
+    // Update in network
+    await updateExperiencesInNetwork(updatedExperiences);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -204,8 +262,9 @@ const WorkExp: React.FC = () => {
           <Button
             type="submit"
             className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+            disabled={isUpdating}
           >
-            {editingId ? "Update Experience" : "Add Experience"}
+            {isUpdating ? "Updating..." : editingId ? "Update Experience" : "Add Experience"}
           </Button>
         </form>
 
@@ -223,6 +282,7 @@ const WorkExp: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => editExperience(exp)}
+                        disabled={isUpdating}
                       >
                         <Edit2 className="h-4 w-4" />
                       </Button>
@@ -230,6 +290,7 @@ const WorkExp: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteExperience(exp.id!)}
+                        disabled={isUpdating}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -259,7 +320,7 @@ const WorkExp: React.FC = () => {
             variant="outline"
             className="w-full sm:w-auto hover:bg-[#5A8DB8] text-black"
             onClick={() => navigate(-1)}
-            disabled={loading}
+            disabled={loading || isUpdating}
           >
             Back
           </Button>
@@ -267,7 +328,7 @@ const WorkExp: React.FC = () => {
             type="button"
             className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || isUpdating}
           >
             {loading ? "Saving..." : "Save and Continue"}
           </Button>

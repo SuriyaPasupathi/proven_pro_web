@@ -161,14 +161,18 @@ export const createUserProfile = createAsyncThunk(
 
 export const getProfile = createAsyncThunk(
   'profile/getProfile',
-  async (_, { rejectWithValue }) => {
+  async (profileId: string | undefined, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
+      // Use the same endpoint for both current user and specific profile
+      // The backend will handle the profileId parameter in the query
+      const url = `${baseUrl}profile/`;
       
-      const response = await axios.get(`${baseUrl}profile/`, {
+      const response = await axios.get(url, {
         headers: {
           'Authorization': `Bearer ${token}`
-        }
+        },
+        params: profileId ? { profile_id: profileId } : undefined
       });
 
       // Debug logging

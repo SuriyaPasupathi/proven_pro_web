@@ -79,6 +79,7 @@ function App() {
 
               {/* Profile Pages */}
               <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/:profileId" element={<Profile />} />
 
               <Route path="/profile/account-settings" element={<AccountSettings />} />
               <Route path="/profile/verification" element={<Verification />} />
