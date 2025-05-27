@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile } from '../Services/CreateProfileService';
 
 interface ProfileError {
   message: string;
@@ -279,6 +279,18 @@ const createProfileSlice = createSlice({
         }
       })
       .addCase(getVerificationStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(shareProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(shareProfile.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(shareProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as ProfileError;
       });

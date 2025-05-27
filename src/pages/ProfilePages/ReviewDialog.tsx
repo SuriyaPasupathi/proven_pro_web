@@ -46,14 +46,7 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
               placeholder="Enter your name"
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Company</label>
-            <Input
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              placeholder="Enter your company name"
-            />
-          </div>
+          
           <div className="space-y-2">
             <label className="text-sm font-medium">Rating</label>
             <div className="flex gap-1">
@@ -79,7 +72,7 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Your Review</label>
+            <label className="text-sm font-medium">Your Comments</label>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}

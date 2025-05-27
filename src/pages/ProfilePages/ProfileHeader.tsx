@@ -1,11 +1,11 @@
-import { Copy, Star, Pencil } from 'lucide-react';
+import { Copy, Star, Pencil, Share2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ProfileData } from './Profile';
 import { useEditMode } from '../../context/EditModeContext';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { updateProfile } from '../../store/Services/CreateProfileService';
+import { updateProfile, shareProfile } from '../../store/Services/CreateProfileService';
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,13 @@ interface EditProfileDialogProps {
   onClose: () => void;
   profileData: ProfileData;
   onSave: (data: Partial<ProfileData>) => void;
+}
+
+interface ShareProfileDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  profileUrl: string;
+  profileName: string;
 }
 
 const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
@@ -110,10 +117,92 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   );
 };
 
+const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
+  isOpen,
+  onClose,
+  profileUrl,
+  profileName,
+}) => {
+  const [email, setEmail] = useState('');
+  const { toast } = useToast();
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleShare = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      const result = await dispatch(shareProfile(email) as any);
+      
+      if (shareProfile.fulfilled.match(result)) {
+        toast({
+          title: "Profile shared successfully",
+          description: "The recipient will receive an email with the profile link",
+        });
+        setEmail('');
+        onClose();
+      } else {
+        throw new Error(result.payload?.message || 'Failed to share profile');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error sharing profile",
+        description: error.message || "Please try again later",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Share Profile</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleShare} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email Address</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter email address"
+              required
+              disabled={isLoading}
+            />
+          </div>
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              className="bg-[#70a4d8] hover:bg-[#3C5979] text-white"
+              disabled={isLoading}
+            >
+              {isLoading ? "Sharing..." : "Share"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
   const { isEditMode } = useEditMode();
   const dispatch = useDispatch();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const { toast } = useToast();
   const [isCopied, setIsCopied] = useState(false);
 
@@ -216,6 +305,23 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      onClick={() => setIsShareDialogOpen(true)}
+                      className="flex-shrink-0"
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Share profile</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
 
@@ -263,6 +369,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
         onClose={() => setIsEditDialogOpen(false)}
         profileData={profileData}
         onSave={handleSaveProfile}
+      />
+
+      <ShareProfileDialog
+        isOpen={isShareDialogOpen}
+        onClose={() => setIsShareDialogOpen(false)}
+        profileUrl={profileData.profile_url || "https://www.mytrustworld.com/profile-d-ae111378"}
+        profileName={`${profileData.first_name} ${profileData.last_name}`}
       />
     </div>
   );

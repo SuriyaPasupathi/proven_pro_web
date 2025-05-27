@@ -383,3 +383,29 @@ export const getVerificationStatus = createAsyncThunk(
     }
   }
 );
+
+export const shareProfile = createAsyncThunk(
+  'profile/shareProfile',
+  async (email: string, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${baseUrl}request-profile-share/`,
+        { 
+          action: 'generate',
+          email 
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Profile share error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
