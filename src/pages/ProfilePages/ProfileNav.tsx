@@ -12,7 +12,7 @@ import { logout } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
 import { useEditMode } from '../../context/EditModeContext';
 import ReviewDialog from '@/pages/ProfilePages/ReviewDialog';
-import { createReview } from '../../store/Services/ReviewService';
+
 
 interface NavbarProps {
   isMenuOpen: boolean;
@@ -84,7 +84,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
 
   const handleReviewSubmit = async (review: { rating: number; content: string; name: string; company: string }) => {
     try {
-      await createReview(review);
+    
       toast.success('Review submitted successfully!', {
         description: 'Thank you for your feedback.',
         duration: 3000,
