@@ -23,6 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import ReviewDialog from './ReviewDialog';
 
 interface ProfileHeaderProps {
   profileData: ProfileData;
@@ -203,6 +204,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
   const dispatch = useDispatch();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const { toast } = useToast();
   const [isCopied, setIsCopied] = useState(false);
 
@@ -238,6 +240,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
     } catch (error) {
       console.error('Error updating profile:', error);
     }
+  };
+
+  const handleReviewSubmit = (review: { rating: number; content: string; name: string; company: string }) => {
+    // TODO: Implement review submission logic
+    console.log('Review submitted:', review);
+    toast({
+      title: "Review submitted",
+      description: "Thank you for your review!",
+    });
   };
 
   return (
@@ -359,7 +370,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
       </div>
 
       <div>
-        <Button className="bg-[#70a4d8] hover:bg-[#3C5979] text-white">
+        <Button 
+          className="bg-[#70a4d8] hover:bg-[#3C5979] text-white"
+          onClick={() => setIsReviewDialogOpen(true)}
+        >
           Write a Review
         </Button>
       </div>
@@ -376,6 +390,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
         onClose={() => setIsShareDialogOpen(false)}
         profileUrl={profileData.profile_url || "https://www.mytrustworld.com/profile-d-ae111378"}
         profileName={`${profileData.first_name} ${profileData.last_name}`}
+      />
+
+      <ReviewDialog
+        isOpen={isReviewDialogOpen}
+        onClose={() => setIsReviewDialogOpen(false)}
+        onSubmit={handleReviewSubmit}
       />
     </div>
   );
