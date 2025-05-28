@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input } from "../../../components/ui/input";
+// import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -7,16 +7,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
+import Select, { MultiValue } from "react-select";
+import { serviceCategoryOptions, rateRangeOptions, availabilityOptions } from "../../../components/common";
+
+interface Option {
+  value: string;
+  label: string;
+}
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 3;
 
 const ServicesOffer: React.FC = () => {
   const [form, setForm] = useState({
-    services_categories: "",
+    services_categories: [] as Option[],
     services_description: "",
-    rate_range: "",
-    availability: "",
+    rate_range: null as Option | null,
+    availability: null as Option | null,
   });
 
   const navigate = useNavigate();
@@ -29,38 +36,33 @@ const ServicesOffer: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleMultiSelectChange = (field: string) => (selectedOptions: MultiValue<Option>) => {
+    setForm({ ...form, [field]: selectedOptions as Option[] });
+  };
+
+  const handleSingleSelectChange = (field: string) => (selectedOption: Option | null) => {
+    setForm({ ...form, [field]: selectedOption });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      // Convert services_categories string to array
-      const servicesCategories = form.services_categories
-        .split(',')
-        .map(category => category.trim())
-        .filter(category => category.length > 0);
-
       const profileData = {
         subscription_type: "premium" as const,
-        services_categories: servicesCategories,
+        services_categories: form.services_categories.map(category => category.value),
         services_description: form.services_description,
-        rate_range: form.rate_range,
-        availability: form.availability,
+        rate_range: form.rate_range?.value || "",
+        availability: form.availability?.value || "",
       };
 
-      // Debug logging
-      console.log('Submitting services data:', profileData);
-
       const result = await dispatch(createUserProfile(profileData)).unwrap();
-      
-      // Debug logging
-      console.log('Services submission result:', result);
       
       if (result) {
         toast.success("Services information saved successfully!");
         navigate("/create-profile/work-exp");
       }
     } catch (err) {
-      console.error('Services submission error:', err);
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to save services information");
     }
@@ -99,12 +101,14 @@ const ServicesOffer: React.FC = () => {
           <label htmlFor="services_categories" className="block text-sm font-medium text-gray-700 mb-1">
             Main Service Category
           </label>
-          <Input
+          <Select
             id="services_categories"
             name="services_categories"
-            placeholder="e.g., Web Development, Design, Marketing"
+            options={serviceCategoryOptions}
+            isMulti
+            placeholder="Select your service categories..."
             value={form.services_categories}
-            onChange={handleChange}
+            onChange={handleMultiSelectChange('services_categories')}
             className="bg-gray-50"
             required
           />
@@ -130,12 +134,13 @@ const ServicesOffer: React.FC = () => {
             <label htmlFor="rate_range" className="block text-sm font-medium text-gray-700 mb-1">
               Rate Range
             </label>
-            <Input
+            <Select
               id="rate_range"
               name="rate_range"
-              placeholder="e.g., $50-100/hour"
+              options={rateRangeOptions}
+              placeholder="Select your rate range..."
               value={form.rate_range}
-              onChange={handleChange}
+              onChange={handleSingleSelectChange('rate_range')}
               className="bg-gray-50"
               required
             />
@@ -145,12 +150,13 @@ const ServicesOffer: React.FC = () => {
             <label htmlFor="availability" className="block text-sm font-medium text-gray-700 mb-1">
               Availability
             </label>
-            <Input
+            <Select
               id="availability"
               name="availability"
-              placeholder="e.g., Full-time, Part-time, Weekends only"
+              options={availabilityOptions}
+              placeholder="Select your availability..."
               value={form.availability}
-              onChange={handleChange}
+              onChange={handleSingleSelectChange('availability')}
               className="bg-gray-50"
               required
             />

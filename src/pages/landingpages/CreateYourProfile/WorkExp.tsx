@@ -9,6 +9,8 @@ import { createUserProfile, updateProfile } from "../../../store/Services/Create
 import { updateProfileData } from "../../../store/Slice/CreateProfileSlice";
 import toast from "react-hot-toast";
 import { Trash2, Edit2 } from "lucide-react";
+import Select from "react-select";
+import { positionOptions } from "../../../components/common";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 4;
@@ -20,6 +22,11 @@ interface WorkExperience {
   experience_start_date: string;
   experience_end_date: string;
   key_responsibilities: string;
+}
+
+interface Option {
+  value: string;
+  label: string;
 }
 
 const WorkExp: React.FC = () => {
@@ -42,6 +49,13 @@ const WorkExp: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setCurrentExperience({ ...currentExperience, [e.target.name]: e.target.value });
+  };
+
+  const handlePositionChange = (selectedOption: Option | null) => {
+    setCurrentExperience({
+      ...currentExperience,
+      position: selectedOption ? selectedOption.value : "",
+    });
   };
 
   const updateExperiencesInNetwork = async (updatedExperiences: WorkExperience[]) => {
@@ -202,12 +216,13 @@ const WorkExp: React.FC = () => {
             <label htmlFor="position" className="block font-medium mb-1 text-sm">
               Position
             </label>
-            <Input
+            <Select
               id="position"
               name="position"
-              placeholder="Enter your job title"
-              value={currentExperience.position}
-              onChange={handleChange}
+              options={positionOptions}
+              placeholder="Select your position"
+              value={positionOptions.find(option => option.value === currentExperience.position)}
+              onChange={handlePositionChange}
               className="bg-gray-50"
               required
             />

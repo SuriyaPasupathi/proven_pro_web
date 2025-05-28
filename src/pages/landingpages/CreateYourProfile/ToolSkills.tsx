@@ -1,22 +1,28 @@
 import React, { useState } from "react";
-import { Input } from "../../../components/ui/input";
+// import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
+import Select, { MultiValue } from "react-select";
+import { toolOptions, techSkillOptions, softSkillOptions } from "../../../components/common";
+
+interface Option {
+  value: string;
+  label: string;
+}
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 5;
 
 const ToolSkills: React.FC = () => {
   const [form, setForm] = useState({
-    primary_tools: "",
-    technical_skills: "",
-    soft_skills: "",
+    primary_tools: [] as Option[],
+    technical_skills: [] as Option[],
+    soft_skills: [] as Option[],
     skills_description: "",
   });
 
@@ -30,15 +36,19 @@ const ToolSkills: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleMultiSelectChange = (field: string) => (selectedOptions: MultiValue<Option>) => {
+    setForm({ ...form, [field]: selectedOptions as Option[] });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       const profileData = {
         subscription_type: "premium" as const,
-        primary_tools: form.primary_tools,
-        technical_skills: form.technical_skills,
-        soft_skills: form.soft_skills,
+        primary_tools: form.primary_tools.map(tool => tool.value).join(", "),
+        technical_skills: form.technical_skills.map(skill => skill.value).join(", "),
+        soft_skills: form.soft_skills.map(skill => skill.value).join(", "),
         skills_description: form.skills_description,
       };
 
@@ -85,13 +95,15 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="primary_tools" className="block font-medium mb-1 text-sm">
             Primary Tools
           </label>
-          <Input
+          <Select
             id="primary_tools"
             name="primary_tools"
-            placeholder="e.g., Adobe Suite, Figma, VS Code"
+            options={toolOptions}
+            isMulti
+            placeholder="Select your primary tools..."
             value={form.primary_tools}
-            onChange={handleChange}
-            className="bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-0 focus:border-[#5A8DB8]"
+            onChange={handleMultiSelectChange('primary_tools')}
+            className="bg-gray-50"
             required
           />
         </div>
@@ -100,13 +112,15 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="technical_skills" className="block font-medium mb-1 text-sm">
             Technical Skills
           </label>
-          <Input
+          <Select
             id="technical_skills"
             name="technical_skills"
-            placeholder="e.g., React, Node.js, Python"
+            options={techSkillOptions}
+            isMulti
+            placeholder="Select your technical skills..."
             value={form.technical_skills}
-            onChange={handleChange}
-            className="bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-0 focus:border-[#5A8DB8]"
+            onChange={handleMultiSelectChange('technical_skills')}
+            className="bg-gray-50"
             required
           />
         </div>
@@ -115,13 +129,15 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="soft_skills" className="block font-medium mb-1 text-sm">
             Soft Skills
           </label>
-          <Input
+          <Select
             id="soft_skills"
             name="soft_skills"
-            placeholder="e.g., Project Management, Team Leadership"
+            options={softSkillOptions}
+            isMulti
+            placeholder="Select your soft skills..."
             value={form.soft_skills}
-            onChange={handleChange}
-            className="bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-0 focus:border-[#5A8DB8]"
+            onChange={handleMultiSelectChange('soft_skills')}
+            className="bg-gray-50"
             required
           />
         </div>
