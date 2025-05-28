@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-import { createUserProfile } from "../../../store/Services/CreateProfileService";
+import { createUserProfile, updateProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
 import Select, { MultiValue } from "react-select";
 import { serviceCategoryOptions, rateRangeOptions, availabilityOptions } from "../../../components/common";
@@ -28,7 +28,29 @@ const ServicesOffer: React.FC = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.createProfile);
+  const { loading, error, profileData } = useSelector((state: RootState) => state.createProfile);
+
+  // Initialize form with existing data if available
+  useEffect(() => {
+    if (profileData?.categories && profileData.categories.length > 0) {
+      const category = profileData.categories[0];
+      setForm({
+        services_categories: category.services_categories
+          ? category.services_categories.split(',').map(cat => ({
+              value: cat.trim(),
+              label: cat.trim()
+            }))
+          : [],
+        services_description: category.services_description || "",
+        rate_range: category.rate_range
+          ? rateRangeOptions.find(opt => opt.value === category.rate_range) || null
+          : null,
+        availability: category.availability
+          ? availabilityOptions.find(opt => opt.value === category.availability) || null
+          : null,
+      });
+    }
+  }, [profileData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -50,17 +72,23 @@ const ServicesOffer: React.FC = () => {
     try {
       const profileData = {
         subscription_type: "premium" as const,
-        services_categories: form.services_categories.map(category => category.value),
-        services_description: form.services_description,
-        rate_range: form.rate_range?.value || "",
-        availability: form.availability?.value || "",
+        categories: [{
+          services_categories: form.services_categories.map(cat => cat.value).join(', '),
+          services_description: form.services_description,
+          rate_range: form.rate_range?.value || "",
+          availability: form.availability?.value || "",
+        }],
       };
 
-      const result = await dispatch(createUserProfile(profileData)).unwrap();
+      // If we have existing profile data, use updateProfile instead of createUserProfile
+      const action = profileData ? updateProfile : createUserProfile;
+      const result = await dispatch(action(profileData)).unwrap();
       
       if (result) {
         toast.success("Services information saved successfully!");
-        navigate("/create-profile/work-exp");
+        if (!profileData) {
+          navigate("/create-profile/work-exp");
+        }
       }
     } catch (err) {
       const error = err as { message: string; code?: string };

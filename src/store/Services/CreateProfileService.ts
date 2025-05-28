@@ -311,8 +311,10 @@ export const updateProfile = createAsyncThunk(
             return;
           }
 
-          // Handle array fields
-          if (Array.isArray(value)) {
+          // Handle array fields and categories specifically
+          if (key === 'categories') {
+            formData.append(key, JSON.stringify(value));
+          } else if (Array.isArray(value)) {
             if (value.length > 0) {
               formData.append(key, JSON.stringify(value));
             }

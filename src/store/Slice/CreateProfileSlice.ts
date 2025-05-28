@@ -247,7 +247,8 @@ const createProfileSlice = createSlice({
         state.loading = false;
         state.profileData = {
           ...state.profileData,
-          ...action.payload
+          ...action.payload,
+          categories: action.payload.categories || state.profileData?.categories
         };
         state.error = null;
       })

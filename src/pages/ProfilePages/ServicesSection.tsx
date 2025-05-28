@@ -2,8 +2,8 @@ import { ChevronDown, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,6 +48,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     rate_range: '',
     availability: '',
   });
+  const { loading } = useSelector((state: RootState) => state.createProfile);
 
   // Initialize form with current values when dialog opens
   useEffect(() => {
@@ -207,14 +208,16 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                   type="button"
                   variant="outline"
                   onClick={() => setIsDialogOpen(false)}
+                  disabled={loading}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                  disabled={loading}
                 >
-                  Save Changes
+                  {loading ? "Saving..." : "Save Changes"}
                 </Button>
               </DialogFooter>
             </form>
@@ -352,14 +355,16 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                 type="button"
                 variant="outline"
                 onClick={() => setIsDialogOpen(false)}
+                disabled={loading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                disabled={loading}
               >
-                Save Changes
+                {loading ? "Saving..." : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>
