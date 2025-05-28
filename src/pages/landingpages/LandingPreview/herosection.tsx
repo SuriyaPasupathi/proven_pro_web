@@ -24,7 +24,7 @@ export default function Hero() {
           <div className="mt-6 sm:mt-8">
             <Button
               className="bg-[#5A8DB8] hover:bg-[#3C5979] px-6 py-3 text-sm sm:text-base"
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/create-profile/services-offer")}
             >
               Create Your Profile
             </Button>

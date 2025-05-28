@@ -9,22 +9,30 @@ import { createUserProfile, updateProfile } from "../../../store/Services/Create
 import toast from "react-hot-toast";
 import Select, { MultiValue } from "react-select";
 import { serviceCategoryOptions, rateRangeOptions, availabilityOptions } from "../../../components/common";
+import { Plus, X } from "lucide-react";
 
 interface Option {
   value: string;
   label: string;
 }
 
+interface ServiceForm {
+  services_categories: Option[];
+  services_description: string;
+  rate_range: Option | null;
+  availability: Option | null;
+}
+
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 3;
 
 const ServicesOffer: React.FC = () => {
-  const [form, setForm] = useState({
-    services_categories: [] as Option[],
+  const [serviceForms, setServiceForms] = useState<ServiceForm[]>([{
+    services_categories: [],
     services_description: "",
-    rate_range: null as Option | null,
-    availability: null as Option | null,
-  });
+    rate_range: null,
+    availability: null,
+  }]);
 
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
@@ -33,8 +41,7 @@ const ServicesOffer: React.FC = () => {
   // Initialize form with existing data if available
   useEffect(() => {
     if (profileData?.categories && profileData.categories.length > 0) {
-      const category = profileData.categories[0];
-      setForm({
+      const categories = profileData.categories.map(category => ({
         services_categories: category.services_categories
           ? category.services_categories.split(',').map(cat => ({
               value: cat.trim(),
@@ -48,22 +55,60 @@ const ServicesOffer: React.FC = () => {
         availability: category.availability
           ? availabilityOptions.find(opt => opt.value === category.availability) || null
           : null,
-      });
+      }));
+      setServiceForms(categories);
     }
   }, [profileData]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    index: number
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const newForms = [...serviceForms];
+    newForms[index] = {
+      ...newForms[index],
+      [e.target.name]: e.target.value
+    };
+    setServiceForms(newForms);
   };
 
-  const handleMultiSelectChange = (field: string) => (selectedOptions: MultiValue<Option>) => {
-    setForm({ ...form, [field]: selectedOptions as Option[] });
+  const handleMultiSelectChange = (field: string, index: number) => (selectedOptions: MultiValue<Option>) => {
+    const newForms = [...serviceForms];
+    newForms[index] = {
+      ...newForms[index],
+      [field]: selectedOptions as Option[]
+    };
+    setServiceForms(newForms);
   };
 
-  const handleSingleSelectChange = (field: string) => (selectedOption: Option | null) => {
-    setForm({ ...form, [field]: selectedOption });
+  const handleSingleSelectChange = (field: string, index: number) => (selectedOption: Option | null) => {
+    const newForms = [...serviceForms];
+    newForms[index] = {
+      ...newForms[index],
+      [field]: selectedOption
+    };
+    setServiceForms(newForms);
+  };
+
+  const addNewService = () => {
+    setServiceForms([
+      ...serviceForms,
+      {
+        services_categories: [],
+        services_description: "",
+        rate_range: null,
+        availability: null,
+      }
+    ]);
+  };
+
+  const removeService = (index: number) => {
+    if (serviceForms.length > 1) {
+      const newForms = serviceForms.filter((_, i) => i !== index);
+      setServiceForms(newForms);
+    } else {
+      toast.error("You must have at least one service category");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,12 +117,12 @@ const ServicesOffer: React.FC = () => {
     try {
       const profileData = {
         subscription_type: "premium" as const,
-        categories: [{
+        categories: serviceForms.map(form => ({
           services_categories: form.services_categories.map(cat => cat.value).join(', '),
           services_description: form.services_description,
           rate_range: form.rate_range?.value || "",
           availability: form.availability?.value || "",
-        }],
+        })),
       };
 
       // If we have existing profile data, use updateProfile instead of createUserProfile
@@ -121,75 +166,104 @@ const ServicesOffer: React.FC = () => {
         onSubmit={handleSubmit}
         className="w-full max-w-4xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-sm space-y-6"
       >
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          Services Offered
-        </h1>
-
-        <div>
-          <label htmlFor="services_categories" className="block text-sm font-medium text-gray-700 mb-1">
-            Main Service Category
-          </label>
-          <Select
-            id="services_categories"
-            name="services_categories"
-            options={serviceCategoryOptions}
-            isMulti
-            placeholder="Select your service categories..."
-            value={form.services_categories}
-            onChange={handleMultiSelectChange('services_categories')}
-            className="bg-gray-50"
-            required
-          />
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Services Offered
+          </h1>
+          <Button
+            type="button"
+            onClick={addNewService}
+            className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Service
+          </Button>
         </div>
 
-        <div>
-          <label htmlFor="services_description" className="block text-sm font-medium text-gray-700 mb-1">
-            Service Description
-          </label>
-          <Textarea
-            id="services_description"
-            name="services_description"
-            placeholder="Describe your main services and expertise..."
-            value={form.services_description}
-            onChange={handleChange}
-            className="bg-gray-50 min-h-[120px]"
-            required
-          />
-        </div>
+        {serviceForms.map((form, index) => (
+          <div key={index} className="border rounded-lg p-6 space-y-6 relative">
+            {index > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 text-gray-500 hover:text-red-500"
+                onClick={() => removeService(index)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
+            <h3 className="text-lg font-semibold text-gray-800">
+              Service Category {index + 1}
+            </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="rate_range" className="block text-sm font-medium text-gray-700 mb-1">
-              Rate Range
-            </label>
-            <Select
-              id="rate_range"
-              name="rate_range"
-              options={rateRangeOptions}
-              placeholder="Select your rate range..."
-              value={form.rate_range}
-              onChange={handleSingleSelectChange('rate_range')}
-              className="bg-gray-50"
-              required
-            />
+            <div>
+              <label htmlFor={`services_categories_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                Main Service Category
+              </label>
+              <Select
+                id={`services_categories_${index}`}
+                name="services_categories"
+                options={serviceCategoryOptions}
+                isMulti
+                placeholder="Select your service categories..."
+                value={form.services_categories}
+                onChange={handleMultiSelectChange('services_categories', index)}
+                className="bg-gray-50"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor={`services_description_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                Service Description
+              </label>
+              <Textarea
+                id={`services_description_${index}`}
+                name="services_description"
+                placeholder="Describe your main services and expertise..."
+                value={form.services_description}
+                onChange={(e) => handleChange(e, index)}
+                className="bg-gray-50 min-h-[120px]"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor={`rate_range_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                  Rate Range
+                </label>
+                <Select
+                  id={`rate_range_${index}`}
+                  name="rate_range"
+                  options={rateRangeOptions}
+                  placeholder="Select your rate range..."
+                  value={form.rate_range}
+                  onChange={handleSingleSelectChange('rate_range', index)}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor={`availability_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                  Availability
+                </label>
+                <Select
+                  id={`availability_${index}`}
+                  name="availability"
+                  options={availabilityOptions}
+                  placeholder="Select your availability..."
+                  value={form.availability}
+                  onChange={handleSingleSelectChange('availability', index)}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+            </div>
           </div>
-
-          <div>
-            <label htmlFor="availability" className="block text-sm font-medium text-gray-700 mb-1">
-              Availability
-            </label>
-            <Select
-              id="availability"
-              name="availability"
-              options={availabilityOptions}
-              placeholder="Select your availability..."
-              value={form.availability}
-              onChange={handleSingleSelectChange('availability')}
-              className="bg-gray-50"
-              required
-            />
-          </div>
-        </div>
+        ))}
 
         {/* Error Message */}
         {error && (

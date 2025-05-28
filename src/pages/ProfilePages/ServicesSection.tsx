@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
@@ -32,6 +32,13 @@ interface ServicesSectionProps {
   availability?: string;
 }
 
+interface ServiceForm {
+  services_categories: string;
+  services_description: string;
+  rate_range: string;
+  availability: string;
+}
+
 const ServicesSection: React.FC<ServicesSectionProps> = ({ 
   categories = [],
   services_categories = [], 
@@ -42,64 +49,82 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   const { isEditMode } = useEditMode();
   const dispatch = useDispatch<AppDispatch>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [form, setForm] = useState({
+  const [serviceForms, setServiceForms] = useState<ServiceForm[]>([{
     services_categories: '',
     services_description: '',
     rate_range: '',
     availability: '',
-  });
+  }]);
   const { loading } = useSelector((state: RootState) => state.createProfile);
 
   // Initialize form with current values when dialog opens
   useEffect(() => {
     if (isDialogOpen) {
-      // If we have categories, use the first one's data
       if (categories && categories.length > 0) {
-        const category = categories[0];
-        setForm({
+        setServiceForms(categories.map(category => ({
           services_categories: category.services_categories || '',
           services_description: category.services_description || '',
           rate_range: category.rate_range || '',
           availability: category.availability || '',
-        });
+        })));
       } else {
-        // Fallback to old format if no categories exist
-        setForm({
+        setServiceForms([{
           services_categories: Array.isArray(services_categories) 
             ? services_categories.join(', ')
             : services_categories || '',
           services_description: services_description || '',
           rate_range: rate_range || '',
           availability: availability || '',
-        });
+        }]);
       }
     }
   }, [isDialogOpen, categories, services_categories, services_description, rate_range, availability]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    index: number
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const newForms = [...serviceForms];
+    newForms[index] = {
+      ...newForms[index],
+      [e.target.name]: e.target.value
+    };
+    setServiceForms(newForms);
+  };
+
+  const addNewService = () => {
+    setServiceForms([
+      ...serviceForms,
+      {
+        services_categories: '',
+        services_description: '',
+        rate_range: '',
+        availability: '',
+      }
+    ]);
+  };
+
+  const removeService = (index: number) => {
+    if (serviceForms.length > 1) {
+      const newForms = serviceForms.filter((_, i) => i !== index);
+      setServiceForms(newForms);
+    } else {
+      toast.error("You must have at least one service category");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      // Convert services_categories string to array
-      const servicesCategories = form.services_categories
-        .split(',')
-        .map(category => category.trim())
-        .filter(category => category.length > 0);
-
       const profileData = {
         subscription_type: 'premium' as const,
-        categories: [{
+        categories: serviceForms.map(form => ({
           services_categories: form.services_categories,
           services_description: form.services_description,
           rate_range: form.rate_range,
           availability: form.availability,
-        }],
+        })),
       };
 
       const result = await dispatch(updateProfile(profileData)).unwrap();
@@ -115,10 +140,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     }
   };
 
-  // Get the first category's data for display
-  const displayCategory = categories && categories.length > 0 ? categories[0] : null;
-
-  if (!displayCategory && !services_description && !services_categories && !rate_range && !availability) {
+  if (!categories.length && !services_description && !services_categories && !rate_range && !availability) {
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
@@ -141,67 +163,95 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
               <DialogTitle>Edit Services</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="services_categories" className="block text-sm font-medium text-gray-700 mb-1">
-                  Main Service Category
-                </label>
-                <Input
-                  id="services_categories"
-                  name="services_categories"
-                  placeholder="e.g., Web Development, Design, Marketing"
-                  value={form.services_categories}
-                  onChange={handleChange}
-                  className="bg-gray-50"
-                  required
-                />
-              </div>
+              {serviceForms.map((form, index) => (
+                <div key={index} className="border rounded-lg p-6 space-y-4 relative">
+                  {index > 0 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-4 right-4 text-gray-500 hover:text-red-500"
+                      onClick={() => removeService(index)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Service Category {index + 1}
+                  </h3>
 
-              <div>
-                <label htmlFor="services_description" className="block text-sm font-medium text-gray-700 mb-1">
-                  Service Description
-                </label>
-                <Textarea
-                  id="services_description"
-                  name="services_description"
-                  placeholder="Describe your main services and expertise..."
-                  value={form.services_description}
-                  onChange={handleChange}
-                  className="bg-gray-50 min-h-[120px]"
-                  required
-                />
-              </div>
+                  <div>
+                    <label htmlFor={`services_categories_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                      Main Service Category
+                    </label>
+                    <Input
+                      id={`services_categories_${index}`}
+                      name="services_categories"
+                      placeholder="e.g., Web Development, Design, Marketing"
+                      value={form.services_categories}
+                      onChange={(e) => handleChange(e, index)}
+                      className="bg-gray-50"
+                      required
+                    />
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="rate_range" className="block text-sm font-medium text-gray-700 mb-1">
-                    Rate Range
-                  </label>
-                  <Input
-                    id="rate_range"
-                    name="rate_range"
-                    placeholder="e.g., $50-100/hour"
-                    value={form.rate_range}
-                    onChange={handleChange}
-                    className="bg-gray-50"
-                    required
-                  />
+                  <div>
+                    <label htmlFor={`services_description_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                      Service Description
+                    </label>
+                    <Textarea
+                      id={`services_description_${index}`}
+                      name="services_description"
+                      placeholder="Describe your main services and expertise..."
+                      value={form.services_description}
+                      onChange={(e) => handleChange(e, index)}
+                      className="bg-gray-50 min-h-[120px]"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor={`rate_range_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                        Rate Range
+                      </label>
+                      <Input
+                        id={`rate_range_${index}`}
+                        name="rate_range"
+                        placeholder="e.g., $50-100/hour"
+                        value={form.rate_range}
+                        onChange={(e) => handleChange(e, index)}
+                        className="bg-gray-50"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor={`availability_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                        Availability
+                      </label>
+                      <Input
+                        id={`availability_${index}`}
+                        name="availability"
+                        placeholder="e.g., Full-time, Part-time, Weekends only"
+                        value={form.availability}
+                        onChange={(e) => handleChange(e, index)}
+                        className="bg-gray-50"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
+              ))}
 
-                <div>
-                  <label htmlFor="availability" className="block text-sm font-medium text-gray-700 mb-1">
-                    Availability
-                  </label>
-                  <Input
-                    id="availability"
-                    name="availability"
-                    placeholder="e.g., Full-time, Part-time, Weekends only"
-                    value={form.availability}
-                    onChange={handleChange}
-                    className="bg-gray-50"
-                    required
-                  />
-                </div>
-              </div>
+              <Button
+                type="button"
+                onClick={addNewService}
+                className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Another Service
+              </Button>
 
               <DialogFooter>
                 <Button
@@ -242,37 +292,41 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         )}
       </div>
       
-      {displayCategory?.services_description && (
-        <p className="text-gray-600 mb-4">{displayCategory.services_description}</p>
-      )}
-
-      {displayCategory?.services_categories && (
-        <div className="flex flex-wrap gap-x-2 gap-y-3 mb-4">
-          {displayCategory.services_categories.split(',').map((service, index) => (
-            <span 
-              key={index}
-              className="text-sm bg-gray-100 text-gray-800 px-3 py-1 rounded-full hover:bg-gray-200 transition-colors"
-            >
-              {service.trim()}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {(displayCategory?.rate_range || displayCategory?.availability) && (
-        <div className="space-y-2 mb-4">
-          {displayCategory.rate_range && (
-            <p className="text-sm text-gray-600">
-              <span className="font-medium">Rate Range:</span> {displayCategory.rate_range}
-            </p>
+      {categories.map((category, index) => (
+        <div key={index} className="mb-8 last:mb-0">
+          {category.services_description && (
+            <p className="text-gray-600 mb-4">{category.services_description}</p>
           )}
-          {displayCategory.availability && (
-            <p className="text-sm text-gray-600">
-              <span className="font-medium">Availability:</span> {displayCategory.availability}
-            </p>
+
+          {category.services_categories && (
+            <div className="flex flex-wrap gap-x-2 gap-y-3 mb-4">
+              {category.services_categories.split(',').map((service, serviceIndex) => (
+                <span 
+                  key={serviceIndex}
+                  className="text-sm bg-gray-100 text-gray-800 px-3 py-1 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  {service.trim()}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {(category.rate_range || category.availability) && (
+            <div className="space-y-2 mb-4">
+              {category.rate_range && (
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Rate Range:</span> {category.rate_range}
+                </p>
+              )}
+              {category.availability && (
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Availability:</span> {category.availability}
+                </p>
+              )}
+            </div>
           )}
         </div>
-      )}
+      ))}
       
       <Button 
         variant="link" 
@@ -288,67 +342,95 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
             <DialogTitle>Edit Services</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="services_categories" className="block text-sm font-medium text-gray-700 mb-1">
-                Main Service Category
-              </label>
-              <Input
-                id="services_categories"
-                name="services_categories"
-                placeholder="e.g., Web Development, Design, Marketing"
-                value={form.services_categories}
-                onChange={handleChange}
-                className="bg-gray-50"
-                required
-              />
-            </div>
+            {serviceForms.map((form, index) => (
+              <div key={index} className="border rounded-lg p-6 space-y-4 relative">
+                {index > 0 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-4 right-4 text-gray-500 hover:text-red-500"
+                    onClick={() => removeService(index)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Service Category {index + 1}
+                </h3>
 
-            <div>
-              <label htmlFor="services_description" className="block text-sm font-medium text-gray-700 mb-1">
-                Service Description
-              </label>
-              <Textarea
-                id="services_description"
-                name="services_description"
-                placeholder="Describe your main services and expertise..."
-                value={form.services_description}
-                onChange={handleChange}
-                className="bg-gray-50 min-h-[120px]"
-                required
-              />
-            </div>
+                <div>
+                  <label htmlFor={`services_categories_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                    Main Service Category
+                  </label>
+                  <Input
+                    id={`services_categories_${index}`}
+                    name="services_categories"
+                    placeholder="e.g., Web Development, Design, Marketing"
+                    value={form.services_categories}
+                    onChange={(e) => handleChange(e, index)}
+                    className="bg-gray-50"
+                    required
+                  />
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="rate_range" className="block text-sm font-medium text-gray-700 mb-1">
-                  Rate Range
-                </label>
-                <Input
-                  id="rate_range"
-                  name="rate_range"
-                  placeholder="e.g., $50-100/hour"
-                  value={form.rate_range}
-                  onChange={handleChange}
-                  className="bg-gray-50"
-                  required
-                />
+                <div>
+                  <label htmlFor={`services_description_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                    Service Description
+                  </label>
+                  <Textarea
+                    id={`services_description_${index}`}
+                    name="services_description"
+                    placeholder="Describe your main services and expertise..."
+                    value={form.services_description}
+                    onChange={(e) => handleChange(e, index)}
+                    className="bg-gray-50 min-h-[120px]"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor={`rate_range_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                      Rate Range
+                    </label>
+                    <Input
+                      id={`rate_range_${index}`}
+                      name="rate_range"
+                      placeholder="e.g., $50-100/hour"
+                      value={form.rate_range}
+                      onChange={(e) => handleChange(e, index)}
+                      className="bg-gray-50"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor={`availability_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                      Availability
+                    </label>
+                    <Input
+                      id={`availability_${index}`}
+                      name="availability"
+                      placeholder="e.g., Full-time, Part-time, Weekends only"
+                      value={form.availability}
+                      onChange={(e) => handleChange(e, index)}
+                      className="bg-gray-50"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
+            ))}
 
-              <div>
-                <label htmlFor="availability" className="block text-sm font-medium text-gray-700 mb-1">
-                  Availability
-                </label>
-                <Input
-                  id="availability"
-                  name="availability"
-                  placeholder="e.g., Full-time, Part-time, Weekends only"
-                  value={form.availability}
-                  onChange={handleChange}
-                  className="bg-gray-50"
-                  required
-                />
-              </div>
-            </div>
+            <Button
+              type="button"
+              onClick={addNewService}
+              className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white flex items-center justify-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Another Service
+            </Button>
 
             <DialogFooter>
               <Button
