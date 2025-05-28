@@ -31,29 +31,29 @@ export default function ForgetPassword() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#fafbfc] px-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow p-8 flex flex-col items-center">
-        <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-gray-100 mb-6">
-          <KeyRound className="w-7 h-7 text-gray-500" />
+    <div className="flex min-h-screen items-center justify-center bg-[#fafbfc] px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-white rounded-lg shadow p-4 sm:p-6 md:p-8 flex flex-col items-center">
+        <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg bg-gray-100 mb-4 sm:mb-6">
+          <KeyRound className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-gray-500" />
         </div>
-        <h1 className="text-2xl font-bold mb-2 text-center">Forgot password?</h1>
-        <p className="text-gray-500 mb-8 text-center">No worries, we'll send you reset instructions.</p>
-        <form onSubmit={handleSubmit} className="w-full space-y-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-2 text-center">Forgot password?</h1>
+        <p className="text-sm sm:text-base text-gray-500 mb-6 sm:mb-8 text-center">No worries, we'll send you reset instructions.</p>
+        <form onSubmit={handleSubmit} className="w-full space-y-4 sm:space-y-6">
           <div>
-            <label className="block mb-1 font-medium">Email</label>
+            <label className="block mb-1 text-xs sm:text-sm font-medium">Email</label>
             <Input
               type="email"
               placeholder="Enter your email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              className="w-full"
+              className="w-full text-sm sm:text-base"
               disabled={isLoading}
             />
           </div>
           <Button
             type="submit"
-            className="w-full bg-[#466184] hover:bg-[#3C5979] text-white font-semibold"
+            className="w-full bg-[#466184] hover:bg-[#3C5979] text-white font-semibold text-sm sm:text-base"
             disabled={isLoading}
           >
             {isLoading ? 'Sending...' : 'Reset your password'}
@@ -61,7 +61,7 @@ export default function ForgetPassword() {
         </form>
         <button
           type="button"
-          className="flex items-center gap-2 mt-8 text-[#466184] hover:underline text-sm"
+          className="flex items-center gap-2 mt-6 sm:mt-8 text-[#466184] hover:underline text-xs sm:text-sm"
           onClick={() => navigate('/login')}
         >
           <span className="inline-block rotate-180">→</span> Back to log in

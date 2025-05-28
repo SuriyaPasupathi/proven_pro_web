@@ -114,18 +114,18 @@ const CheckEmailCode: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow p-8 flex flex-col items-center">
-        <div className="bg-gray-100 rounded-full p-3 mb-6">
-          <Mail className="w-8 h-8 text-gray-400" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-white rounded-xl shadow p-4 sm:p-6 md:p-8 flex flex-col items-center">
+        <div className="bg-gray-100 rounded-full p-2 sm:p-3 mb-4 sm:mb-6">
+          <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
         </div>
-        <h1 className="text-2xl font-bold mb-2 text-center">Check your email</h1>
-        <p className="text-gray-700 text-center mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-2 text-center">Check your email</h1>
+        <p className="text-sm sm:text-base text-gray-700 text-center mb-4 sm:mb-6">
           We sent a verification code to<br />
           <span className="text-gray-900 font-medium">{email}</span>
         </p>
         <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
             {code.map((digit, idx) => (
               <input
                 key={idx}
@@ -137,7 +137,7 @@ const CheckEmailCode: React.FC = () => {
                 onChange={e => handleChange(e.target.value, idx)}
                 onKeyDown={e => handleKeyDown(e, idx)}
                 onPaste={handlePaste}
-                className="w-14 h-16 text-3xl text-center border-2 border-[#6C63FF] rounded-lg focus:outline-none focus:border-[#3C5979] transition"
+                className="w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-16 text-2xl sm:text-3xl text-center border-2 border-[#6C63FF] rounded-lg focus:outline-none focus:border-[#3C5979] transition"
                 style={{ boxShadow: "0 2px 6px 0 rgba(108,99,255,0.05)" }}
                 autoFocus={idx === 0}
                 disabled={loading}
@@ -146,14 +146,14 @@ const CheckEmailCode: React.FC = () => {
           </div>
           <Button
             type="submit"
-            className="w-full bg-[#3C5979] hover:bg-[#2f4560] mb-4"
+            className="w-full bg-[#3C5979] hover:bg-[#2f4560] mb-3 sm:mb-4 text-sm sm:text-base"
             disabled={loading}
             onClick={() => console.log('Button clicked')}
           >
             {loading ? "Verifying..." : "Verify email"}
           </Button>
         </form>
-        <p className="text-sm text-gray-700 mb-6 text-center">
+        <p className="text-xs sm:text-sm text-gray-700 mb-4 sm:mb-6 text-center">
           Didn&apos;t receive the code?{" "}
           <button
             type="button"
@@ -166,7 +166,7 @@ const CheckEmailCode: React.FC = () => {
         </p>
         <button
           type="button"
-          className="flex items-center text-sm text-gray-700 hover:underline"
+          className="flex items-center text-xs sm:text-sm text-gray-700 hover:underline"
           onClick={() => navigate("/login")}
           disabled={loading}
         >
