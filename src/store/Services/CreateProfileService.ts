@@ -174,49 +174,57 @@ export const createUserProfile = createAsyncThunk(
 
 export const getProfile = createAsyncThunk(
   'profile/getProfile',
-  async (profileId: string | undefined, { rejectWithValue }) => {
+  async (profileId?: string) => {
     try {
       const token = getAuthToken();
-      // Use the same endpoint for both current user and specific profile
-      // The backend will handle the profileId parameter in the query
-      const url = `${baseUrl}profile/`;
-      
-      const response = await axios.get(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        params: profileId ? { profile_id: profileId } : undefined
-      });
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
 
-      // Debug logging
-      console.log('Profile API Response:', response.data);
-      console.log('Categories:', response.data.categories);
-      console.log('Projects:', response.data.projects);
-      console.log('Services Categories:', response.data.services_categories);
-      console.log('Services Description:', response.data.services_description);
-      console.log('Rate Range:', response.data.rate_range);
-      console.log('Availability:', response.data.availability);
-      console.log('Portfolio:', response.data.portfolio);
-      
-      // Transform the data if needed
+      const response = await axios.get(
+        `${baseUrl}profile/${profileId ? `${profileId}/` : ''}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Transform the response data to include verification details
       const transformedData = {
         ...response.data,
-        categories: response.data.categories || [],
-        projects: response.data.projects || [],
-        portfolio: response.data.portfolio || [],
-        services_categories: response.data.services_categories || [],
-        services_description: response.data.services_description || '',
-        rate_range: response.data.rate_range || '',
-        availability: response.data.availability || ''
+        verification_details: {
+          government_id: {
+            uploaded: response.data.has_gov_id_document || false,
+            verified: response.data.gov_id_verified || false,
+            percentage: response.data.gov_id_verified ? 100 : 0
+          },
+          address_proof: {
+            uploaded: response.data.has_address_document || false,
+            verified: response.data.address_verified || false,
+            percentage: response.data.address_verified ? 100 : 0
+          },
+          mobile: {
+            provided: !!response.data.mobile,
+            verified: response.data.mobile_verified || false,
+            percentage: response.data.mobile_verified ? 100 : 0
+          }
+        }
       };
-      
+
+      console.log('Profile API Response:', response.data);
       console.log('Transformed Data:', transformedData);
-      
+      console.log('Verification Details:', transformedData.verification_details);
+
       return transformedData;
     } catch (error) {
-      console.error('Profile fetch error:', error);
-      const profileError = handleProfileError(error);
-      return rejectWithValue(profileError);
+      console.error('Error fetching profile:', error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        // Handle unauthorized error specifically
+        console.error('Authentication error: Please log in again');
+        // You might want to dispatch a logout action here
+      }
+      throw error;
     }
   }
 );

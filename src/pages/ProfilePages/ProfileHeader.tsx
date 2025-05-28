@@ -25,8 +25,28 @@ import {
 } from "@/components/ui/tooltip";
 import ReviewDialog from './ReviewDialog';
 
+interface VerificationDetails {
+  government_id: {
+    uploaded: boolean;
+    verified: boolean;
+    percentage: number;
+  };
+  address_proof: {
+    uploaded: boolean;
+    verified: boolean;
+    percentage: number;
+  };
+  mobile: {
+    provided: boolean;
+    verified: boolean;
+    percentage: number;
+  };
+}
+
 interface ProfileHeaderProps {
-  profileData: ProfileData;
+  profileData: ProfileData & {
+    verification_details?: VerificationDetails;
+  };
 }
 
 interface EditProfileDialogProps {
@@ -42,6 +62,27 @@ interface ShareProfileDialogProps {
   profileUrl: string;
   profileName: string;
 }
+
+const calculateVerificationPercentage = (details: VerificationDetails): number => {
+  let totalPercentage = 0;
+
+  // Government ID verification is worth 50%
+  if (details.government_id.verified) {
+    totalPercentage += 50;
+  }
+
+  // Address proof verification is worth 25%
+  if (details.address_proof.verified) {
+    totalPercentage += 25;
+  }
+
+  // Mobile verification is worth 25%
+  if (details.mobile.verified) {
+    totalPercentage += 25;
+  }
+
+  return totalPercentage;
+};
 
 const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   isOpen,
@@ -275,11 +316,26 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
 
               {/* Below Section: Verification */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-               
-
                 <div className="flex items-center">
-                  <div className="text-green-700  rounded-full text-base font-medium w-[360px] h-[89px] flex items-center sm:w-[360px] md:w-[360px] lg:w-[360px]">
-                    Profile Verified 100%
+                  <div className="text-green-700 rounded-full text-base font-medium w-[360px] h-[89px] flex items-center sm:w-[360px] md:w-[360px] lg:w-[360px]">
+                    {profileData.verification_details ? (
+                      <div className="flex flex-col">
+                        <span>Profile Verified {calculateVerificationPercentage(profileData.verification_details)}%</span>
+                        {/* <div className="flex gap-2 text-sm">
+                          {profileData.verification_details.government_id.verified && (
+                            <span className="text-green-600">✓ Government ID</span>
+                          )}
+                          {profileData.verification_details.address_proof.verified && (
+                            <span className="text-green-600">✓ Address</span>
+                          )}
+                          {profileData.verification_details.mobile.verified && (
+                            <span className="text-green-600">✓ Mobile</span>
+                          )}
+                        </div> */}
+                      </div>
+                    ) : (
+                      <span>Profile Verification Pending</span>
+                    )}
                   </div>
                 </div>
               </div>

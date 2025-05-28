@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { getProfile } from '../../store/Services/CreateProfileService';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import ProfileNav from './ProfileNav'
 import ProfileHeader from './ProfileHeader';
 import ProfileSidebar from './ProfileSidebar';
@@ -13,6 +13,8 @@ import SkillsSection from './SkillsSection';
 import ToolsSection from './ToolsSection';
 import PortfolioSection from './PortfolioSection';
 import { ThemeProvider } from './ThemeProvider';
+import { Button } from '@/components/ui/button';
+import axios from 'axios';
 
 export interface ProfileData {
   subscription_type: 'free' | 'standard' | 'premium';
@@ -92,6 +94,31 @@ export interface ProfileData {
 
   // Reviews
   reviews?: any[];
+
+  // Verification
+  verification_status?: string;
+  gov_id_verified?: boolean;
+  address_verified?: boolean;
+  mobile_verified?: boolean;
+  has_gov_id_document?: boolean;
+  has_address_document?: boolean;
+  verification_details?: {
+    government_id: {
+      uploaded: boolean;
+      verified: boolean;
+      percentage: number;
+    };
+    address_proof: {
+      uploaded: boolean;
+      verified: boolean;
+      percentage: number;
+    };
+    mobile: {
+      provided: boolean;
+      verified: boolean;
+      percentage: number;
+    };
+  };
 }
 
 function App() {
@@ -99,19 +126,44 @@ function App() {
   const dispatch = useDispatch<AppDispatch>();
   const { profileId } = useParams();
   const { profileData, loading, error } = useSelector((state: RootState) => state.createProfile);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // If profileId is provided, fetch that specific profile
-    // Otherwise, fetch the current user's profile
-    dispatch(getProfile(profileId));
-  }, [dispatch, profileId]);
+    const fetchProfile = async () => {
+      try {
+        await dispatch(getProfile(profileId));
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          // Redirect to login page if unauthorized
+          navigate('/login');
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [dispatch, profileId, navigate]);
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   if (error) {
-    return <div className="min-h-screen flex items-center justify-center text-red-500">{error.message}</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-500 mb-4">Error Loading Profile</h2>
+          <p className="text-gray-600">{error.message}</p>
+          {error.status === 401 && (
+            <Button 
+              className="mt-4 bg-[#70a4d8] hover:bg-[#3C5979] text-white"
+              onClick={() => navigate('/login')}
+            >
+              Go to Login
+            </Button>
+          )}
+        </div>
+      </div>
+    );
   }
 
   const profile = profileData as ProfileData;

@@ -15,11 +15,12 @@ import {
 import { Input } from "@/components/ui/input";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 
 const Verification = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.createProfile);
+  const { loading, error, profileData } = useSelector((state: RootState) => state.createProfile);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -280,6 +281,24 @@ const Verification = () => {
     };
   }, [previewUrl]);
 
+  const getStatusIcon = (uploaded: boolean, verified: boolean) => {
+    if (verified) {
+      return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+    } else if (uploaded) {
+      return <Clock className="w-5 h-5 text-yellow-500" />;
+    }
+    return <AlertCircle className="w-5 h-5 text-gray-400" />;
+  };
+
+  const getStatusText = (uploaded: boolean, verified: boolean) => {
+    if (verified) {
+      return <span className="text-green-500 font-medium">Verified</span>;
+    } else if (uploaded) {
+      return <span className="text-yellow-500 font-medium">Pending Verification</span>;
+    }
+    return <span className="text-gray-500 font-medium">Not Uploaded</span>;
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -307,6 +326,16 @@ const Verification = () => {
             </div>
             <h2 className="text-base sm:text-lg font-semibold mb-2 text-center">Verify with a Government ID <br/>(Required)</h2>
             <div className="text-blue-900 font-semibold mb-2">+50 Proven Proof</div>
+            <div className="flex items-center gap-2 mb-4">
+              {profileData?.verification_details?.government_id && getStatusIcon(
+                profileData.verification_details.government_id.uploaded,
+                profileData.verification_details.government_id.verified
+              )}
+              {profileData?.verification_details?.government_id && getStatusText(
+                profileData.verification_details.government_id.uploaded,
+                profileData.verification_details.government_id.verified
+              )}
+            </div>
             <p className="text-gray-500 text-center mb-4 sm:mb-6 text-xs sm:text-sm">Provide a photo of your valid Government ID and a selfie showing it</p>
             <div className="space-y-3 sm:space-y-4 w-full">
               <input
@@ -386,6 +415,16 @@ const Verification = () => {
             </div>
             <h2 className="text-base sm:text-lg font-semibold mb-2 text-center">Address Validation<br/>(Choose to Provide)</h2>
             <div className="text-blue-900 font-semibold mb-2">+25 Proven Proof</div>
+            <div className="flex items-center gap-2 mb-4">
+              {profileData?.verification_details?.address_proof && getStatusIcon(
+                profileData.verification_details.address_proof.uploaded,
+                profileData.verification_details.address_proof.verified
+              )}
+              {profileData?.verification_details?.address_proof && getStatusText(
+                profileData.verification_details.address_proof.uploaded,
+                profileData.verification_details.address_proof.verified
+              )}
+            </div>
             <p className="text-gray-500 text-center mb-4 sm:mb-6 text-xs sm:text-sm">Upload a picture of the document showing your billing address</p>
             <div className="space-y-3 sm:space-y-4 w-full">
               <input
@@ -465,6 +504,16 @@ const Verification = () => {
             </div>
             <h2 className="text-base sm:text-lg font-semibold mb-2 text-center">Verify Mobile Number<br/>(Choose to Provide)</h2>
             <div className="text-blue-900 font-semibold mb-2">+25 Proven Proof</div>
+            <div className="flex items-center gap-2 mb-4">
+              {profileData?.verification_details?.mobile && getStatusIcon(
+                profileData.verification_details.mobile.provided,
+                profileData.verification_details.mobile.verified
+              )}
+              {profileData?.verification_details?.mobile && getStatusText(
+                profileData.verification_details.mobile.provided,
+                profileData.verification_details.mobile.verified
+              )}
+            </div>
             <p className="text-gray-500 text-center mb-4 sm:mb-6 text-xs sm:text-sm">Enter your mobile number to receive a verification code</p>
             
             <div className="w-full space-y-3 sm:space-y-4">

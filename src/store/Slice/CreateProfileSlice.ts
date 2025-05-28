@@ -120,6 +120,23 @@ interface CreateProfileState {
   profileData: ProfileData | null;
   hasProfile: boolean;
   profileStatusLoading: boolean;
+  verificationDetails: {
+    government_id: {
+      uploaded: boolean;
+      verified: boolean;
+      percentage: number;
+    };
+    address_proof: {
+      uploaded: boolean;
+      verified: boolean;
+      percentage: number;
+    };
+    mobile: {
+      provided: boolean;
+      verified: boolean;
+      percentage: number;
+    };
+  } | null;
 }
 
 const initialState: CreateProfileState = {
@@ -131,6 +148,7 @@ const initialState: CreateProfileState = {
   },
   hasProfile: false,
   profileStatusLoading: false,
+  verificationDetails: null,
 };
 
 const createProfileSlice = createSlice({
@@ -177,8 +195,9 @@ const createProfileSlice = createSlice({
       })
       .addCase(getProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.profileData = action.payload;
         state.error = null;
+        state.profileData = action.payload;
+        state.verificationDetails = action.payload.verification_details || null;
       })
       .addCase(getProfile.rejected, (state, action) => {
         state.loading = false;
