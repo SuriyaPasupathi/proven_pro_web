@@ -14,7 +14,20 @@ interface ProfilePayload {
   skills?: string[];
   tools?: string[];
   languages?: string[];
-  categories?: string[];
+  categories?: {
+    id?: number;
+    services_categories: string;
+    services_description: string;
+    rate_range: string;
+    availability: string;
+  }[];
+  projects?: {
+    id?: number;
+    project_title: string;
+    project_description: string;
+    project_url: string;
+    project_image?: File;
+  }[];
   education?: string[];
   certifications?: string[];
   licenses?: string[];
@@ -177,8 +190,29 @@ export const getProfile = createAsyncThunk(
 
       // Debug logging
       console.log('Profile API Response:', response.data);
+      console.log('Categories:', response.data.categories);
+      console.log('Projects:', response.data.projects);
+      console.log('Services Categories:', response.data.services_categories);
+      console.log('Services Description:', response.data.services_description);
+      console.log('Rate Range:', response.data.rate_range);
+      console.log('Availability:', response.data.availability);
+      console.log('Portfolio:', response.data.portfolio);
       
-      return response.data;
+      // Transform the data if needed
+      const transformedData = {
+        ...response.data,
+        categories: response.data.categories || [],
+        projects: response.data.projects || [],
+        portfolio: response.data.portfolio || [],
+        services_categories: response.data.services_categories || [],
+        services_description: response.data.services_description || '',
+        rate_range: response.data.rate_range || '',
+        availability: response.data.availability || ''
+      };
+      
+      console.log('Transformed Data:', transformedData);
+      
+      return transformedData;
     } catch (error) {
       console.error('Profile fetch error:', error);
       const profileError = handleProfileError(error);
@@ -252,10 +286,13 @@ export const updateProfile = createAsyncThunk(
       
       // If payload is not FormData, convert it to FormData
       if (!(payload instanceof FormData)) {
+        // Add subscription type first
+        formData.append('subscription_type', payload.subscription_type);
+
         // Add all non-file fields to formData
         Object.entries(payload).forEach(([key, value]) => {
-          // Skip file fields and undefined values
-          if (key === 'profile_pic' || key === 'video_intro' || value === undefined) {
+          // Skip file fields, undefined values, and subscription_type (already added)
+          if (key === 'profile_pic' || key === 'video_intro' || key === 'subscription_type' || value === undefined) {
             return;
           }
 
@@ -279,12 +316,22 @@ export const updateProfile = createAsyncThunk(
         }
       }
 
+      // Debug logging
+      console.log('Update Profile Payload:', payload);
+      console.log('FormData entries:');
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
       const response = await axios.put(`${baseUrl}profile/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         }
       });
+
+      // Debug logging
+      console.log('Update Profile Response:', response.data);
 
       return response.data;
     } catch (error) {

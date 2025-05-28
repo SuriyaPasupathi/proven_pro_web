@@ -16,7 +16,16 @@ import {
 } from "@/components/ui/dialog";
 import toast from 'react-hot-toast';
 
+interface ServiceCategory {
+  id?: number;
+  services_categories: string;
+  services_description: string;
+  rate_range: string;
+  availability: string;
+}
+
 interface ServicesSectionProps {
+  categories?: ServiceCategory[];
   services_categories?: string[] | string;
   services_description?: string;
   rate_range?: string;
@@ -24,6 +33,7 @@ interface ServicesSectionProps {
 }
 
 const ServicesSection: React.FC<ServicesSectionProps> = ({ 
+  categories = [],
   services_categories = [], 
   services_description,
   rate_range,
@@ -42,16 +52,28 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   // Initialize form with current values when dialog opens
   useEffect(() => {
     if (isDialogOpen) {
-      setForm({
-        services_categories: Array.isArray(services_categories) 
-          ? services_categories.join(', ')
-          : services_categories || '',
-        services_description: services_description || '',
-        rate_range: rate_range || '',
-        availability: availability || '',
-      });
+      // If we have categories, use the first one's data
+      if (categories && categories.length > 0) {
+        const category = categories[0];
+        setForm({
+          services_categories: category.services_categories || '',
+          services_description: category.services_description || '',
+          rate_range: category.rate_range || '',
+          availability: category.availability || '',
+        });
+      } else {
+        // Fallback to old format if no categories exist
+        setForm({
+          services_categories: Array.isArray(services_categories) 
+            ? services_categories.join(', ')
+            : services_categories || '',
+          services_description: services_description || '',
+          rate_range: rate_range || '',
+          availability: availability || '',
+        });
+      }
     }
-  }, [isDialogOpen, services_categories, services_description, rate_range, availability]);
+  }, [isDialogOpen, categories, services_categories, services_description, rate_range, availability]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -71,10 +93,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
       const profileData = {
         subscription_type: 'premium' as const,
-        services_categories: servicesCategories,
-        services_description: form.services_description,
-        rate_range: form.rate_range,
-        availability: form.availability,
+        categories: [{
+          services_categories: form.services_categories,
+          services_description: form.services_description,
+          rate_range: form.rate_range,
+          availability: form.availability,
+        }],
       };
 
       const result = await dispatch(updateProfile(profileData)).unwrap();
@@ -90,14 +114,10 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     }
   };
 
-  // Ensure services_categories is an array
-  const servicesCategories = Array.isArray(services_categories) 
-    ? services_categories 
-    : typeof services_categories === 'string'
-      ? services_categories.split(',').map(category => category.trim()).filter(Boolean)
-      : [];
+  // Get the first category's data for display
+  const displayCategory = categories && categories.length > 0 ? categories[0] : null;
 
-  if (!services_description && servicesCategories.length === 0 && !rate_range && !availability) {
+  if (!displayCategory && !services_description && !services_categories && !rate_range && !availability) {
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
@@ -219,33 +239,33 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         )}
       </div>
       
-      {services_description && (
-        <p className="text-gray-600 mb-4">{services_description}</p>
+      {displayCategory?.services_description && (
+        <p className="text-gray-600 mb-4">{displayCategory.services_description}</p>
       )}
 
-      {servicesCategories.length > 0 && (
+      {displayCategory?.services_categories && (
         <div className="flex flex-wrap gap-x-2 gap-y-3 mb-4">
-          {servicesCategories.map((service, index) => (
+          {displayCategory.services_categories.split(',').map((service, index) => (
             <span 
               key={index}
               className="text-sm bg-gray-100 text-gray-800 px-3 py-1 rounded-full hover:bg-gray-200 transition-colors"
             >
-              {service}
+              {service.trim()}
             </span>
           ))}
         </div>
       )}
 
-      {(rate_range || availability) && (
+      {(displayCategory?.rate_range || displayCategory?.availability) && (
         <div className="space-y-2 mb-4">
-          {rate_range && (
+          {displayCategory.rate_range && (
             <p className="text-sm text-gray-600">
-              <span className="font-medium">Rate Range:</span> {rate_range}
+              <span className="font-medium">Rate Range:</span> {displayCategory.rate_range}
             </p>
           )}
-          {availability && (
+          {displayCategory.availability && (
             <p className="text-sm text-gray-600">
-              <span className="font-medium">Availability:</span> {availability}
+              <span className="font-medium">Availability:</span> {displayCategory.availability}
             </p>
           )}
         </div>

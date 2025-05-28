@@ -45,10 +45,34 @@ interface ProfileData {
   video_description?: string;
 
   // Services
+  categories?: {
+    id?: number;
+    services_categories: string;
+    services_description: string;
+    rate_range: string;
+    availability: string;
+  }[];
   services_categories?: string[];
   services_description?: string;
   rate_range?: string;
   availability?: string;
+
+  // Portfolio
+  projects?: {
+    id?: number;
+    project_title: string;
+    project_description: string;
+    project_url: string;
+    project_image?: string;
+    project_image_url?: string;
+  }[];
+  portfolio?: {
+    project_title: string;
+    project_description: string;
+    project_url: string;
+    project_image: string;
+    project_image_url: string;
+  }[];
 
   // Experience
   experiences?: {
@@ -64,15 +88,6 @@ interface ProfileData {
   technical_skills?: string[];
   soft_skills?: string[];
   skills_description?: string;
-
-  // Portfolio
-  portfolio?: {
-    project_title: string;
-    project_description: string;
-    project_url: string;
-    project_image: string;
-    project_image_url: string;
-  }[];
 
   // Certifications
   certifications?: {

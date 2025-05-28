@@ -30,6 +30,13 @@ export interface ProfileData {
   profile_pic_url?: string;
 
   // Services
+  categories?: {
+    id?: number;
+    services_categories: string;
+    services_description: string;
+    rate_range: string;
+    availability: string;
+  }[];
   services_categories?: string[];
   services_description?: string;
   rate_range?: string;
@@ -51,6 +58,14 @@ export interface ProfileData {
   skills_description?: string;
 
   // Portfolio
+  projects?: {
+    id?: number;
+    project_title: string;
+    project_description: string;
+    project_url: string;
+    project_image?: string;
+    project_image_url?: string;
+  }[];
   portfolio?: {
     project_title: string;
     project_description: string;
@@ -76,13 +91,7 @@ export interface ProfileData {
   video_description?: string;
 
   // Reviews
-  reviews?: {
-    id: number;
-    name: string;
-    company: string;
-    rating: number;
-    content: string;
-  }[];
+  reviews?: any[];
 }
 
 function App() {
@@ -126,6 +135,7 @@ function App() {
               <div className="space-y-8 md:space-y-12 mt-6 md:mt-8">
                 <ReviewCarousel reviews={profile.reviews} />
                 <ServicesSection 
+                  categories={profile.categories}
                   services_categories={profile.services_categories}
                   services_description={profile.services_description}
                   rate_range={profile.rate_range}
@@ -138,7 +148,10 @@ function App() {
                   skills_description={profile.skills_description}
                 />
                 <ToolsSection primary_tools={profile.primary_tools} />
-                <PortfolioSection portfolio={profile.portfolio} />
+                <PortfolioSection 
+                  projects={profile.projects}
+                  portfolio={profile.portfolio}
+                />
               </div>
             </div>
           </div>
