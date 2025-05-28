@@ -72,6 +72,17 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [isImageUploading, setIsImageUploading] = useState(false);
+
+  // Loading states
+  const [isProfileUpdating, setIsProfileUpdating] = useState(false);
+  const [isVideoUpdating, setIsVideoUpdating] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+
+  // Certification states
+  const [isCertUpdating, setIsCertUpdating] = useState(false);
+  const [selectedCertImage, setSelectedCertImage] = useState<File | null>(null);
+  const certImageInputRef = useRef<HTMLInputElement>(null);
 
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
@@ -89,6 +100,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsProfileUpdating(true);
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
       
@@ -96,12 +108,19 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         if (value) formData.append(key, value);
       });
 
+      // Optimistically update the UI
+      dispatch(updateProfileData({
+        ...reduxProfileData,
+        ...profileForm
+      }));
+
       const result = await dispatch(updateProfile(formData)).unwrap();
       
       if (result) {
+        // Update with the actual server response
         dispatch(updateProfileData({
           ...reduxProfileData,
-          ...profileForm
+          ...result
         }));
         toast.success("Profile information updated successfully!");
         setIsProfileDialogOpen(false);
@@ -109,6 +128,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     } catch (err) {
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to update profile information");
+      // Revert optimistic update on error
+      dispatch(updateProfileData({
+        ...reduxProfileData,
+        ...profileData
+      }));
+    } finally {
+      setIsProfileUpdating(false);
     }
   };
 
@@ -137,13 +163,23 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     }
 
     try {
+      setIsImageUploading(true);
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
       formData.append('profile_pic', selectedImage);
 
+      // Optimistically update the UI with the preview
+      if (imagePreview) {
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          profile_pic_url: imagePreview
+        }));
+      }
+
       const result = await dispatch(updateProfile(formData)).unwrap();
       
       if (result) {
+        // Update with the actual server response
         dispatch(updateProfileData({
           ...reduxProfileData,
           profile_pic_url: result.profile_pic_url
@@ -156,38 +192,104 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     } catch (err) {
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to update profile image");
+      // Revert optimistic update on error
+      dispatch(updateProfileData({
+        ...reduxProfileData,
+        profile_pic_url: profileData.profile_pic_url
+      }));
+    } finally {
+      setIsImageUploading(false);
     }
   };
 
   // Video handlers
-  const handleVideoChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const videoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleVideoClick = () => {
+    videoInputRef.current?.click();
+  };
+
+  const handleVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 100 * 1024 * 1024) { // 100MB limit
+        toast.error('Video size should be less than 100MB');
+        return;
+      }
+      setSelectedVideo(file);
+    }
+  };
+
+  const handleVideoDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setVideoForm({ ...videoForm, video_description: e.target.value });
   };
 
   const handleVideoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsVideoUpdating(true);
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
-      formData.append('video_description', videoForm.video_description);
-
-      const result = await dispatch(updateProfile(formData)).unwrap();
       
-      if (result) {
+      if (selectedVideo) {
+        formData.append('video_intro', selectedVideo);
+      }
+      
+      if (videoForm.video_description) {
+        formData.append('video_description', videoForm.video_description);
+      }
+
+      // Optimistically update the UI
+      if (videoForm.video_description) {
         dispatch(updateProfileData({
           ...reduxProfileData,
           video_description: videoForm.video_description
         }));
-        toast.success("Video description updated successfully!");
+      }
+
+      const result = await dispatch(updateProfile(formData)).unwrap();
+      
+      if (result) {
+        // Update with the actual server response
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          video_description: result.video_description,
+          video_intro_url: result.video_intro_url
+        }));
+        toast.success("Video updated successfully!");
         setIsVideoDialogOpen(false);
+        setSelectedVideo(null);
+        setVideoForm({ video_description: '' });
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to update video description");
+      toast.error(error.message || "Failed to update video");
+      // Revert optimistic update on error
+      dispatch(updateProfileData({
+        ...reduxProfileData,
+        video_description: profileData.video_description
+      }));
+    } finally {
+      setIsVideoUpdating(false);
     }
   };
 
   // Certification handlers
+  const handleCertImageClick = () => {
+    certImageInputRef.current?.click();
+  };
+
+  const handleCertImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+      setSelectedCertImage(file);
+    }
+  };
+
   const handleCertChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCertForm({ ...certForm, [e.target.name]: e.target.value });
   };
@@ -195,34 +297,135 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const handleCertSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const updatedCerts = profileData.certifications?.map(cert => 
-        cert === certForm ? certForm : cert
-      ) || [];
-
+      setIsCertUpdating(true);
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
+
+      // Handle certification image upload
+      if (selectedCertImage) {
+        formData.append('certifications_image', selectedCertImage);
+      }
+
+      // Create updated certification object
+      const updatedCert = {
+        ...certForm,
+        certifications_image: selectedCertImage ? selectedCertImage.name : certForm.certifications_image
+      };
+
+      // Update certifications array
+      const updatedCerts = profileData.certifications?.map(cert => 
+        cert.certifications_id === certForm.certifications_id ? updatedCert : cert
+      ) || [];
+
+      // Add certifications to form data
       formData.append('certifications', JSON.stringify(updatedCerts));
+
+      // Optimistically update the UI
+      dispatch(updateProfileData({
+        ...reduxProfileData,
+        certifications: updatedCerts
+      }));
 
       const result = await dispatch(updateProfile(formData)).unwrap();
       
       if (result) {
+        // Update with the actual server response
         dispatch(updateProfileData({
           ...reduxProfileData,
-          certifications: updatedCerts
+          certifications: result.certifications
         }));
         toast.success("Certification updated successfully!");
         setIsCertDialogOpen(false);
+        setSelectedCertImage(null);
+        setCertForm({
+          certifications_name: '',
+          certifications_issuer: '',
+          certifications_issued_date: '',
+          certifications_expiration_date: '',
+          certifications_id: '',
+          certifications_image: '',
+          certifications_image_url: ''
+        });
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to update certification");
+      // Revert optimistic update on error
+      dispatch(updateProfileData({
+        ...reduxProfileData,
+        certifications: profileData.certifications
+      }));
+    } finally {
+      setIsCertUpdating(false);
     }
   };
+
+  // Function to handle opening the certification edit dialog
+  const handleOpenCertDialog = (certification: Certification) => {
+    // Set the form data with the existing certification
+    setCertForm({
+      certifications_name: certification.certifications_name || '',
+      certifications_issuer: certification.certifications_issuer || '',
+      certifications_issued_date: certification.certifications_issued_date || '',
+      certifications_expiration_date: certification.certifications_expiration_date || '',
+      certifications_id: certification.certifications_id || '',
+      certifications_image: certification.certifications_image || '',
+      certifications_image_url: certification.certifications_image_url || ''
+    });
+    setIsCertDialogOpen(true);
+  };
+
+  // Function to handle closing the certification edit dialog
+  const handleCloseCertDialog = () => {
+    setIsCertDialogOpen(false);
+    setSelectedCertImage(null);
+    setCertForm({
+      certifications_name: '',
+      certifications_issuer: '',
+      certifications_issued_date: '',
+      certifications_expiration_date: '',
+      certifications_id: '',
+      certifications_image: '',
+      certifications_image_url: ''
+    });
+  };
+
+  // Add edit button back to each certification
+  const renderCertification = (cert: Certification, index: number) => (
+    <div key={index} className="space-y-1 text-sm">
+      <div>
+        <p className="font-medium">{cert.certifications_name}</p>
+        <p className="text-gray-600">{cert.certifications_issuer}</p>
+        <p className="text-gray-500 text-xs">
+          {cert.certifications_issued_date} - {cert.certifications_expiration_date}
+        </p>
+        {cert.certifications_id && (
+          <p className="text-gray-500 text-xs mt-1">
+            ID: {cert.certifications_id}
+          </p>
+        )}
+      </div>
+      {cert.certifications_image_url && (
+        <div className="mt-2">
+          <img 
+            src={getFullImageUrl(cert.certifications_image_url)} 
+            alt={cert.certifications_name}
+            className="w-full h-auto rounded-lg object-cover max-h-48"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+            }}
+          />
+        </div>
+      )}
+     
+    </div>
+  );
 
   return (
     <div className="space-y-8">
       {/* Profile Image */}
-      <div>
+      <div className="pb-8 border-b-2 border-gray-200">
         <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-gray-200 to-blue-900">
           {profileData.profile_pic_url || profileData.profile_pic ? (
             <div className="relative">
@@ -296,7 +499,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
       {/* Video Introduction */}
       {(profileData.video_intro || profileData.video_intro_url) && (
-        <div>
+        <div className="pb-8 border-b-2 border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Video className="h-5 w-5 text-[#70a4d8]" />
@@ -313,17 +516,21 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             )}
           </div>
           
-          <div className="relative bg-gray-200 rounded-lg aspect-video overflow-hidden">
-            <video 
-              src={getFullImageUrl(profileData.video_intro_url || profileData.video_intro)}
-              className="w-full h-full object-cover"
-              controls
-              preload="metadata"
-              controlsList="nodownload"
-              playsInline
-            />
+          <div className="space-y-4">
+            <div className="relative bg-gray-200 rounded-lg aspect-video overflow-hidden">
+              <video 
+                src={getFullImageUrl(profileData.video_intro_url || profileData.video_intro)}
+                className="w-full h-full object-cover"
+                controls
+                preload="metadata"
+                controlsList="nodownload"
+                playsInline
+              />
+            </div>
             {profileData.video_description && (
-              <p className="text-sm text-gray-600 mt-2">{profileData.video_description}</p>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-sm text-gray-700">{profileData.video_description}</p>
+              </div>
             )}
           </div>
         </div>
@@ -331,17 +538,17 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
       {/* Certifications */}
       {profileData.certifications && profileData.certifications.length > 0 && (
-        <div>
+        <div className="pb-8 border-b-2 border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Award className="h-5 w-5 text-[#70a4d8]" />
               <h3 className="font-semibold">Certifications</h3>
             </div>
-            {isEditMode && (
+            {isEditMode && profileData.certifications && profileData.certifications.length > 0 && (
               <Button 
                 variant="ghost" 
                 className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-                onClick={() => setIsCertDialogOpen(true)}
+                onClick={() => profileData.certifications && handleOpenCertDialog(profileData.certifications[0])}
               >
                 <Pencil className="w-4 h-4" />
               </Button>
@@ -349,24 +556,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           </div>
           
           <div className="space-y-4">
-            {profileData.certifications.map((cert, index) => (
-              <div key={index} className="space-y-1 text-sm">
-                <div>
-                  <p className="font-medium">{cert.certifications_name}</p>
-                  <p className="text-gray-600">{cert.certifications_issuer}</p>
-                  <p className="text-gray-500 text-xs">
-                    {cert.certifications_issued_date} - {cert.certifications_expiration_date}
-                  </p>
-                </div>
-                {cert.certifications_image_url && (
-                  <img 
-                    src={cert.certifications_image_url} 
-                    alt={cert.certifications_name}
-                    className="w-full h-auto rounded mt-2"
-                  />
-                )}
-              </div>
-            ))}
+            {profileData.certifications.map(renderCertification)}
           </div>
         </div>
       )}
@@ -386,6 +576,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 onChange={handleProfileChange}
                 className="bg-gray-50"
                 required
+                disabled={isProfileUpdating}
               />
             </div>
             <div>
@@ -396,6 +587,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 onChange={handleProfileChange}
                 className="bg-gray-50"
                 required
+                disabled={isProfileUpdating}
               />
             </div>
             <div>
@@ -407,6 +599,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 onChange={handleProfileChange}
                 className="bg-gray-50"
                 required
+                disabled={isProfileUpdating}
               />
             </div>
             <div>
@@ -416,6 +609,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 value={profileForm.bio}
                 onChange={handleProfileChange}
                 className="bg-gray-50 min-h-[100px]"
+                disabled={isProfileUpdating}
               />
             </div>
             <DialogFooter>
@@ -423,14 +617,16 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 type="button"
                 variant="outline"
                 onClick={() => setIsProfileDialogOpen(false)}
+                disabled={isProfileUpdating}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                disabled={isProfileUpdating}
               >
-                Save Changes
+                {isProfileUpdating ? 'Updating...' : 'Save Changes'}
               </Button>
             </DialogFooter>
           </form>
@@ -451,6 +647,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 ref={imageInputRef}
                 className="hidden"
                 onChange={handleImageChange}
+                disabled={isImageUploading}
               />
               {imagePreview ? (
                 <img
@@ -468,8 +665,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 variant="outline"
                 onClick={handleImageClick}
                 className="mb-2"
+                disabled={isImageUploading}
               >
-                Choose Image
+                {isImageUploading ? 'Uploading...' : 'Choose Image'}
               </Button>
               <p className="text-gray-500 text-sm">
                 Recommended: Square image, max 5MB
@@ -480,15 +678,16 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 type="button"
                 variant="outline"
                 onClick={() => setIsImageDialogOpen(false)}
+                disabled={isImageUploading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-                disabled={!selectedImage}
+                disabled={!selectedImage || isImageUploading}
               >
-                Upload Image
+                {isImageUploading ? 'Uploading...' : 'Upload Image'}
               </Button>
             </DialogFooter>
           </form>
@@ -499,16 +698,48 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Video Description</DialogTitle>
+            <DialogTitle>Update Video Introduction</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleVideoSubmit} className="space-y-4">
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+              <input
+                type="file"
+                accept="video/*"
+                ref={videoInputRef}
+                className="hidden"
+                onChange={handleVideoFileChange}
+                disabled={isVideoUpdating}
+              />
+              {selectedVideo ? (
+                <div className="text-sm text-gray-600 mb-4">
+                  Selected: {selectedVideo.name}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-600 mb-4">
+                  {profileData.video_intro_url ? 'Current video will be replaced' : 'No video selected'}
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleVideoClick}
+                className="mb-2"
+                disabled={isVideoUpdating}
+              >
+                {isVideoUpdating ? 'Uploading...' : 'Choose Video'}
+              </Button>
+              <p className="text-gray-500 text-sm">
+                Recommended: MP4 format, max 100MB
+              </p>
+            </div>
             <div>
               <label className="block font-medium mb-1 text-sm">Description</label>
               <Textarea
                 value={videoForm.video_description}
-                onChange={handleVideoChange}
+                onChange={handleVideoDescriptionChange}
                 placeholder="Add a description for your video..."
                 className="bg-gray-50 min-h-[100px]"
+                disabled={isVideoUpdating}
               />
             </div>
             <DialogFooter>
@@ -516,14 +747,16 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 type="button"
                 variant="outline"
                 onClick={() => setIsVideoDialogOpen(false)}
+                disabled={isVideoUpdating}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                disabled={isVideoUpdating}
               >
-                Save Changes
+                {isVideoUpdating ? 'Updating...' : 'Save Changes'}
               </Button>
             </DialogFooter>
           </form>
@@ -531,7 +764,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       </Dialog>
 
       {/* Certification Edit Dialog */}
-      <Dialog open={isCertDialogOpen} onOpenChange={setIsCertDialogOpen}>
+      <Dialog open={isCertDialogOpen} onOpenChange={handleCloseCertDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Certification</DialogTitle>
@@ -545,6 +778,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 onChange={handleCertChange}
                 className="bg-gray-50"
                 required
+                disabled={isCertUpdating}
               />
             </div>
             <div>
@@ -555,6 +789,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 onChange={handleCertChange}
                 className="bg-gray-50"
                 required
+                disabled={isCertUpdating}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -567,6 +802,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   onChange={handleCertChange}
                   className="bg-gray-50"
                   required
+                  disabled={isCertUpdating}
                 />
               </div>
               <div>
@@ -578,6 +814,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   onChange={handleCertChange}
                   className="bg-gray-50"
                   required
+                  disabled={isCertUpdating}
                 />
               </div>
             </div>
@@ -589,21 +826,64 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 onChange={handleCertChange}
                 className="bg-gray-50"
                 required
+                disabled={isCertUpdating}
               />
+            </div>
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+              <input
+                type="file"
+                accept="image/*"
+                ref={certImageInputRef}
+                className="hidden"
+                onChange={handleCertImageChange}
+                disabled={isCertUpdating}
+              />
+              {selectedCertImage ? (
+                <div className="text-sm text-gray-600 mb-4">
+                  Selected: {selectedCertImage.name}
+                </div>
+              ) : certForm.certifications_image_url ? (
+                <div className="mb-4">
+                  <img 
+                    src={certForm.certifications_image_url} 
+                    alt="Current certification"
+                    className="w-32 h-32 mx-auto object-cover rounded"
+                  />
+                  <p className="text-sm text-gray-600 mt-2">Current image will be replaced</p>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-600 mb-4">
+                  No image selected
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCertImageClick}
+                className="mb-2"
+                disabled={isCertUpdating}
+              >
+                {isCertUpdating ? 'Uploading...' : 'Choose Image'}
+              </Button>
+              <p className="text-gray-500 text-sm">
+                Recommended: Square image, max 5MB
+              </p>
             </div>
             <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsCertDialogOpen(false)}
+                onClick={handleCloseCertDialog}
+                disabled={isCertUpdating}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                disabled={isCertUpdating}
               >
-                Save Changes
+                {isCertUpdating ? 'Updating...' : 'Save Changes'}
               </Button>
             </DialogFooter>
           </form>
