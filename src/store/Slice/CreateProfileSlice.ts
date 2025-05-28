@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword } from '../Services/CreateProfileService';
 
 interface ProfileError {
   message: string;
@@ -120,6 +120,9 @@ interface CreateProfileState {
   profileData: ProfileData | null;
   hasProfile: boolean;
   profileStatusLoading: boolean;
+  emailChangeLoading: boolean;
+  otpVerificationLoading: boolean;
+  passwordChangeLoading: boolean;
   verificationDetails: {
     government_id: {
       uploaded: boolean;
@@ -148,6 +151,9 @@ const initialState: CreateProfileState = {
   },
   hasProfile: false,
   profileStatusLoading: false,
+  emailChangeLoading: false,
+  otpVerificationLoading: false,
+  passwordChangeLoading: false,
   verificationDetails: null,
 };
 
@@ -326,6 +332,48 @@ const createProfileSlice = createSlice({
       })
       .addCase(shareProfile.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(requestEmailChange.pending, (state) => {
+        state.emailChangeLoading = true;
+        state.error = null;
+      })
+      .addCase(requestEmailChange.fulfilled, (state) => {
+        state.emailChangeLoading = false;
+        state.error = null;
+      })
+      .addCase(requestEmailChange.rejected, (state, action) => {
+        state.emailChangeLoading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(verifyEmailOTP.pending, (state) => {
+        state.otpVerificationLoading = true;
+        state.error = null;
+      })
+      .addCase(verifyEmailOTP.fulfilled, (state, action) => {
+        state.otpVerificationLoading = false;
+        state.error = null;
+        if (state.profileData) {
+          state.profileData = {
+            ...state.profileData,
+            profile_mail: action.payload.email
+          };
+        }
+      })
+      .addCase(verifyEmailOTP.rejected, (state, action) => {
+        state.otpVerificationLoading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(changePassword.pending, (state) => {
+        state.passwordChangeLoading = true;
+        state.error = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.passwordChangeLoading = false;
+        state.error = null;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.passwordChangeLoading = false;
         state.error = action.payload as ProfileError;
       });
   },

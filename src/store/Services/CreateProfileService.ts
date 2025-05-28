@@ -61,8 +61,9 @@ const handleProfileError = (error: unknown): ProfileError => {
     const axiosError = error as AxiosError;
     
     if (!axiosError.response) {
+      // Network error or server not running
       return {
-        message: 'Network error. Please check your internet connection.',
+        message: 'Unable to connect to the server. Please check if the server is running.',
         code: 'NETWORK_ERROR'
       };
     }
@@ -73,25 +74,31 @@ const handleProfileError = (error: unknown): ProfileError => {
     switch (status) {
       case 400:
         return {
-          message: data.error || 'Invalid profile data',
+          message: data.error || 'Invalid request data',
           status,
           code: 'BAD_REQUEST'
         };
       case 401:
         return {
-          message: 'Please log in to continue',
+          message: 'Your session has expired. Please log in again.',
           status,
           code: 'UNAUTHORIZED'
         };
       case 403:
         return {
-          message: data.error || 'Access denied',
+          message: data.error || 'You do not have permission to perform this action',
           status,
           code: 'FORBIDDEN'
         };
+      case 404:
+        return {
+          message: 'The requested resource was not found',
+          status,
+          code: 'NOT_FOUND'
+        };
       case 500:
         return {
-          message: data.error || 'Server error. Please try again later.',
+          message: 'Server error. Please try again later.',
           status,
           code: 'SERVER_ERROR'
         };
@@ -463,6 +470,84 @@ export const shareProfile = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error('Profile share error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
+
+export const requestEmailChange = createAsyncThunk(
+  'profile/requestEmailChange',
+  async (email: string, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${baseUrl}account-settings/`,
+        { 
+          action: 'change_email_request',
+          email 
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Email change request error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
+
+export const verifyEmailOTP = createAsyncThunk(
+  'profile/verifyEmailOTP',
+  async (otp: string, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${baseUrl}account-settings/`,
+        { 
+          action: 'verify_email_otp',
+          otp 
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Email OTP verification error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
+
+export const changePassword = createAsyncThunk(
+  'profile/changePassword',
+  async (payload: { current_password: string; new_password: string }, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${baseUrl}account-settings/`,
+        { 
+          action: 'change_password',
+          ...payload
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Password change error:', error);
       const profileError = handleProfileError(error);
       return rejectWithValue(profileError);
     }

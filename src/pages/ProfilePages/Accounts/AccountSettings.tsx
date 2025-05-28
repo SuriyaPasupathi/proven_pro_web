@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '@/store/store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,64 +15,102 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-
-// Mock: get email from localStorage (replace with Redux or API as needed)
-const getUserEmail = () => localStorage.getItem('user_email');
+import { requestEmailChange, verifyEmailOTP, changePassword } from '@/store/Services/CreateProfileService';
+import { RootState } from '@/store/store';
 
 const AccountSettings: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { profileData, emailChangeLoading, otpVerificationLoading, passwordChangeLoading, error } = useSelector(
+    (state: RootState) => state.createProfile
+  );
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // Email state
-  const [email, setEmail] = useState(getUserEmail());
+  const [email, setEmail] = useState(profileData?.profile_mail || '');
   const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [showOtpDialog, setShowOtpDialog] = useState(false);
   const [newEmail, setNewEmail] = useState(email || '');
-  const [emailLoading, setEmailLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [emailSuccess, setEmailSuccess] = useState('');
+  
+  // OTP state
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
 
   // Password state
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
   // Handlers
   const handleEmailChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEmailLoading(true);
     setEmailError('');
     setEmailSuccess('');
-    // TODO: Replace with real API call
-    setTimeout(() => {
-      setEmail(newEmail);
-      if (newEmail) {
-        localStorage.setItem('user_email', newEmail);
-      }
-      setEmailSuccess('Email updated successfully!');
-      setEmailLoading(false);
+    
+    try {
+      await dispatch(requestEmailChange(newEmail)).unwrap();
+      setEmailSuccess('Verification code sent to your new email address');
       setShowEmailDialog(false);
-    }, 1000);
+      setShowOtpDialog(true);
+      setOtpSent(true);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send verification code';
+      setEmailError(errorMessage);
+    }
+  };
+
+  const handleOtpVerification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setOtpError('');
+    
+    try {
+      await dispatch(verifyEmailOTP(otp)).unwrap();
+      setEmailSuccess('Email updated successfully!');
+      setShowOtpDialog(false);
+      setOtp('');
+      setOtpSent(false);
+      setEmail(newEmail);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Invalid verification code';
+      setOtpError(errorMessage);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setOtpError('');
+    try {
+      await dispatch(requestEmailChange(newEmail)).unwrap();
+      setOtpSent(true);
+      setEmailSuccess('Verification code resent successfully');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to resend verification code';
+      setOtpError(errorMessage);
+    }
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPasswordLoading(true);
     setPasswordError('');
     setPasswordSuccess('');
-    // TODO: Replace with real API call
-    setTimeout(() => {
-      if (!currentPassword || !newPassword) {
-        setPasswordError('Please fill in all fields.');
-        setPasswordLoading(false);
-        return;
-      }
+    
+    try {
+      await dispatch(changePassword({
+        current_password: currentPassword,
+        new_password: newPassword
+      })).unwrap();
+      
       setPasswordSuccess('Password changed successfully!');
-      setPasswordLoading(false);
       setCurrentPassword('');
       setNewPassword('');
-    }, 1000);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to change password';
+      setPasswordError(errorMessage);
+    }
   };
 
   return (
@@ -107,8 +147,8 @@ const AccountSettings: React.FC = () => {
                   {emailError && <div className="text-red-500 text-sm">{emailError}</div>}
                   {emailSuccess && <div className="text-green-600 text-sm">{emailSuccess}</div>}
                   <DialogFooter>
-                    <Button type="submit" className='bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-6 py-2 rounded-md font-semibold text-sm sm:text-base' disabled={emailLoading}>
-                      {emailLoading ? 'Saving...' : 'Save'}
+                    <Button type="submit" className='bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-6 py-2 rounded-md font-semibold text-sm sm:text-base' disabled={emailChangeLoading}>
+                      {emailChangeLoading ? 'Sending OTP...' : 'Send OTP'}
                     </Button>
                     <DialogClose asChild>
                       <Button type="button" variant="outline">Cancel</Button>
@@ -120,6 +160,53 @@ const AccountSettings: React.FC = () => {
           </div>
           <div>Your email address is <span className="font-semibold">{email}</span></div>
         </div>
+
+        {/* OTP Verification Dialog */}
+        <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Verify OTP</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleOtpVerification} className="space-y-4">
+              <div>
+                <Label htmlFor="otp">Enter OTP</Label>
+                <Input
+                  id="otp"
+                  type="text"
+                  value={otp}
+                  onChange={e => setOtp(e.target.value)}
+                  placeholder="Enter 6-digit OTP"
+                  maxLength={6}
+                  required
+                />
+                {otpSent && (
+                  <div className="text-sm text-gray-500 mt-1">
+                    OTP has been sent to {newEmail}
+                  </div>
+                )}
+              </div>
+              {otpError && <div className="text-red-500 text-sm">{otpError}</div>}
+              <div className="flex justify-between items-center">
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  className="text-[#5A8DB8] hover:underline text-sm"
+                  disabled={otpVerificationLoading}
+                >
+                  Resend OTP
+                </button>
+                <div className="flex gap-2">
+                  <Button type="submit" className='bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-6 py-2 rounded-md font-semibold text-sm sm:text-base' disabled={otpVerificationLoading}>
+                    {otpVerificationLoading ? 'Verifying...' : 'Verify'}
+                  </Button>
+                  <DialogClose asChild>
+                    <Button type="button" variant="outline">Cancel</Button>
+                  </DialogClose>
+                </div>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
 
         {/* Password Section */}
         <div className="bg-white rounded-md shadow p-6 border">
@@ -171,8 +258,8 @@ const AccountSettings: React.FC = () => {
               <div>
                 <a href="/forget-password" className="text-[#5A8DB8] hover:underline text-sm">Reset password</a>
               </div>
-              <Button type="submit" className='bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-6 py-2 rounded-md font-semibold text-sm sm:text-base' disabled={passwordLoading}>
-                {passwordLoading ? 'Changing...' : 'Change Password'}
+              <Button type="submit" className='bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-6 py-2 rounded-md font-semibold text-sm sm:text-base' disabled={passwordChangeLoading}>
+                {passwordChangeLoading ? 'Changing...' : 'Change Password'}
               </Button>
             </div>
             {passwordError && <div className="text-red-500 text-sm">{passwordError}</div>}
