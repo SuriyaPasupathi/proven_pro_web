@@ -111,8 +111,34 @@ const ServicesOffer: React.FC = () => {
     }
   };
 
+  const validateForm = () => {
+    for (const form of serviceForms) {
+      if (!form.services_categories.length) {
+        toast.error("Please select at least one service category");
+        return false;
+      }
+      if (!form.services_description.trim()) {
+        toast.error("Please provide a service description");
+        return false;
+      }
+      if (!form.rate_range) {
+        toast.error("Please select a rate range");
+        return false;
+      }
+      if (!form.availability) {
+        toast.error("Please select availability");
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
     
     try {
       const profileData = {
@@ -131,9 +157,8 @@ const ServicesOffer: React.FC = () => {
       
       if (result) {
         toast.success("Services information saved successfully!");
-        if (!profileData) {
-          navigate("/create-profile/work-exp");
-        }
+        // Always navigate to the next page after successful save
+        navigate("/create-profile/work-exp");
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
