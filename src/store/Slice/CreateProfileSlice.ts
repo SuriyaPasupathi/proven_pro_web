@@ -52,10 +52,7 @@ interface ProfileData {
     rate_range: string;
     availability: string;
   }[];
-  services_categories?: string[];
-  services_description?: string;
-  rate_range?: string;
-  availability?: string;
+ 
 
   // Portfolio
   projects?: {
