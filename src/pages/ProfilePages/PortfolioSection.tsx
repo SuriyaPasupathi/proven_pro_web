@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -21,6 +21,11 @@ const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // Add this constant at the top of the file after imports
 const PLACEHOLDER_IMAGE = 'https://placehold.co/400x400/e2e8f0/64748b?text=No+Image';
+
+interface ProjectImage {
+  file: File;
+  previewUrl: string;
+}
 
 interface Project {
   id?: number;
@@ -45,11 +50,13 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
   const [editingItem, setEditingItem] = useState<Project | null>(null);
   const [projectItems, setProjectItems] = useState<Project[]>([]);
   const isInitialMount = useRef(true);
-  const [form, setForm] = useState<Project>({
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [form, setForm] = useState<Project & { project_images: ProjectImage[] }>({
     project_title: "",
     project_description: "",
     project_url: "",
     project_image: "",
+    project_images: [],
   });
 
   // Parse project data
@@ -79,13 +86,17 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
   useEffect(() => {
     if (isDialogOpen) {
       if (editingItem) {
-        setForm(editingItem);
+        setForm({
+          ...editingItem,
+          project_images: [],
+        });
       } else {
         setForm({
           project_title: "",
           project_description: "",
           project_url: "",
           project_image: "",
+          project_images: [],
         });
       }
     }
@@ -114,6 +125,52 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      
+      // Validate each file
+      for (const file of newFiles) {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`${file.name} is too large. Max size is 5MB`);
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          toast.error(`${file.name} is not a valid image file`);
+          return;
+        }
+      }
+
+      // Create preview URLs for new files
+      const newImages = newFiles.map(file => ({
+        file,
+        previewUrl: URL.createObjectURL(file)
+      }));
+
+      setForm(prev => ({
+        ...prev,
+        project_images: [...prev.project_images, ...newImages]
+      }));
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setForm(prev => {
+      const newImages = [...prev.project_images];
+      // Revoke the object URL to prevent memory leaks
+      URL.revokeObjectURL(newImages[index].previewUrl);
+      newImages.splice(index, 1);
+      return { ...prev, project_images: newImages };
+    });
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -134,6 +191,11 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       formData.append('projects', JSON.stringify(updatedProjects));
+
+      // Add project images
+      form.project_images.forEach((image, index) => {
+        formData.append(`project_image_${index}`, image.file);
+      });
 
       // Add other profile data
       if (profileData) {
@@ -162,6 +224,11 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
         // Update local state
         setProjectItems(updatedProjects);
 
+        // Clean up all preview URLs
+        form.project_images.forEach(image => {
+          URL.revokeObjectURL(image.previewUrl);
+        });
+
         toast.success(editingItem ? "Project updated successfully!" : "Project added successfully!");
         setIsDialogOpen(false);
         setEditingItem(null);
@@ -170,6 +237,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
           project_description: "",
           project_url: "",
           project_image: "",
+          project_images: [],
         });
       }
     } catch (err) {
@@ -179,6 +247,11 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
   };
 
   const handleCancel = () => {
+    // Clean up any preview URLs before closing
+    form.project_images.forEach(image => {
+      URL.revokeObjectURL(image.previewUrl);
+    });
+    
     setIsDialogOpen(false);
     setEditingItem(null);
     setForm({
@@ -186,6 +259,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
       project_description: "",
       project_url: "",
       project_image: "",
+      project_images: [],
     });
   };
 
@@ -260,6 +334,53 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
                   className="bg-gray-50"
                   required
                 />
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-6 md:px-8 text-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleImageChange}
+                    multiple
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="mb-2"
+                    onClick={handleUploadClick}
+                  >
+                    Upload Project Images
+                  </Button>
+                  <p className="text-gray-500 text-sm">
+                    Upload project images (max 5MB each)
+                  </p>
+                </div>
+
+                {/* Image Previews */}
+                {form.project_images.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {form.project_images.map((image, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={image.previewUrl}
+                          alt={`Project preview ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <DialogFooter>
@@ -435,6 +556,53 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
                 className="bg-gray-50"
                 required
               />
+            </div>
+
+            {/* Image Upload Section */}
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-6 md:px-8 text-center">
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleImageChange}
+                  multiple
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mb-2"
+                  onClick={handleUploadClick}
+                >
+                  Upload Project Images
+                </Button>
+                <p className="text-gray-500 text-sm">
+                  Upload project images (max 5MB each)
+                </p>
+              </div>
+
+              {/* Image Previews */}
+              {form.project_images.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {form.project_images.map((image, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={image.previewUrl}
+                        alt={`Project preview ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <DialogFooter>
