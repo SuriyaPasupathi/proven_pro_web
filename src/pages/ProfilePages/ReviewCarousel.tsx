@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
+import ReviewDialog from './ReviewDialog';
+import { useToast } from "@/hooks/use-toast";
 
 interface Review {
   id: number;
@@ -19,6 +21,8 @@ interface ReviewCarouselProps {
 const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews = [] }) => {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const { toast } = useToast();
   const visibleReviews = 3; // Number of reviews visible at once on desktop
   const totalReviews = reviews.length;
 
@@ -47,17 +51,65 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews
     return result;
   };
 
+  const handleReviewSubmit = (review: { rating: number; content: string; name: string; company: string }) => {
+    // Create a new review object with a unique ID
+    const newReview = {
+      id: Date.now(), // Using timestamp as a simple unique ID
+      ...review
+    };
+
+    // Add the new review to the reviews list
+    setReviews(prevReviews => [...prevReviews, newReview]);
+    
+    // Show success message
+    toast({
+      title: "Review submitted",
+      description: "Thank you for your review!",
+    });
+
+    // Close the dialog
+    setIsReviewDialogOpen(false);
+  };
+
   // If no reviews, show a message
   if (totalReviews === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">No reviews yet. Be the first to write a review!</p>
+      <div className="py-8">
+        <div className="flex justify-start mb-4">
+          <Button 
+            className="bg-[#70a4d8] hover:bg-[#3C5979] text-white"
+            onClick={() => {
+              setIsReviewDialogOpen(true);
+            }}
+          >
+            Write a Review
+          </Button>
+        </div>
+        <div className="text-center">
+          <p className="text-gray-500">No reviews yet. Be the first to write a review!</p>
+        </div>
+
+        <ReviewDialog
+          isOpen={isReviewDialogOpen}
+          onClose={() => setIsReviewDialogOpen(false)}
+          onSubmit={handleReviewSubmit}
+        />
       </div>
     );
   }
 
   return (
     <div className="relative">
+      <div className="flex justify-start mb-6">
+        <Button 
+          className="bg-[#70a4d8] hover:bg-[#3C5979] text-white"
+          onClick={() => {
+            setIsReviewDialogOpen(true);
+          }}
+        >
+          Write a Review
+        </Button>
+      </div>
       <div className="hidden md:grid md:grid-cols-3 gap-6">
         {getVisibleReviews().map((review) => (
           <ReviewCard key={review.id} review={review} />
@@ -90,6 +142,12 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews
           <span className="sr-only">Next</span>
         </Button>
       </div>
+
+      <ReviewDialog
+        isOpen={isReviewDialogOpen}
+        onClose={() => setIsReviewDialogOpen(false)}
+        onSubmit={handleReviewSubmit}
+      />
     </div>
   );
 };

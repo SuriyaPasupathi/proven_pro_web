@@ -162,8 +162,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
   isOpen,
   onClose,
-  profileUrl,
-  profileName,
+
 }) => {
   const [email, setEmail] = useState('');
   const { toast } = useToast();
@@ -426,12 +425,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
       </div>
 
       <div>
-        <Button 
-          className="bg-[#70a4d8] hover:bg-[#3C5979] text-white"
-          onClick={() => setIsReviewDialogOpen(true)}
-        >
-          Write a Review
-        </Button>
+        
       </div>
 
       <EditProfileDialog
