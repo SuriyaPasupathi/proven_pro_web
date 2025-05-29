@@ -5,7 +5,7 @@ import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-import { createUserProfile, updateProfile } from "../../../store/Services/CreateProfileService";
+import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
 import Select, { MultiValue } from "react-select";
 import { serviceCategoryOptions, rateRangeOptions, availabilityOptions } from "../../../components/common";
@@ -184,16 +184,16 @@ const ServicesOffer: React.FC = () => {
 
       console.log('Submitting profile data:', profileData);
 
-      const action = profileData ? updateProfile : createUserProfile;
-      const result = await dispatch(action(profileData)).unwrap();
+      // Always use createUserProfile (POST) for new service creation
+      const result = await dispatch(createUserProfile(profileData)).unwrap();
       
       if (result) {
-        console.log('Profile update response:', result);
+        console.log('Profile creation response:', result);
         toast.success("Services information saved successfully!");
         navigate("/create-profile/work-exp");
       }
     } catch (err) {
-      console.error('Profile update error:', err);
+      console.error('Profile creation error:', err);
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to save services information");
     }
