@@ -100,6 +100,13 @@ const WorkExp: React.FC = () => {
   };
 
   const addOrUpdateExperience = async () => {
+    if (!currentExperience.company_name || !currentExperience.position || 
+        !currentExperience.experience_start_date || !currentExperience.experience_end_date || 
+        !currentExperience.key_responsibilities) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
     let updatedExperiences: WorkExperience[];
     
     if (editingId) {
@@ -110,20 +117,54 @@ const WorkExp: React.FC = () => {
       updatedExperiences = [...experiences, { ...currentExperience, id: Date.now().toString() }];
     }
 
-    // Optimistically update UI
-    setExperiences(updatedExperiences);
-    
-    // Update in network
-    await updateExperiencesInNetwork(updatedExperiences);
+    try {
+      setIsUpdating(true);
+      const formData = new FormData();
+      formData.append('subscription_type', profileData?.subscription_type || 'premium');
+      formData.append('work_experiences', JSON.stringify(updatedExperiences));
 
-    setCurrentExperience({
-      company_name: "",
-      position: "",
-      experience_start_date: "",
-      experience_end_date: "",
-      key_responsibilities: "",
-    });
-    setEditingId(null);
+      // Add other profile data
+      if (profileData) {
+        Object.entries(profileData).forEach(([key, value]) => {
+          if (key !== 'work_experiences' && key !== 'subscription_type' && value !== undefined) {
+            if (Array.isArray(value)) {
+              formData.append(key, JSON.stringify(value));
+            } else if (value instanceof File) {
+              formData.append(key, value);
+            } else if (typeof value === 'string') {
+              formData.append(key, value);
+            }
+          }
+        });
+      }
+
+      const result = await dispatch(createUserProfile(formData)).unwrap();
+      
+      if (result) {
+        // Update local state only after successful API call
+        setExperiences(updatedExperiences);
+        dispatch(updateProfileData({
+          ...profileData,
+          work_experiences: updatedExperiences
+        }));
+        
+        // Reset form
+        setCurrentExperience({
+          company_name: "",
+          position: "",
+          experience_start_date: "",
+          experience_end_date: "",
+          key_responsibilities: "",
+        });
+        setEditingId(null);
+        toast.success(editingId ? "Experience updated successfully!" : "Experience added successfully!");
+      }
+    } catch (err) {
+      const error = err as { message: string; code?: string };
+      toast.error(error.message || "Failed to save experience");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const editExperience = (experience: WorkExperience) => {
@@ -150,20 +191,10 @@ const WorkExp: React.FC = () => {
     }
 
     try {
-      const profileData = {
-        subscription_type: "premium" as const,
-        work_experiences: experiences,
-      };
-
-      const result = await dispatch(createUserProfile(profileData)).unwrap();
-      
-      if (result) {
-        toast.success("Work experiences saved successfully!");
-        navigate("/create-profile/tool-skills");
-      }
+      navigate("/create-profile/tool-skills");
     } catch (err) {
       const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to save work experiences");
+      toast.error(error.message || "Failed to proceed to next step");
     }
   };
 
