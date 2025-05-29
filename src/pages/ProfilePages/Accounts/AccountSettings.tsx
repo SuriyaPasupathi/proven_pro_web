@@ -20,7 +20,7 @@ import { RootState } from '@/store/store';
 
 const AccountSettings: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { profileData, emailChangeLoading, otpVerificationLoading, passwordChangeLoading, error } = useSelector(
+  const { profileData, emailChangeLoading, otpVerificationLoading, passwordChangeLoading } = useSelector(
     (state: RootState) => state.createProfile
   );
 

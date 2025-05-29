@@ -84,7 +84,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
 
   const handleReviewSubmit = async (review: { rating: number; content: string; name: string; company: string }) => {
     try {
-    
+      console.log('Review submitted:', review);
       toast.success('Review submitted successfully!', {
         description: 'Thank you for your feedback.',
         duration: 3000,
