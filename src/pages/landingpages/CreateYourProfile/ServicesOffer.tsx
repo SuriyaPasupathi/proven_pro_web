@@ -41,22 +41,33 @@ const ServicesOffer: React.FC = () => {
   // Initialize form with existing data if available
   useEffect(() => {
     if (profileData?.categories && profileData.categories.length > 0) {
-      const categories = profileData.categories.map(category => ({
-        services_categories: category.services_categories
+      const formattedCategories = profileData.categories.map(category => {
+        // Parse services_categories from comma-separated string to array of options
+        const categories = category.services_categories
           ? category.services_categories.split(',').map(cat => ({
               value: cat.trim(),
               label: cat.trim()
             }))
-          : [],
-        services_description: category.services_description || "",
-        rate_range: category.rate_range
+          : [];
+
+        // Find matching rate range option
+        const rateRange = category.rate_range
           ? rateRangeOptions.find(opt => opt.value === category.rate_range) || null
-          : null,
-        availability: category.availability
+          : null;
+
+        // Find matching availability option
+        const availability = category.availability
           ? availabilityOptions.find(opt => opt.value === category.availability) || null
-          : null,
-      }));
-      setServiceForms(categories);
+          : null;
+
+        return {
+          services_categories: categories,
+          services_description: category.services_description || '',
+          rate_range: rateRange,
+          availability: availability
+        };
+      });
+      setServiceForms(formattedCategories);
     }
   }, [profileData]);
 
@@ -113,11 +124,11 @@ const ServicesOffer: React.FC = () => {
 
   const validateForm = () => {
     for (const form of serviceForms) {
-      if (!form.services_categories.length) {
+      if (!form.services_categories || form.services_categories.length === 0) {
         toast.error("Please select at least one service category");
         return false;
       }
-      if (!form.services_description.trim()) {
+      if (!form.services_description || form.services_description.trim() === '') {
         toast.error("Please provide a service description");
         return false;
       }
@@ -141,26 +152,48 @@ const ServicesOffer: React.FC = () => {
     }
     
     try {
+      // Ensure all fields are properly formatted before submission
+      const formattedCategories = serviceForms.map(form => {
+        // Handle services_categories
+        const categories = Array.isArray(form.services_categories) 
+          ? form.services_categories.map(cat => cat.value).join(', ')
+          : form.services_categories || '';
+
+        // Handle rate_range
+        const rateRange = form.rate_range 
+          ? (typeof form.rate_range === 'object' ? form.rate_range.value : form.rate_range)
+          : '';
+
+        // Handle availability
+        const availability = form.availability
+          ? (typeof form.availability === 'object' ? form.availability.value : form.availability)
+          : '';
+
+        return {
+          services_categories: categories,
+          services_description: form.services_description || '',
+          rate_range: rateRange,
+          availability: availability
+        };
+      });
+
       const profileData = {
         subscription_type: "premium" as const,
-        categories: serviceForms.map(form => ({
-          services_categories: form.services_categories.map(cat => cat.value).join(', '),
-          services_description: form.services_description,
-          rate_range: form.rate_range?.value || "",
-          availability: form.availability?.value || "",
-        })),
+        categories: formattedCategories
       };
 
-      // If we have existing profile data, use updateProfile instead of createUserProfile
+      console.log('Submitting profile data:', profileData);
+
       const action = profileData ? updateProfile : createUserProfile;
       const result = await dispatch(action(profileData)).unwrap();
       
       if (result) {
+        console.log('Profile update response:', result);
         toast.success("Services information saved successfully!");
-        // Always navigate to the next page after successful save
         navigate("/create-profile/work-exp");
       }
     } catch (err) {
+      console.error('Profile update error:', err);
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to save services information");
     }

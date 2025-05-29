@@ -117,13 +117,26 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     e.preventDefault();
     
     try {
+      // Validate form data
+      const isValid = serviceForms.every(form => 
+        form.services_categories.trim() !== '' &&
+        form.services_description.trim() !== '' &&
+        form.rate_range.trim() !== '' &&
+        form.availability.trim() !== ''
+      );
+
+      if (!isValid) {
+        toast.error("Please fill in all fields for each service category");
+        return;
+      }
+
       const profileData = {
         subscription_type: 'premium' as const,
         categories: serviceForms.map(form => ({
-          services_categories: form.services_categories,
-          services_description: form.services_description,
-          rate_range: form.rate_range,
-          availability: form.availability,
+          services_categories: form.services_categories.trim(),
+          services_description: form.services_description.trim(),
+          rate_range: form.rate_range.trim(),
+          availability: form.availability.trim(),
         })),
       };
 
@@ -132,6 +145,13 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       if (result) {
         toast.success("Services information updated successfully!");
         setIsDialogOpen(false);
+        // Reset form after successful submission
+        setServiceForms([{
+          services_categories: '',
+          services_description: '',
+          rate_range: '',
+          availability: '',
+        }]);
       }
     } catch (err) {
       console.error('Services update error:', err);
