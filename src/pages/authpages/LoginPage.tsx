@@ -200,6 +200,14 @@ export function LoginForm() {
             >
               {isLoading ? 'Signing in...' : 'Log in'}
             </Button>
+            
+            {/* OR Divider */}
+            <div className="relative flex items-center justify-center my-4">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="flex-shrink mx-4 text-gray-500">OR</span>
+              <div className="flex-grow border-t border-gray-300"></div>
+            </div>
+
             {/* Google Sign In */}
             <div className="w-full flex items-center justify-center">
               <GoogleLogin
@@ -225,6 +233,26 @@ export function LoginForm() {
               Register
             </button>
           </p>
+          
+          {/* Privacy Policy & Terms */}
+          <div className="mt-6 text-center">
+            <p className="text-xs text-gray-500">
+              By continuing, you agree to our{' '}
+              <button
+                className="text-[#5A8DB8] hover:underline font-bold"
+                onClick={() => navigate('/login')}
+              >
+                Privacy Policy
+              </button>
+              {' '}and{' '}
+              <button
+                className="text-[#5A8DB8] hover:underline font-bold"
+                onClick={() => navigate('/login')}
+              >
+                Terms & Conditions
+              </button>
+            </p>
+          </div>
         </div>
       </div>
       {/* Right: Hero Image */}

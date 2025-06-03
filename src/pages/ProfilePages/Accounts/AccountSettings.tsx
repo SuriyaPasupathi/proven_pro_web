@@ -256,7 +256,7 @@ const AccountSettings: React.FC = () => {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <a href="/forget-password" className="text-[#5A8DB8] hover:underline text-sm">Reset password</a>
+                {/* <a href="/forget-password" className="text-[#5A8DB8] hover:underline text-sm">Reset password</a> */}
               </div>
               <Button type="submit" className='bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-6 py-2 rounded-md font-semibold text-sm sm:text-base' disabled={passwordChangeLoading}>
                 {passwordChangeLoading ? 'Changing...' : 'Change Password'}
