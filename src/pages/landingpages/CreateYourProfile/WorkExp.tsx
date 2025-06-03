@@ -107,6 +107,18 @@ const WorkExp: React.FC = () => {
       return;
     }
 
+    // Check for duplicate experience
+    const isDuplicate = experiences.some(exp => 
+      exp.company_name.toLowerCase() === currentExperience.company_name.toLowerCase() && 
+      exp.position.toLowerCase() === currentExperience.position.toLowerCase() &&
+      exp.id !== editingId
+    );
+
+    if (isDuplicate) {
+      toast.error("This work experience already exists");
+      return;
+    }
+
     let updatedExperiences: WorkExperience[];
     
     if (editingId) {
@@ -114,7 +126,12 @@ const WorkExp: React.FC = () => {
         exp.id === editingId ? { ...currentExperience, id: editingId } : exp
       );
     } else {
-      updatedExperiences = [...experiences, { ...currentExperience, id: Date.now().toString() }];
+      // Add new experience with a unique ID
+      const newExperience = {
+        ...currentExperience,
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      };
+      updatedExperiences = [...experiences, newExperience];
     }
 
     try {
