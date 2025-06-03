@@ -29,6 +29,9 @@ import Verification from './pages/ProfilePages/Accounts/Verification';
 import MembershipPlans from './pages/ProfilePages/Accounts/MembershipPlans';
 import { EditModeProvider } from './context/EditModeContext';
 import Contact from './pages/landingpages/LandingPreview/Contact';
+import ProtectedRoute from './context/ProtectedRoute';
+import ShareProfilePage from './pages/ProfilePages/SharePage/ShareProfilePage';
+
 function ThemeProvider({ children }: { children: React.ReactNode }) {
 const { theme } = useTheme();
   
@@ -48,15 +51,13 @@ function App() {
           <BrowserRouter>
             <Toaster richColors position="top-center" />
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
-
-              {/* Plan Pages */}
               <Route path="/plans" element={<Plans />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/share/:profileId/:shareToken" element={<ShareProfilePage />} />
 
-              
-
-              {/* Auth Pages */}
+              {/* Auth Routes */}
               <Route path="/signup" element={<SignUpForm />} />
               <Route path="/login" element={<LoginForm />} />
               <Route path="/forget-password" element={<ForgetPassword />} />
@@ -67,27 +68,25 @@ function App() {
               <Route path="/check-email-code" element={<CheckEmailCode />} />
               <Route path="/verified-email" element={<VerifiedEmail />} />
 
-              {/* Create Your Profile */}
-              <Route path="/create-profile/personal-info" element={<PersonalInfo />} />
-              <Route path="/create-profile/profile-img" element={<ProfileImg />} />
-              <Route path="/create-profile/services-offer" element={<ServicesOffer />} />
-              <Route path="/create-profile/work-exp" element={<WorkExp />} />
-              <Route path="/create-profile/tool-skills" element={<ToolSkills />} />
-              <Route path="/create-profile/portfolio" element={<Portfolio />} />
-              <Route path="/create-profile/licenses" element={<Licenses />} />
-              <Route path="/create-profile/video-intro" element={<VideoIntro />} />
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                {/* Create Your Profile Routes */}
+                <Route path="/create-profile/personal-info" element={<PersonalInfo />} />
+                <Route path="/create-profile/profile-img" element={<ProfileImg />} />
+                <Route path="/create-profile/services-offer" element={<ServicesOffer />} />
+                <Route path="/create-profile/work-exp" element={<WorkExp />} />
+                <Route path="/create-profile/tool-skills" element={<ToolSkills />} />
+                <Route path="/create-profile/portfolio" element={<Portfolio />} />
+                <Route path="/create-profile/licenses" element={<Licenses />} />
+                <Route path="/create-profile/video-intro" element={<VideoIntro />} />
 
-              {/* Profile Pages */}
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/profile/:profileId" element={<Profile />} />
-
-              <Route path="/profile/account-settings" element={<AccountSettings />} />
-              <Route path="/profile/verification" element={<Verification />} />
-              <Route path="/profile/membership-plans" element={<MembershipPlans />} />
-
-              
-
-
+                {/* Profile Routes */}
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/:profileId" element={<Profile />} />
+                <Route path="/profile/account-settings" element={<AccountSettings />} />
+                <Route path="/profile/verification" element={<Verification />} />
+                <Route path="/profile/membership-plans" element={<MembershipPlans />} />
+              </Route>
             </Routes>
           </BrowserRouter>
         </ThemeProvider>

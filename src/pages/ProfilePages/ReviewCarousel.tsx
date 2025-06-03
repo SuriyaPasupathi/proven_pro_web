@@ -16,9 +16,10 @@ interface Review {
 
 interface ReviewCarouselProps {
   reviews?: Review[];
+  onSubmit?: (review: { rating: number; content: string; name: string; company: string }) => void;
 }
 
-const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews = [] }) => {
+const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews = [], onSubmit }) => {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
@@ -69,6 +70,10 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews
 
     // Close the dialog
     setIsReviewDialogOpen(false);
+
+    if (onSubmit) {
+      onSubmit(review);
+    }
   };
 
   // If no reviews, show a message

@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews } from '../Services/CreateProfileService';
 
 interface ProfileError {
   message: string;
@@ -110,6 +110,15 @@ interface ProfileData {
   verification_details?: VerificationDetails;
 }
 
+interface Review {
+  id: number;
+  reviewer_name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+  company?: string;
+}
+
 interface CreateProfileState {
   loading: boolean;
   error: ProfileError | null;
@@ -120,6 +129,10 @@ interface CreateProfileState {
   emailChangeLoading: boolean;
   otpVerificationLoading: boolean;
   passwordChangeLoading: boolean;
+  reviewSubmissionLoading: boolean;
+  reviewSubmissionSuccess: boolean;
+  reviewsLoading: boolean;
+  reviews: Review[];
   verificationDetails: {
     government_id: {
       uploaded: boolean;
@@ -151,6 +164,10 @@ const initialState: CreateProfileState = {
   emailChangeLoading: false,
   otpVerificationLoading: false,
   passwordChangeLoading: false,
+  reviewSubmissionLoading: false,
+  reviewSubmissionSuccess: false,
+  reviewsLoading: false,
+  reviews: [],
   verificationDetails: null,
 };
 
@@ -172,6 +189,16 @@ const createProfileSlice = createSlice({
         ...state.profileData,
         ...action.payload,
       };
+    },
+    resetReviewState: (state) => {
+      state.reviewSubmissionLoading = false;
+      state.reviewSubmissionSuccess = false;
+      state.error = null;
+    },
+    resetReviewsState: (state) => {
+      state.reviewsLoading = false;
+      state.reviews = [];
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -373,9 +400,37 @@ const createProfileSlice = createSlice({
       .addCase(changePassword.rejected, (state, action) => {
         state.passwordChangeLoading = false;
         state.error = action.payload as ProfileError;
+      })
+      .addCase(submitProfileReview.pending, (state) => {
+        state.reviewSubmissionLoading = true;
+        state.error = null;
+        state.reviewSubmissionSuccess = false;
+      })
+      .addCase(submitProfileReview.fulfilled, (state) => {
+        state.reviewSubmissionLoading = false;
+        state.reviewSubmissionSuccess = true;
+        state.error = null;
+      })
+      .addCase(submitProfileReview.rejected, (state, action) => {
+        state.reviewSubmissionLoading = false;
+        state.reviewSubmissionSuccess = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(getProfileReviews.pending, (state) => {
+        state.reviewsLoading = true;
+        state.error = null;
+      })
+      .addCase(getProfileReviews.fulfilled, (state, action) => {
+        state.reviewsLoading = false;
+        state.reviews = action.payload;
+        state.error = null;
+      })
+      .addCase(getProfileReviews.rejected, (state, action) => {
+        state.reviewsLoading = false;
+        state.error = action.payload as ProfileError;
       });
   },
 });
 
-export const { clearError, resetState, updateProfileData } = createProfileSlice.actions;
+export const { clearError, resetState, updateProfileData, resetReviewState, resetReviewsState } = createProfileSlice.actions;
 export default createProfileSlice.reducer;

@@ -555,3 +555,53 @@ export const changePassword = createAsyncThunk(
     }
   }
 );
+
+export const submitProfileReview = createAsyncThunk(
+  'profile/submitProfileReview',
+  async (payload: { 
+    share_token: string;
+    reviewer_name: string;
+    rating: number;
+    comment: string;
+    company?: string;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${baseUrl}profile-share/`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Review submission error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
+
+export const getProfileReviews = createAsyncThunk(
+  'profile/getProfileReviews',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.get(
+        `${baseUrl}profile-share/?action=get_reviews`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Get reviews error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
