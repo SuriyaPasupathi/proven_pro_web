@@ -104,7 +104,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
           variant="ghost" 
           className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
           onClick={() => {
-              navigate(`/profile/verification/${userData.id}`);
+            navigate(`/profile/verification/${userData.id}`);
             closeDropdown();
           }}
         >

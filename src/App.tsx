@@ -84,9 +84,9 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/profile/:profileId" element={<Profile />} />
                 <Route path="/share-profile/:profileId/:shareToken" element={<ShareProfilePage />} />
-                <Route path="/profile/account-settings" element={<AccountSettings />} />
-                <Route path="/profile/verification" element={<Verification />} />
-                <Route path="/profile/membership-plans" element={<MembershipPlans />} />
+                <Route path="/profile/account-settings/:profileId" element={<AccountSettings />} />
+                <Route path="/profile/verification/:profileId" element={<Verification />} />
+                <Route path="/profile/membership-plans/:profileId" element={<MembershipPlans />} />
               </Route>
             </Routes>
           </BrowserRouter>

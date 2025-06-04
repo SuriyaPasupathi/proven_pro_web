@@ -188,8 +188,12 @@ export const getProfile = createAsyncThunk(
         throw new Error('No authentication token found');
       }
 
+      if (!profileId) {
+        throw new Error('Profile ID is required');
+      }
+
       const response = await axios.get(
-        `${baseUrl}profile/${profileId ? `${profileId}/` : ''}`,
+        `${baseUrl}profile/${profileId}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -294,12 +298,16 @@ export const checkProfileStatus = createAsyncThunk(
 
 export const updateProfile = createAsyncThunk(
   'profile/updateProfile',
-    async (payload: { data: ProfilePayload | FormData; profileId?: string }, { rejectWithValue }) => {
+    async (payload: { data: ProfilePayload | FormData; profileId: string }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const formData = payload.data instanceof FormData ? payload.data : new FormData();
       const { profileId } = payload;
       
+      if (!profileId) {
+        throw new Error('Profile ID is required for update');
+      }
+
       // If payload is not FormData, convert it to FormData
       if (!(payload.data instanceof FormData)) {
         // Add subscription type first
@@ -341,10 +349,13 @@ export const updateProfile = createAsyncThunk(
         console.log(`${key}:`, value);
       }
 
-      const response = await axios.put(`${baseUrl}profile/${profileId ? `${profileId}/` : ''}`, formData, {
+      const response = await axios.put(`${baseUrl}profile/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
+        },
+        params: {
+          user_id: profileId
         }
       });
 
@@ -362,7 +373,7 @@ export const updateProfile = createAsyncThunk(
 
 export const uploadVerificationDocument = createAsyncThunk(
   'profile/uploadVerificationDocument',
-  async (payload: { document: File; document_type: 'gov_id' | 'address' }, { rejectWithValue }) => {
+  async (payload: { document: File; document_type: 'gov_id' | 'address'; user_id: string }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const formData = new FormData();
@@ -373,6 +384,9 @@ export const uploadVerificationDocument = createAsyncThunk(
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
+        },
+        params: {
+          user_id: payload.user_id
         }
       });
 

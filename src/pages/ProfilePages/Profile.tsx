@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import axios from 'axios';
 
 export interface ProfileData {
-  id?: string;
+  id: string;
   subscription_type: 'free' | 'standard' | 'premium';
   // Profile Fields
   first_name?: string;

@@ -16,8 +16,10 @@ import { Input } from "@/components/ui/input";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 
 const Verification = () => {
+  const { profileId } = useParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, profileData } = useSelector((state: RootState) => state.createProfile);
@@ -41,9 +43,11 @@ const Verification = () => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(getProfile());
-    dispatch(getVerificationStatus());
-  }, [dispatch]);
+    if (profileId) {
+      dispatch(getProfile(profileId));
+      dispatch(getVerificationStatus());
+    }
+  }, [dispatch, profileId]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -102,44 +106,38 @@ const Verification = () => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) {
-      toast.error('Please select a file first');
-      return;
-    }
+    if (!selectedFile) return;
 
     setIsUploading(true);
     try {
-      const result = await dispatch(uploadVerificationDocument({
+      await dispatch(uploadVerificationDocument({
         document: selectedFile,
-        document_type: 'gov_id'
+        document_type: 'gov_id',
+        user_id: profileId || ''
       })).unwrap();
-
-      toast.success(result.message);
+      toast.success('Document uploaded successfully');
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     } catch (error) {
-      toast.error('Failed to upload file');
+      toast.error('Failed to upload document');
     } finally {
       setIsUploading(false);
     }
   };
 
   const handleAddressUpload = async () => {
-    if (!selectedAddressFile) {
-      toast.error('Please select an address document first');
-      return;
-    }
+    if (!selectedAddressFile) return;
 
     setIsAddressUploading(true);
     try {
-      const result = await dispatch(uploadVerificationDocument({
+      await dispatch(uploadVerificationDocument({
         document: selectedAddressFile,
-        document_type: 'address'
+        document_type: 'address',
+        user_id: profileId || ''
       })).unwrap();
-
-      toast.success(result.message);
+      toast.success('Address document uploaded successfully');
       setSelectedAddressFile(null);
       if (addressFileInputRef.current) {
         addressFileInputRef.current.value = '';
