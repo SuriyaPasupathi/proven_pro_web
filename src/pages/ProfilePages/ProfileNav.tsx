@@ -82,7 +82,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleReviewSubmit = async (review: { rating: number; content: string; name: string; company: string }) => {
+  const handleReviewSubmit = (review: { rating: number; content: string; name: string }) => {
     try {
       console.log('Review submitted:', review);
       toast.success('Review submitted successfully!', {

@@ -14,10 +14,12 @@ import ToolsSection from '../ToolsSection';
 import { ThemeProvider } from '../ThemeProvider';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import ShareNavbar from './ShareNavbar';
 
 const ShareProfilePage = () => {
   const { profileId, shareToken } = useParams();
   const dispatch = useAppDispatch();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { 
     profileData, 
     loading, 
@@ -119,6 +121,7 @@ const ShareProfilePage = () => {
   return (
     <ThemeProvider defaultTheme="light">
       <div className="min-h-screen bg-gray-50">
+        <ShareNavbar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
         <main className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Sidebar */}
