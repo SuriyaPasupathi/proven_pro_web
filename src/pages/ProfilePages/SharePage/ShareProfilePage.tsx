@@ -16,7 +16,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const ShareProfilePage = () => {
-  const { profileId, shareToken, userId } = useParams();
+  const { profileId, shareToken } = useParams();
   const dispatch = useAppDispatch();
   const { 
     profileData, 
@@ -32,7 +32,7 @@ const ShareProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        if (profileId && shareToken && userId) {
+        if (profileId && shareToken) {
           await dispatch(getProfile(profileId)).unwrap();
           // Fetch reviews after profile is loaded
           await dispatch(getProfileReviews()).unwrap();
@@ -49,7 +49,7 @@ const ShareProfilePage = () => {
     return () => {
       dispatch(resetReviewsState());
     };
-  }, [dispatch, profileId, shareToken, userId]);
+  }, [dispatch, profileId, shareToken]);
 
   useEffect(() => {
     if (reviewSubmissionSuccess) {
@@ -61,7 +61,7 @@ const ShareProfilePage = () => {
   }, [reviewSubmissionSuccess, dispatch]);
 
   const handleReviewSubmit = async (review: { rating: number; content: string; name: string; company: string }) => {
-    if (!shareToken || !userId) return;
+    if (!shareToken) return;
 
     try {
       await dispatch(submitProfileReview({
@@ -69,8 +69,7 @@ const ShareProfilePage = () => {
         reviewer_name: review.name,
         rating: review.rating,
         comment: review.content,
-        company: review.company,
-        user_id: userId
+        company: review.company
       })).unwrap();
     } catch (err) {
       toast.error('Failed to submit review. Please try again.');
@@ -123,12 +122,12 @@ const ShareProfilePage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Sidebar */}
             <div className="lg:col-span-1">
-              <ProfileSidebar profileData={{ ...profileData, id: profileId || '', user_id: userId || '' }} />
+              <ProfileSidebar profileData={{ ...profileData, id: profileId || '' }} />
             </div>
 
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
-              <ProfileHeader profileData={{ ...profileData, id: profileId || '', user_id: userId || '' }} />
+              <ProfileHeader profileData={{ ...profileData, id: profileId || '' }} />
               
               {profileData.experiences && profileData.experiences.length > 0 && (
                 <ExperienceSection experiences={profileData.experiences} />

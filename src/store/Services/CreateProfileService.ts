@@ -574,30 +574,22 @@ export const changePassword = createAsyncThunk(
 export const submitProfileReview = createAsyncThunk(
   'profile/submitProfileReview',
   async (payload: { 
-    share_token: string; 
-    reviewer_name: string; 
-    rating: number; 
-    comment: string; 
+    share_token: string;
+    reviewer_name: string;
+    rating: number;
+    comment: string;
     company?: string;
-    user_id: string;
   }, { rejectWithValue }) => {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
       const response = await axios.post(
-        `${baseUrl}profile/review/`,
+        `${baseUrl}profile-share/`,
         payload,
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Content-Type': 'application/json'
           }
         }
       );
-
       return response.data;
     } catch (error) {
       console.error('Review submission error:', error);

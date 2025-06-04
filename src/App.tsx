@@ -55,7 +55,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/plans" element={<Plans />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/share/:profileId/:shareToken/:userId" element={<ShareProfilePage />} />
+              <Route path="/share/:profileId/:shareToken" element={<ShareProfilePage />} />
 
               {/* Auth Routes */}
               <Route path="/signup" element={<SignUpForm />} />
@@ -83,7 +83,7 @@ function App() {
                 {/* Profile Routes */}
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/profile/:profileId" element={<Profile />} />
-                <Route path="/share-profile/:profileId/:shareToken/:userId" element={<ShareProfilePage />} />
+                <Route path="/share-profile/:profileId/:shareToken" element={<ShareProfilePage />} />
                 <Route path="/profile/account-settings/:profileId" element={<AccountSettings />} />
                 <Route path="/profile/verification/:profileId" element={<Verification />} />
                 <Route path="/profile/membership-plans/:profileId" element={<MembershipPlans />} />
