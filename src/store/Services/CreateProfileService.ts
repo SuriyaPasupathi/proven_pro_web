@@ -469,14 +469,15 @@ export const getVerificationStatus = createAsyncThunk(
 
 export const shareProfile = createAsyncThunk(
   'profile/shareProfile',
-  async (email: string, { rejectWithValue }) => {
+  async (payload: { email: string; user_id: string }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const response = await axios.post(
         `${baseUrl}request-profile-share/`,
         { 
           action: 'generate',
-          email 
+          email: payload.email,
+          user_id: payload.user_id
         },
         {
           headers: {
@@ -574,6 +575,7 @@ export const changePassword = createAsyncThunk(
 export const submitProfileReview = createAsyncThunk(
   'profile/submitProfileReview',
   async (payload: { 
+    id: string;
     share_token: string;
     reviewer_name: string;
     rating: number;

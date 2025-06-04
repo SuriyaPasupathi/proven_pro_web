@@ -65,6 +65,7 @@ const ShareProfilePage = () => {
 
     try {
       await dispatch(submitProfileReview({
+        id: profileId || '',
         share_token: shareToken,
         reviewer_name: review.name,
         rating: review.rating,

@@ -8,6 +8,8 @@ import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ProfileData } from '../ProfilePages/Profile';
+import { useParams } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -42,6 +44,7 @@ interface PortfolioSectionProps {
 }
 
 const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], portfolio = [] }) => {
+  const { profileId } = useParams();
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
@@ -212,7 +215,10 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
         });
       }
 
-      const result = await dispatch(updateProfile(formData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileId || ''
+      })).unwrap();
       
       if (result) {
         // Update Redux store
