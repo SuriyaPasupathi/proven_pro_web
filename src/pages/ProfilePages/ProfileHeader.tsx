@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { ProfileData } from './Profile';
 import { useEditMode } from '../../context/EditModeContext';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../store/store';
 import { updateProfile, shareProfile } from '../../store/Services/CreateProfileService';
 import {
   Dialog,
@@ -44,8 +44,40 @@ interface VerificationDetails {
 }
 
 interface ProfileHeaderProps {
-  profileData: ProfileData & {
-    verification_details?: VerificationDetails;
+  profileData: {
+    id: string;
+    subscription_type: 'free' | 'standard' | 'premium';
+    first_name?: string;
+    last_name?: string;
+    bio?: string;
+    profile_mail?: string;
+    profile_url?: string;
+    rating?: number;
+    reviews?: Array<{
+      id: number;
+      reviewer_name: string;
+      rating: number;
+      comment: string;
+      created_at: string;
+      company?: string;
+    }>;
+    verification_details?: {
+      government_id: {
+        uploaded: boolean;
+        verified: boolean;
+        percentage: number;
+      };
+      address_proof: {
+        uploaded: boolean;
+        verified: boolean;
+        percentage: number;
+      };
+      mobile: {
+        provided: boolean;
+        verified: boolean;
+        percentage: number;
+      };
+    };
   };
 }
 
@@ -59,8 +91,11 @@ interface EditProfileDialogProps {
 interface ShareProfileDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  profileUrl: string;
-  profileName: string;
+  profileData: {
+    id: string;
+    first_name?: string;
+    last_name?: string;
+  };
 }
 
 const calculateVerificationPercentage = (details: VerificationDetails): number => {
@@ -162,34 +197,35 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
   isOpen,
   onClose,
-
+  profileData,
 }) => {
   const [email, setEmail] = useState('');
   const { toast } = useToast();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleShare = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
+    if (!email || !profileData?.id) return;
+
     try {
-      const result = await dispatch(shareProfile(email) as any);
+      setIsLoading(true);
+      await dispatch(shareProfile({ 
+        email, 
+        user_id: profileData.id 
+      })).unwrap();
       
-      if (shareProfile.fulfilled.match(result)) {
-        toast({
-          title: "Profile shared successfully",
-          description: "The recipient will receive an email with the profile link",
-        });
-        setEmail('');
-        onClose();
-      } else {
-        throw new Error(result.payload?.message || 'Failed to share profile');
-      }
-    } catch (error: any) {
+      toast({
+        title: "Profile shared successfully",
+        description: "The recipient will receive an email with the profile link",
+      });
+      setEmail('');
+      onClose();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to share profile';
       toast({
         title: "Error sharing profile",
-        description: error.message || "Please try again later",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -241,7 +277,7 @@ const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
   const { isEditMode } = useEditMode();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
@@ -270,13 +306,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
   const handleSaveProfile = async (data: Partial<ProfileData>) => {
     try {
       const updateData = {
-        subscription_type: profileData.subscription_type || 'free',
-        first_name: data.first_name,
-        last_name: data.last_name,
-        bio: data.bio,
-        profile_mail: data.profile_mail
+        data: {
+          subscription_type: profileData.subscription_type || 'free',
+          first_name: data.first_name,
+          last_name: data.last_name,
+          bio: data.bio,
+          profile_mail: data.profile_mail
+        },
+        profileId: profileData.id
       };
-      await dispatch(updateProfile(updateData) as any);
+      await dispatch(updateProfile(updateData));
     } catch (error) {
       console.error('Error updating profile:', error);
     }
@@ -438,8 +477,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
       <ShareProfileDialog
         isOpen={isShareDialogOpen}
         onClose={() => setIsShareDialogOpen(false)}
-        profileUrl={profileData.profile_url || "https://www.mytrustworld.com/profile-d-ae111378"}
-        profileName={`${profileData.first_name} ${profileData.last_name}`}
+        profileData={profileData}
       />
 
       <ReviewDialog

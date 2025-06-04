@@ -98,7 +98,10 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
         });
       }
 
-      const result = await dispatch(updateProfile(formData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData?.profile_url || ''
+      })).unwrap();
       
       if (result) {
         // Update local state

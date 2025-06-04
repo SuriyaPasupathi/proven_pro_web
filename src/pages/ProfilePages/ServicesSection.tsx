@@ -61,7 +61,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     rate_range: null,
     availability: null,
   }]);
-  const { loading } = useSelector((state: RootState) => state.createProfile);
+  const { loading, profileData: reduxProfileData } = useSelector((state: RootState) => state.createProfile);
 
   // Initialize form with current values when dialog opens
   useEffect(() => {
@@ -214,7 +214,10 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         categories: formattedCategories
       };
 
-      const result = await dispatch(updateProfile(profileData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: profileData,
+        profileId: reduxProfileData?.profile_url || ''
+      })).unwrap();
       
       if (result) {
         toast.success("Services information updated successfully!");

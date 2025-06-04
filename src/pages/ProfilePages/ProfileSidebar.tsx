@@ -114,7 +114,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         ...profileForm
       }));
 
-      const result = await dispatch(updateProfile(formData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData.profile_url || ''
+      })).unwrap();
       
       if (result) {
         // Update with the actual server response
@@ -176,7 +179,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         }));
       }
 
-      const result = await dispatch(updateProfile(formData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData.profile_url || ''
+      })).unwrap();
       
       if (result) {
         // Update with the actual server response
@@ -247,7 +253,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         }));
       }
 
-      const result = await dispatch(updateProfile(formData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData.profile_url || ''
+      })).unwrap();
       
       if (result) {
         // Update with the actual server response
@@ -326,7 +335,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         certifications: updatedCerts
       }));
 
-      const result = await dispatch(updateProfile(formData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData.profile_url || ''
+      })).unwrap();
       
       if (result) {
         // Update with the actual server response

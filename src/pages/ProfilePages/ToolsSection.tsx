@@ -93,7 +93,10 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         });
       }
 
-      const result = await dispatch(updateProfile(formData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData?.profile_url || ''
+      })).unwrap();
       
       if (result) {
         dispatch(updateProfileData({

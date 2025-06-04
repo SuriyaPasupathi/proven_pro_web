@@ -92,7 +92,10 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         });
       }
 
-      const result = await dispatch(updateProfile(formData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData?.profile_url || ''
+      })).unwrap();
       
       if (result) {
         dispatch(updateProfileData({
