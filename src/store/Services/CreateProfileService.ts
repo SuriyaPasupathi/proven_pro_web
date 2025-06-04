@@ -294,18 +294,19 @@ export const checkProfileStatus = createAsyncThunk(
 
 export const updateProfile = createAsyncThunk(
   'profile/updateProfile',
-  async (payload: ProfilePayload | FormData, { rejectWithValue }) => {
+    async (payload: { data: ProfilePayload | FormData; profileId?: string }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      const formData = payload instanceof FormData ? payload : new FormData();
+      const formData = payload.data instanceof FormData ? payload.data : new FormData();
+      const { profileId } = payload;
       
       // If payload is not FormData, convert it to FormData
-      if (!(payload instanceof FormData)) {
+      if (!(payload.data instanceof FormData)) {
         // Add subscription type first
-        formData.append('subscription_type', payload.subscription_type);
+        formData.append('subscription_type', payload.data.subscription_type);
 
         // Add all non-file fields to formData
-        Object.entries(payload).forEach(([key, value]) => {
+        Object.entries(payload.data).forEach(([key, value]) => {
           // Skip file fields, undefined values, and subscription_type (already added)
           if (key === 'profile_pic' || key === 'video_intro' || key === 'subscription_type' || value === undefined) {
             return;
@@ -325,22 +326,22 @@ export const updateProfile = createAsyncThunk(
         });
 
         // Add file fields only if they exist and are not null
-        if (payload.profile_pic instanceof File) {
-          formData.append('profile_pic', payload.profile_pic);
+        if (payload.data.profile_pic instanceof File) {
+          formData.append('profile_pic', payload.data.profile_pic);
         }
-        if (payload.video_intro instanceof File) {
-          formData.append('video_intro', payload.video_intro);
+        if (payload.data.video_intro instanceof File) {
+          formData.append('video_intro', payload.data.video_intro);
         }
       }
 
       // Debug logging
-      console.log('Update Profile Payload:', payload);
+      console.log('Update Profile Payload:', payload.data);
       console.log('FormData entries:');
       for (let [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }
 
-      const response = await axios.put(`${baseUrl}profile/`, formData, {
+      const response = await axios.put(`${baseUrl}profile/${profileId ? `${profileId}/` : ''}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
