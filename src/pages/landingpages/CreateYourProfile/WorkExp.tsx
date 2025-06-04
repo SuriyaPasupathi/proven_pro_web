@@ -9,8 +9,6 @@ import { createUserProfile, updateProfile } from "../../../store/Services/Create
 import { updateProfileData } from "../../../store/Slice/CreateProfileSlice";
 import toast from "react-hot-toast";
 import { Trash2, Edit2 } from "lucide-react";
-import Select from "react-select";
-import { positionOptions } from "../../../components/common";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 4;
@@ -22,11 +20,6 @@ interface WorkExperience {
   experience_start_date: string;
   experience_end_date: string;
   key_responsibilities: string;
-}
-
-interface Option {
-  value: string;
-  label: string;
 }
 
 const WorkExp: React.FC = () => {
@@ -51,13 +44,6 @@ const WorkExp: React.FC = () => {
     setCurrentExperience({ ...currentExperience, [e.target.name]: e.target.value });
   };
 
-  const handlePositionChange = (selectedOption: Option | null) => {
-    setCurrentExperience({
-      ...currentExperience,
-      position: selectedOption ? selectedOption.value : "",
-    });
-  };
-
   const updateExperiencesInNetwork = async (updatedExperiences: WorkExperience[]) => {
     try {
       setIsUpdating(true);
@@ -80,7 +66,10 @@ const WorkExp: React.FC = () => {
         });
       }
 
-      const result = await dispatch(updateProfile(formData)).unwrap();
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData?.profile_url || ''
+      })).unwrap();
       
       if (result) {
         dispatch(updateProfileData({
@@ -264,13 +253,12 @@ const WorkExp: React.FC = () => {
             <label htmlFor="position" className="block font-medium mb-1 text-sm">
               Position
             </label>
-            <Select
+            <Input
               id="position"
               name="position"
-              options={positionOptions}
-              placeholder="Select your position"
-              value={positionOptions.find(option => option.value === currentExperience.position)}
-              onChange={handlePositionChange}
+              placeholder="Enter your position"
+              value={currentExperience.position}
+              onChange={handleChange}
               className="bg-gray-50"
               required
             />

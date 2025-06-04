@@ -7,22 +7,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
-import Select, { MultiValue } from "react-select";
-import { toolOptions, techSkillOptions, softSkillOptions } from "../../../components/common";
-
-interface Option {
-  value: string;
-  label: string;
-}
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 5;
 
 const ToolSkills: React.FC = () => {
   const [form, setForm] = useState({
-    primary_tools: [] as Option[],
-    technical_skills: [] as Option[],
-    soft_skills: [] as Option[],
+    primary_tools: "",
+    technical_skills: "",
+    soft_skills: "",
     skills_description: "",
   });
 
@@ -36,19 +29,15 @@ const ToolSkills: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleMultiSelectChange = (field: string) => (selectedOptions: MultiValue<Option>) => {
-    setForm({ ...form, [field]: selectedOptions as Option[] });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       const profileData = {
         subscription_type: "premium" as const,
-        primary_tools: form.primary_tools.map(tool => tool.value).join(", "),
-        technical_skills: form.technical_skills.map(skill => skill.value).join(", "),
-        soft_skills: form.soft_skills.map(skill => skill.value).join(", "),
+        primary_tools: form.primary_tools,
+        technical_skills: form.technical_skills,
+        soft_skills: form.soft_skills,
         skills_description: form.skills_description,
       };
 
@@ -95,15 +84,14 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="primary_tools" className="block font-medium mb-1 text-sm">
             Primary Tools
           </label>
-          <Select
+          <input
+            type="text"
             id="primary_tools"
             name="primary_tools"
-            options={toolOptions}
-            isMulti
-            placeholder="Select your primary tools..."
             value={form.primary_tools}
-            onChange={handleMultiSelectChange('primary_tools')}
-            className="bg-gray-50"
+            onChange={handleChange}
+            className="w-full p-2 border rounded-md bg-gray-50"
+            placeholder="Enter your primary tools (comma separated)..."
             required
           />
         </div>
@@ -112,15 +100,14 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="technical_skills" className="block font-medium mb-1 text-sm">
             Technical Skills
           </label>
-          <Select
+          <input
+            type="text"
             id="technical_skills"
             name="technical_skills"
-            options={techSkillOptions}
-            isMulti
-            placeholder="Select your technical skills..."
             value={form.technical_skills}
-            onChange={handleMultiSelectChange('technical_skills')}
-            className="bg-gray-50"
+            onChange={handleChange}
+            className="w-full p-2 border rounded-md bg-gray-50"
+            placeholder="Enter your technical skills (comma separated)..."
             required
           />
         </div>
@@ -129,15 +116,14 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="soft_skills" className="block font-medium mb-1 text-sm">
             Soft Skills
           </label>
-          <Select
+          <input
+            type="text"
             id="soft_skills"
             name="soft_skills"
-            options={softSkillOptions}
-            isMulti
-            placeholder="Select your soft skills..."
             value={form.soft_skills}
-            onChange={handleMultiSelectChange('soft_skills')}
-            className="bg-gray-50"
+            onChange={handleChange}
+            className="w-full p-2 border rounded-md bg-gray-50"
+            placeholder="Enter your soft skills (comma separated)..."
             required
           />
         </div>
