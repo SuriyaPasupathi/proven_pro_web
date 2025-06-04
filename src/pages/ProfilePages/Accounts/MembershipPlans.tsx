@@ -4,17 +4,20 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../store/store';
 import { getProfile } from '../../../store/Services/CreateProfileService';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const MembershipPlans = () => {
+  const { profileId } = useParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const { profileData } = useSelector((state: RootState) => state.createProfile);
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getProfile());
-  }, [dispatch]);
+    if (profileId) {
+      dispatch(getProfile(profileId));
+    }
+  }, [dispatch, profileId]);
 
   const currentPlan = profileData?.subscription_type || 'free';
 
