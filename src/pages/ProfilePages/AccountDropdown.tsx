@@ -63,7 +63,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
 
   const handleEditProfile = () => {
     setIsEditMode(true);
-    navigate('/profile');
+    navigate(`/profile/${userData.id}`);
   };
 
   const userData = profileData as ProfileData;
