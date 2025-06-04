@@ -35,7 +35,7 @@ const ShareProfilePage = () => {
         if (profileId && shareToken) {
           await dispatch(getProfile(profileId)).unwrap();
           // Fetch reviews after profile is loaded
-          await dispatch(getProfileReviews()).unwrap();
+          await dispatch(getProfileReviews(profileId)).unwrap();
         }
       } catch (err) {
         setError('Failed to load profile. Please try again later.');
@@ -56,9 +56,11 @@ const ShareProfilePage = () => {
       toast.success('Review submitted successfully!');
       dispatch(resetReviewState());
       // Refresh reviews after successful submission
-      dispatch(getProfileReviews());
+      if (profileId) {
+        dispatch(getProfileReviews(profileId));
+      }
     }
-  }, [reviewSubmissionSuccess, dispatch]);
+  }, [reviewSubmissionSuccess, dispatch, profileId]);
 
   const handleReviewSubmit = async (review: { rating: number; content: string; name: string; company: string }) => {
     if (!shareToken) return;

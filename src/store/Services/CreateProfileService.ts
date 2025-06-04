@@ -603,11 +603,11 @@ export const submitProfileReview = createAsyncThunk(
 
 export const getProfileReviews = createAsyncThunk(
   'profile/getProfileReviews',
-  async (_, { rejectWithValue }) => {
+  async (user_id: string, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const response = await axios.get(
-        `${baseUrl}profile-share/?action=get_reviews`,
+        `${baseUrl}request-profile-share/?action=get_reviews&user_id=${user_id}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
