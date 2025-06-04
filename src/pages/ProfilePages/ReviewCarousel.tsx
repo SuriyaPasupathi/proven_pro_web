@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
 import ReviewDialog from './ReviewDialog';
+import { useToast } from "@/hooks/use-toast";
 
 interface Review {
   id: number;
@@ -23,17 +24,26 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
   onSubmit,
   isSubmitting = false 
 }) => {
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const { toast } = useToast();
   const visibleReviews = 3; // Number of reviews visible at once on desktop
-  const totalReviews = initialReviews.length;
+  const totalReviews = reviews.length;
+
+  // Only update reviews when initialReviews changes and they are different
+  useEffect(() => {
+    if (JSON.stringify(initialReviews) !== JSON.stringify(reviews)) {
+      setReviews(initialReviews);
+    }
+  }, [initialReviews]);
 
   const goToPrevious = () => {
     setActiveIndex((prevIndex) => (prevIndex === 0 ? totalReviews - 1 : prevIndex - 1));
   };
 
   const goToNext = () => {
-    setActiveIndex((prevIndex) => (prevIndex === 0 ? totalReviews - 1 : prevIndex + 1));
+    setActiveIndex((prevIndex) => (prevIndex === totalReviews - 1 ? 0 : prevIndex + 1));
   };
 
   // Calculate which reviews to show based on the active index
@@ -41,7 +51,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
     const result = [];
     for (let i = 0; i < visibleReviews; i++) {
       const index = (activeIndex + i) % totalReviews;
-      result.push(initialReviews[index]);
+      result.push(reviews[index]);
     }
     return result;
   };
@@ -96,14 +106,14 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
         </Button>
       </div>
       <div className="hidden md:grid md:grid-cols-3 gap-6">
-        {getVisibleReviews().map((review, index) => (
-          <ReviewCard key={`${review.id}-${index}`} review={review} />
+        {getVisibleReviews().map((review) => (
+          <ReviewCard key={review.id} review={review} />
         ))}
       </div>
 
       {/* Mobile version - show only one review */}
       <div className="md:hidden">
-        <ReviewCard review={initialReviews[activeIndex]} />
+        <ReviewCard review={reviews[activeIndex]} />
       </div>
 
       {/* Navigation buttons */}
@@ -113,7 +123,6 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
           size="icon"
           className="absolute top-1/2 -left-4 -translate-y-1/2 md:static md:translate-y-0 bg-white border shadow-sm"
           onClick={goToPrevious}
-          disabled={totalReviews <= 1}
         >
           <ChevronLeft className="h-5 w-5" />
           <span className="sr-only">Previous</span>
@@ -123,7 +132,6 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
           size="icon"
           className="absolute top-1/2 -right-4 -translate-y-1/2 md:static md:translate-y-0 bg-white border shadow-sm"
           onClick={goToNext}
-          disabled={totalReviews <= 1}
         >
           <ChevronRight className="h-5 w-5" />
           <span className="sr-only">Next</span>
