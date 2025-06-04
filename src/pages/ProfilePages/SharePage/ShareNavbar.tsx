@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Search, Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import logo from '../../assets/logo.png';
+import logo from '../../../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 
 interface NavbarProps {
@@ -14,13 +14,21 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const navigate = useNavigate();
 
+  const handleLogoClick = () => {
+    // Navigate to home page
+    navigate('/');
+  };
+
   return (
     <header className="border-b bg-white sticky top-0 z-50 w-full">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center w-full md:w-auto gap-4">
             {/* Logo Section */}
-            <div className="flex items-center gap-2 shrink-0 cursor-pointer" onClick={() => navigate('/')}>
+            <div 
+              className="flex items-center gap-2 shrink-0 cursor-pointer hover:opacity-80 transition-opacity" 
+              onClick={handleLogoClick}
+            >
               <img src={logo} alt="ProvenPro Logo" className="w-8 h-8" />
               <span className="text-lg font-semibold text-blue-900">
                 Proven<span className="font-light">Pro</span>
