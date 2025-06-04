@@ -9,14 +9,13 @@ import { useToast } from "@/hooks/use-toast";
 interface Review {
   id: number;
   name: string;
-  company: string;
   rating: number;
   content: string;
 }
 
 interface ReviewCarouselProps {
   reviews?: Review[];
-  onSubmit?: (review: { rating: number; content: string; name: string; company: string }) => void;
+  onSubmit?: (review: { rating: number; content: string; name: string }) => void;
 }
 
 const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews = [], onSubmit }) => {
@@ -52,10 +51,10 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews
     return result;
   };
 
-  const handleReviewSubmit = (review: { rating: number; content: string; name: string; company: string }) => {
+  const handleReviewSubmit = (review: { rating: number; content: string; name: string }) => {
     // Create a new review object with a unique ID
-    const newReview = {
-      id: Date.now(), // Using timestamp as a simple unique ID
+    const newReview: Review = {
+      id: Date.now(),
       ...review
     };
 
@@ -167,7 +166,6 @@ const ReviewCard = ({ review }: ReviewCardProps) => {
       <CardContent className="p-6">
         <div className="mb-4">
           <h3 className="font-medium">{review.name}</h3>
-          <p className="text-sm text-muted-foreground">{review.company}</p>
         </div>
         
         <div className="flex mb-3">

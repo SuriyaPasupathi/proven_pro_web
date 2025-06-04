@@ -580,12 +580,17 @@ export const submitProfileReview = createAsyncThunk(
     reviewer_name: string;
     rating: number;
     comment: string;
-    company?: string;
   }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${baseUrl}profile-share/`,
-        payload,
+        `${baseUrl}submit-profile-review/`,
+        {
+          id: payload.id,
+          share_token: payload.share_token,
+          reviewer_name: payload.reviewer_name,
+          rating: payload.rating,
+          comment: payload.comment
+        },
         {
           headers: {
             'Content-Type': 'application/json'

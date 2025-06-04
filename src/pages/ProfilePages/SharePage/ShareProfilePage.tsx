@@ -21,7 +21,6 @@ const ShareProfilePage = () => {
   const { 
     profileData, 
     loading, 
-    reviewSubmissionLoading, 
     reviewSubmissionSuccess, 
     error: profileError,
     reviews,
@@ -62,17 +61,16 @@ const ShareProfilePage = () => {
     }
   }, [reviewSubmissionSuccess, dispatch, profileId]);
 
-  const handleReviewSubmit = async (review: { rating: number; content: string; name: string; company: string }) => {
+  const handleReviewSubmit = async (review: { rating: number; content: string; name: string }) => {
     if (!shareToken) return;
 
     try {
       await dispatch(submitProfileReview({
-        id: profileId || '',
         share_token: shareToken,
         reviewer_name: review.name,
         rating: review.rating,
         comment: review.content,
-        company: review.company
+        id: profileId || ''
       })).unwrap();
     } catch (err) {
       toast.error('Failed to submit review. Please try again.');
