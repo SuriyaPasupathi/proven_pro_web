@@ -84,7 +84,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
         <Button variant="ghost" className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
           onClick={() => {
             setIsEditMode(false);
-            navigate('/profile');
+            navigate(`/profile/${userData.id}`);
             closeDropdown();
           }}
         >
@@ -104,7 +104,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
           variant="ghost" 
           className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
           onClick={() => {
-            navigate('/profile/verification');
+              navigate(`/profile/verification/${userData.id}`);
             closeDropdown();
           }}
         >
@@ -115,7 +115,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
           variant="ghost" 
           className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
           onClick={() => {
-            navigate('/profile/membership-plans');
+            navigate(`/profile/membership-plans/${userData.id}`);
             closeDropdown();
           }}
         >
@@ -126,7 +126,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
           variant="ghost"
           className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
           onClick={() => {
-            navigate('/profile/account-settings');
+            navigate(`/profile/account-settings/${userData.id}`);
             closeDropdown();
           }}
         >

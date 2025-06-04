@@ -66,7 +66,7 @@ export function LoginForm() {
             description: 'Redirecting to your profile...',
             duration: 3000,
           });
-          navigate("/profile");
+          navigate(`/profile/${result.user.id}`);
         } else {
           toast.info('Please select a plan to continue', {
             description: 'You need to choose a plan to access all features.',
@@ -117,7 +117,7 @@ export function LoginForm() {
             description: 'Redirecting to your profile...',
             duration: 3000,
           });
-          navigate("/profile");
+          navigate(`/profile/${result.user.id}`);
         } else {
           toast.info('Please select a plan to continue', {
             description: 'You need to choose a plan to access all features.',

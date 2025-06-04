@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import axios from 'axios';
 
 export interface ProfileData {
+  id?: string;
   subscription_type: 'free' | 'standard' | 'premium';
   // Profile Fields
   first_name?: string;
@@ -125,6 +126,7 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const { profileId } = useParams();
+  console.log(profileId);
   const { profileData, loading, error } = useSelector((state: RootState) => state.createProfile);
   const navigate = useNavigate();
 
