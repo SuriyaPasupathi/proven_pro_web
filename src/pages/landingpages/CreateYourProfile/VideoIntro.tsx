@@ -80,7 +80,7 @@ const VideoIntro: React.FC = () => {
       
       if (result) {
         toast.success("Profile created successfully!");
-        navigate("/profile");
+        navigate(`/profile/${result.id}`);
       }
     } catch (err) {
       const error = err as ProfileError;
