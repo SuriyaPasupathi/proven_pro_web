@@ -29,6 +29,7 @@ const ShareProfilePage = () => {
     reviewsLoading 
   } = useAppSelector((state) => state.createProfile);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -56,6 +57,7 @@ const ShareProfilePage = () => {
     if (reviewSubmissionSuccess) {
       toast.success('Review submitted successfully!');
       dispatch(resetReviewState());
+      setIsSubmitting(false);
       // Refresh reviews after successful submission
       if (profileId) {
         dispatch(getProfileReviews(profileId));
@@ -64,9 +66,10 @@ const ShareProfilePage = () => {
   }, [reviewSubmissionSuccess, dispatch, profileId]);
 
   const handleReviewSubmit = async (review: { rating: number; content: string; name: string }) => {
-    if (!shareToken) return;
+    if (!shareToken || isSubmitting) return;
 
     try {
+      setIsSubmitting(true);
       await dispatch(submitProfileReview({
         share_token: shareToken,
         reviewer_name: review.name,
@@ -76,6 +79,7 @@ const ShareProfilePage = () => {
       })).unwrap();
     } catch (err) {
       toast.error('Failed to submit review. Please try again.');
+      setIsSubmitting(false);
     }
   };
 
@@ -169,6 +173,7 @@ const ShareProfilePage = () => {
                   <ReviewCarousel 
                     reviews={transformedReviews}
                     onSubmit={handleReviewSubmit}
+                    isSubmitting={isSubmitting}
                   />
                 )}
               </div>

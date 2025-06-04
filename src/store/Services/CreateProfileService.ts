@@ -447,7 +447,7 @@ export const verifyMobileOTP = createAsyncThunk(
 
 export const getVerificationStatus = createAsyncThunk(
   'profile/getVerificationStatus',
-  async (_, { rejectWithValue }) => {
+  async (userId: string, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const response = await axios.get(
@@ -455,6 +455,9 @@ export const getVerificationStatus = createAsyncThunk(
         {
           headers: {
             'Authorization': `Bearer ${token}`
+          },
+          params: {
+            user_id: userId
           }
         }
       );

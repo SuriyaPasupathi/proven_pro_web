@@ -45,7 +45,7 @@ const Verification = () => {
   useEffect(() => {
     if (profileId) {
       dispatch(getProfile(profileId));
-      dispatch(getVerificationStatus());
+      dispatch(getVerificationStatus(profileId));
     }
   }, [dispatch, profileId]);
 
@@ -248,7 +248,9 @@ const Verification = () => {
       setCountdown(0);
       
       // Refresh verification status
-      dispatch(getVerificationStatus());
+      if (profileId) {
+        dispatch(getVerificationStatus(profileId));
+      }
     } catch (error) {
       toast.error('Invalid OTP');
     }
@@ -265,6 +267,9 @@ const Verification = () => {
       setCountdown(60);
       startCountdown();
       toast.success(result.message);
+      if (profileId) {
+        dispatch(getVerificationStatus(profileId));
+      }
     } catch (error) {
       toast.error('Failed to resend OTP');
     }

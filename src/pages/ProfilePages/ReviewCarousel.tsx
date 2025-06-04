@@ -16,9 +16,14 @@ interface Review {
 interface ReviewCarouselProps {
   reviews?: Review[];
   onSubmit?: (review: { rating: number; content: string; name: string }) => void;
+  isSubmitting?: boolean;
 }
 
-const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews = [], onSubmit }) => {
+const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ 
+  reviews: initialReviews = [], 
+  onSubmit,
+  isSubmitting = false 
+}) => {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
@@ -52,23 +57,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews
   };
 
   const handleReviewSubmit = (review: { rating: number; content: string; name: string }) => {
-    // Create a new review object with a unique ID
-    const newReview: Review = {
-      id: Date.now(),
-      ...review
-    };
-
-    // Add the new review to the reviews list
-    setReviews(prevReviews => [...prevReviews, newReview]);
-    
-    // Show success message
-    toast({
-      title: "Review submitted",
-      description: "Thank you for your review!",
-    });
-
-    // Close the dialog
-    setIsReviewDialogOpen(false);
+    if (isSubmitting) return;
 
     if (onSubmit) {
       onSubmit(review);
@@ -85,6 +74,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews
             onClick={() => {
               setIsReviewDialogOpen(true);
             }}
+            disabled={isSubmitting}
           >
             Write a Review
           </Button>
@@ -110,6 +100,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews
           onClick={() => {
             setIsReviewDialogOpen(true);
           }}
+          disabled={isSubmitting}
         >
           Write a Review
         </Button>
@@ -126,7 +117,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({ reviews: initialReviews
       </div>
 
       {/* Navigation buttons */}
-      <div className="flex justify-center md:justify-between w-full mt-6 md:mt-0">
+      <div className="flex justify-between mt-4">
         <Button
           variant="ghost"
           size="icon"
