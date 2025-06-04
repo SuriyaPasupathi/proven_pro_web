@@ -5,6 +5,8 @@ import themeReducer from './Slice/themeSlice';
 import registerReducer from './Slice/RegisterSlice';
 import loginReducer from './Slice/LoginSlice';
 import createProfileReducer from './Slice/CreateProfileSlice';
+import dropDownReducer from './Slice/DropDownSlice';
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -12,6 +14,7 @@ export const store = configureStore({
     register: registerReducer,
     login: loginReducer,
     createProfile: createProfileReducer,
+    dropdown: dropDownReducer,
   },
 });
 

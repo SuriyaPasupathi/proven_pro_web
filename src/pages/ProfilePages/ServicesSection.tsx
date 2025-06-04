@@ -6,8 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
 import { Textarea } from "@/components/ui/textarea";
-import Select, { MultiValue } from 'react-select';
-import { serviceCategoryOptions, rateRangeOptions, availabilityOptions } from '../../components/common';
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -17,16 +16,11 @@ import {
 } from "@/components/ui/dialog";
 import toast from 'react-hot-toast';
 
-interface Option {
-  value: string;
-  label: string;
-}
-
 interface ServiceForm {
-  services_categories: Option[];
+  services_categories: string;
   services_description: string;
-  rate_range: Option | null;
-  availability: Option | null;
+  rate_range: string;
+  availability: string;
 }
 
 interface ServiceCategory {
@@ -56,10 +50,10 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [serviceForms, setServiceForms] = useState<ServiceForm[]>([{
-    services_categories: [],
+    services_categories: '',
     services_description: '',
-    rate_range: null,
-    availability: null,
+    rate_range: '',
+    availability: '',
   }]);
   const { loading, profileData: reduxProfileData } = useSelector((state: RootState) => state.createProfile);
 
@@ -67,41 +61,21 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   useEffect(() => {
     if (isDialogOpen) {
       if (categories && categories.length > 0) {
-        const formattedCategories = categories.map(category => {
-          // Parse services_categories from comma-separated string to array of options
-          const categories = category.services_categories
-            ? category.services_categories.split(',').map(cat => ({
-                value: cat.trim(),
-                label: cat.trim()
-              }))
-            : [];
-
-          // Find matching rate range option
-          const rateRange = category.rate_range
-            ? rateRangeOptions.find(opt => opt.value === category.rate_range) || null
-            : null;
-
-          // Find matching availability option
-          const availability = category.availability
-            ? availabilityOptions.find(opt => opt.value === category.availability) || null
-            : null;
-
-          return {
-            services_categories: categories,
-            services_description: category.services_description || '',
-            rate_range: rateRange,
-            availability: availability
-          };
-        });
+        const formattedCategories = categories.map(category => ({
+          services_categories: category.services_categories || '',
+          services_description: category.services_description || '',
+          rate_range: category.rate_range || '',
+          availability: category.availability || ''
+        }));
         setServiceForms(formattedCategories);
       } else {
         setServiceForms([{
           services_categories: Array.isArray(services_categories) 
-            ? services_categories.map(cat => ({ value: cat, label: cat }))
-            : services_categories ? [{ value: services_categories, label: services_categories }] : [],
+            ? services_categories.join(', ')
+            : services_categories || '',
           services_description: services_description || '',
-          rate_range: rate_range ? rateRangeOptions.find(opt => opt.value === rate_range) || null : null,
-          availability: availability ? availabilityOptions.find(opt => opt.value === availability) || null : null,
+          rate_range: rate_range || '',
+          availability: availability || '',
         }]);
       }
     }
@@ -119,32 +93,14 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     setServiceForms(newForms);
   };
 
-  const handleMultiSelectChange = (field: string, index: number) => (selectedOptions: MultiValue<Option>) => {
-    const newForms = [...serviceForms];
-    newForms[index] = {
-      ...newForms[index],
-      [field]: selectedOptions as Option[]
-    };
-    setServiceForms(newForms);
-  };
-
-  const handleSingleSelectChange = (field: string, index: number) => (selectedOption: Option | null) => {
-    const newForms = [...serviceForms];
-    newForms[index] = {
-      ...newForms[index],
-      [field]: selectedOption
-    };
-    setServiceForms(newForms);
-  };
-
   const addNewService = () => {
     setServiceForms([
       ...serviceForms,
       {
-        services_categories: [],
+        services_categories: '',
         services_description: '',
-        rate_range: null,
-        availability: null,
+        rate_range: '',
+        availability: '',
       }
     ]);
   };
@@ -160,20 +116,20 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   const validateForm = () => {
     for (const form of serviceForms) {
-      if (!form.services_categories || form.services_categories.length === 0) {
-        toast.error("Please select at least one service category");
+      if (!form.services_categories || form.services_categories.trim() === '') {
+        toast.error("Please enter at least one service category");
         return false;
       }
       if (!form.services_description || form.services_description.trim() === '') {
         toast.error("Please provide a service description");
         return false;
       }
-      if (!form.rate_range) {
-        toast.error("Please select a rate range");
+      if (!form.rate_range || form.rate_range.trim() === '') {
+        toast.error("Please enter a rate range");
         return false;
       }
-      if (!form.availability) {
-        toast.error("Please select availability");
+      if (!form.availability || form.availability.trim() === '') {
+        toast.error("Please enter availability");
         return false;
       }
     }
@@ -188,26 +144,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     }
     
     try {
-      const formattedCategories = serviceForms.map(form => {
-        const categories = Array.isArray(form.services_categories) 
-          ? form.services_categories.map(cat => cat.value).join(', ')
-          : form.services_categories || '';
-
-        const rateRange = form.rate_range 
-          ? (typeof form.rate_range === 'object' ? form.rate_range.value : form.rate_range)
-          : '';
-
-        const availability = form.availability
-          ? (typeof form.availability === 'object' ? form.availability.value : form.availability)
-          : '';
-
-        return {
-          services_categories: categories,
-          services_description: form.services_description || '',
-          rate_range: rateRange,
-          availability: availability
-        };
-      });
+      const formattedCategories = serviceForms.map(form => ({
+        services_categories: form.services_categories,
+        services_description: form.services_description,
+        rate_range: form.rate_range,
+        availability: form.availability
+      }));
 
       const profileData = {
         subscription_type: 'premium' as const,
@@ -274,14 +216,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                     <label htmlFor={`services_categories_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                       Main Service Category
                     </label>
-                    <Select
+                    <Input
                       id={`services_categories_${index}`}
                       name="services_categories"
-                      options={serviceCategoryOptions}
-                      isMulti
-                      placeholder="Select your service categories..."
+                      placeholder="Enter your service categories (comma-separated)..."
                       value={form.services_categories}
-                      onChange={handleMultiSelectChange('services_categories', index)}
+                      onChange={(e) => handleChange(e, index)}
                       className="bg-gray-50"
                       required
                     />
@@ -307,13 +247,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                       <label htmlFor={`rate_range_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                         Rate Range
                       </label>
-                      <Select
+                      <Input
                         id={`rate_range_${index}`}
                         name="rate_range"
-                        options={rateRangeOptions}
-                        placeholder="Select your rate range..."
+                        placeholder="Enter your rate range..."
                         value={form.rate_range}
-                        onChange={handleSingleSelectChange('rate_range', index)}
+                        onChange={(e) => handleChange(e, index)}
                         className="bg-gray-50"
                         required
                       />
@@ -323,13 +262,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                       <label htmlFor={`availability_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                         Availability
                       </label>
-                      <Select
+                      <Input
                         id={`availability_${index}`}
                         name="availability"
-                        options={availabilityOptions}
-                        placeholder="Select your availability..."
+                        placeholder="Enter your availability..."
                         value={form.availability}
-                        onChange={handleSingleSelectChange('availability', index)}
+                        onChange={(e) => handleChange(e, index)}
                         className="bg-gray-50"
                         required
                       />
@@ -457,14 +395,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                   <label htmlFor={`services_categories_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                     Main Service Category
                   </label>
-                  <Select
+                  <Input
                     id={`services_categories_${index}`}
                     name="services_categories"
-                    options={serviceCategoryOptions}
-                    isMulti
-                    placeholder="Select your service categories..."
+                    placeholder="Enter your service categories (comma-separated)..."
                     value={form.services_categories}
-                    onChange={handleMultiSelectChange('services_categories', index)}
+                    onChange={(e) => handleChange(e, index)}
                     className="bg-gray-50"
                     required
                   />
@@ -490,13 +426,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                     <label htmlFor={`rate_range_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                       Rate Range
                     </label>
-                    <Select
+                    <Input
                       id={`rate_range_${index}`}
                       name="rate_range"
-                      options={rateRangeOptions}
-                      placeholder="Select your rate range..."
+                      placeholder="Enter your rate range..."
                       value={form.rate_range}
-                      onChange={handleSingleSelectChange('rate_range', index)}
+                      onChange={(e) => handleChange(e, index)}
                       className="bg-gray-50"
                       required
                     />
@@ -506,13 +441,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                     <label htmlFor={`availability_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                       Availability
                     </label>
-                    <Select
+                    <Input
                       id={`availability_${index}`}
                       name="availability"
-                      options={availabilityOptions}
-                      placeholder="Select your availability..."
+                      placeholder="Enter your availability..."
                       value={form.availability}
-                      onChange={handleSingleSelectChange('availability', index)}
+                      onChange={(e) => handleChange(e, index)}
                       className="bg-gray-50"
                       required
                     />

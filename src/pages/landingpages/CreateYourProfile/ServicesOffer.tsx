@@ -6,8 +6,10 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
+import { fetchServices } from "../../../store/Services/DropDownService";
 import toast from "react-hot-toast";
 import { Plus, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 interface ServiceForm {
   services_categories: string;
@@ -30,6 +32,11 @@ const ServicesOffer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, profileData } = useSelector((state: RootState) => state.createProfile);
+  const { services, loading: servicesLoading } = useSelector((state: RootState) => state.dropdown);
+
+  useEffect(() => {
+    dispatch(fetchServices());
+  }, [dispatch]);
 
   // Initialize form with existing data if available
   useEffect(() => {
@@ -52,6 +59,15 @@ const ServicesOffer: React.FC = () => {
     newForms[index] = {
       ...newForms[index],
       [e.target.name]: e.target.value
+    };
+    setServiceForms(newForms);
+  };
+
+  const handleServiceSelect = (value: string, index: number) => {
+    const newForms = [...serviceForms];
+    newForms[index] = {
+      ...newForms[index],
+      services_categories: value
     };
     setServiceForms(newForms);
   };
@@ -80,7 +96,7 @@ const ServicesOffer: React.FC = () => {
   const validateForm = () => {
     for (const form of serviceForms) {
       if (!form.services_categories || form.services_categories.trim() === '') {
-        toast.error("Please enter service categories");
+        toast.error("Please select a service category");
         return false;
       }
       if (!form.services_description || form.services_description.trim() === '') {
@@ -119,17 +135,13 @@ const ServicesOffer: React.FC = () => {
         categories: formattedCategories
       };
 
-      console.log('Submitting profile data:', profileData);
-
       const result = await dispatch(createUserProfile(profileData)).unwrap();
       
       if (result) {
-        console.log('Profile creation response:', result);
         toast.success("Services information saved successfully!");
         navigate("/create-profile/work-exp");
       }
     } catch (err) {
-      console.error('Profile creation error:', err);
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to save services information");
     }
@@ -195,16 +207,21 @@ const ServicesOffer: React.FC = () => {
               <label htmlFor={`services_categories_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                 Main Service Category
               </label>
-              <input
-                type="text"
-                id={`services_categories_${index}`}
-                name="services_categories"
+              <Select
                 value={form.services_categories}
-                onChange={(e) => handleChange(e, index)}
-                className="w-full p-2 border rounded-md bg-gray-50"
-                placeholder="Enter your service categories..."
-                required
-              />
+                onValueChange={(value) => handleServiceSelect(value, index)}
+              >
+                <SelectTrigger className="w-full bg-gray-50">
+                  <SelectValue placeholder="Select a service category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {services.map((service: any) => (
+                    <SelectItem key={service.id} value={service.name}>
+                      {service.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -272,14 +289,14 @@ const ServicesOffer: React.FC = () => {
             variant="outline"
             className="w-full sm:w-auto hover:bg-[#5A8DB8] hover:text-white transition"
             onClick={() => navigate(-1)}
-            disabled={loading}
+            disabled={loading || servicesLoading}
           >
             Back
           </Button>
           <Button
             type="submit"
             className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition"
-            disabled={loading}
+            disabled={loading || servicesLoading}
           >
             {loading ? "Saving..." : "Save and Continue"}
           </Button>

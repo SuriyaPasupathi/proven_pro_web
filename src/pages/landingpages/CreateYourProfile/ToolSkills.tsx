@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
@@ -6,7 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
+import { fetchSkills } from "../../../store/Services/DropDownService";
 import toast from "react-hot-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 5;
@@ -22,11 +24,20 @@ const ToolSkills: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.createProfile);
+  const { skills, loading: skillsLoading } = useSelector((state: RootState) => state.dropdown);
+
+  useEffect(() => {
+    dispatch(fetchSkills());
+  }, [dispatch]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSkillSelect = (value: string, field: string) => {
+    setForm({ ...form, [field]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,48 +95,63 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="primary_tools" className="block font-medium mb-1 text-sm">
             Primary Tools
           </label>
-          <input
-            type="text"
-            id="primary_tools"
-            name="primary_tools"
+          <Select
             value={form.primary_tools}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md bg-gray-50"
-            placeholder="Enter your primary tools (comma separated)..."
-            required
-          />
+            onValueChange={(value) => handleSkillSelect(value, 'primary_tools')}
+          >
+            <SelectTrigger className="w-full bg-gray-50">
+              <SelectValue placeholder="Select primary tools" />
+            </SelectTrigger>
+            <SelectContent>
+              {skills.map((skill: any) => (
+                <SelectItem key={skill.id} value={skill.name}>
+                  {skill.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
           <label htmlFor="technical_skills" className="block font-medium mb-1 text-sm">
             Technical Skills
           </label>
-          <input
-            type="text"
-            id="technical_skills"
-            name="technical_skills"
+          <Select
             value={form.technical_skills}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md bg-gray-50"
-            placeholder="Enter your technical skills (comma separated)..."
-            required
-          />
+            onValueChange={(value) => handleSkillSelect(value, 'technical_skills')}
+          >
+            <SelectTrigger className="w-full bg-gray-50">
+              <SelectValue placeholder="Select technical skills" />
+            </SelectTrigger>
+            <SelectContent>
+              {skills.map((skill: any) => (
+                <SelectItem key={skill.id} value={skill.name}>
+                  {skill.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
           <label htmlFor="soft_skills" className="block font-medium mb-1 text-sm">
             Soft Skills
           </label>
-          <input
-            type="text"
-            id="soft_skills"
-            name="soft_skills"
+          <Select
             value={form.soft_skills}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md bg-gray-50"
-            placeholder="Enter your soft skills (comma separated)..."
-            required
-          />
+            onValueChange={(value) => handleSkillSelect(value, 'soft_skills')}
+          >
+            <SelectTrigger className="w-full bg-gray-50">
+              <SelectValue placeholder="Select soft skills" />
+            </SelectTrigger>
+            <SelectContent>
+              {skills.map((skill: any) => (
+                <SelectItem key={skill.id} value={skill.name}>
+                  {skill.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
@@ -157,14 +183,14 @@ const ToolSkills: React.FC = () => {
             variant="outline"
             className="w-full sm:w-auto hover:bg-[#5A8DB8] text-black"
             onClick={() => navigate(-1)}
-            disabled={loading}
+            disabled={loading || skillsLoading}
           >
             Back
           </Button>
           <Button
             type="submit"
             className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-            disabled={loading}
+            disabled={loading || skillsLoading}
           >
             {loading ? "Saving..." : "Save and Continue"}
           </Button>

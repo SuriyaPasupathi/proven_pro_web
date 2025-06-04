@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
@@ -7,8 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile, updateProfile } from "../../../store/Services/CreateProfileService";
 import { updateProfileData } from "../../../store/Slice/CreateProfileSlice";
+import { fetchJobPositions } from "../../../store/Services/DropDownService";
 import toast from "react-hot-toast";
 import { Trash2, Edit2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 4;
@@ -37,11 +39,20 @@ const WorkExp: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, profileData } = useSelector((state: RootState) => state.createProfile);
+  const { jobPositions, loading: jobPositionsLoading } = useSelector((state: RootState) => state.dropdown);
+
+  useEffect(() => {
+    dispatch(fetchJobPositions());
+  }, [dispatch]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setCurrentExperience({ ...currentExperience, [e.target.name]: e.target.value });
+  };
+
+  const handlePositionSelect = (value: string) => {
+    setCurrentExperience({ ...currentExperience, position: value });
   };
 
   const updateExperiencesInNetwork = async (updatedExperiences: WorkExperience[]) => {
@@ -253,15 +264,21 @@ const WorkExp: React.FC = () => {
             <label htmlFor="position" className="block font-medium mb-1 text-sm">
               Position
             </label>
-            <Input
-              id="position"
-              name="position"
-              placeholder="Enter your position"
+            <Select
               value={currentExperience.position}
-              onChange={handleChange}
-              className="bg-gray-50"
-              required
-            />
+              onValueChange={handlePositionSelect}
+            >
+              <SelectTrigger className="w-full bg-gray-50">
+                <SelectValue placeholder="Select a position" />
+              </SelectTrigger>
+              <SelectContent>
+                {jobPositions.map((position: any) => (
+                  <SelectItem key={position.id} value={position.name}>
+                    {position.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -313,7 +330,7 @@ const WorkExp: React.FC = () => {
           <Button
             type="submit"
             className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-            disabled={isUpdating}
+            disabled={isUpdating || jobPositionsLoading}
           >
             {isUpdating ? "Updating..." : editingId ? "Update Experience" : "Add Experience"}
           </Button>
@@ -333,7 +350,7 @@ const WorkExp: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => editExperience(exp)}
-                        disabled={isUpdating}
+                        disabled={isUpdating || jobPositionsLoading}
                       >
                         <Edit2 className="h-4 w-4" />
                       </Button>
@@ -341,7 +358,7 @@ const WorkExp: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteExperience(exp.id!)}
-                        disabled={isUpdating}
+                        disabled={isUpdating || jobPositionsLoading}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -371,7 +388,7 @@ const WorkExp: React.FC = () => {
             variant="outline"
             className="w-full sm:w-auto hover:bg-[#5A8DB8] text-black"
             onClick={() => navigate(-1)}
-            disabled={loading || isUpdating}
+            disabled={loading || isUpdating || jobPositionsLoading}
           >
             Back
           </Button>
@@ -379,7 +396,7 @@ const WorkExp: React.FC = () => {
             type="button"
             className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
             onClick={handleSubmit}
-            disabled={loading || isUpdating}
+            disabled={loading || isUpdating || jobPositionsLoading}
           >
             {loading ? "Saving..." : "Save and Continue"}
           </Button>
