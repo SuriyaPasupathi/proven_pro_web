@@ -1,6 +1,6 @@
 import { ChevronDown, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
@@ -26,23 +26,28 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tools, setTools] = useState<string[]>([]);
   const [newTool, setNewTool] = useState('');
-  const isInitialMount = useRef(true);
 
   // Convert tools input to array
   const getToolsArray = (input: string[] | string): string[] => {
     if (Array.isArray(input)) return input;
     if (typeof input === 'string') {
-      return input.split(',').map(tool => tool.trim()).filter(Boolean);
+      try {
+        // Try to parse if it's a JSON string
+        const parsed = JSON.parse(input);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        // If not JSON, split by comma
+        return input.split(',').map(tool => tool.trim()).filter(Boolean);
+      }
     }
     return [];
   };
 
   useEffect(() => {
-    if (isInitialMount.current) {
-      setTools(getToolsArray(primary_tools));
-      isInitialMount.current = false;
-    }
-  }, []);
+    const toolsArray = getToolsArray(primary_tools);
+    console.log('ToolsSection received props:', { primary_tools, toolsArray }); // Debug log
+    setTools(toolsArray);
+  }, [primary_tools]);
 
   const handleAddTool = () => {
     if (newTool.trim()) {
@@ -71,12 +76,15 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       formData.append('primary_tools', JSON.stringify(tools));
 
+      console.log('Submitting tools update:', { tools }); // Debug log
+
       const result = await dispatch(updateProfile({
         data: formData,
         profileId: profileData?.id || ''
       })).unwrap();
       
       if (result) {
+        console.log('Tools update result:', result); // Debug log
         dispatch(updateProfileData({
           ...profileData,
           primary_tools: tools
@@ -86,6 +94,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         setIsDialogOpen(false);
       }
     } catch (err) {
+      console.error('Error updating tools:', err); // Debug log
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to update tools");
     }
@@ -96,7 +105,10 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     setIsDialogOpen(false);
   };
 
-  if (tools.length === 0 && !isDialogOpen) {
+  // Debug log for current tools state
+  console.log('Current tools state:', tools);
+
+  if (!tools || tools.length === 0) {
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
@@ -192,11 +204,11 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         </DialogContent>
       </Dialog>
 
-      <div className="flex flex-wrap gap-x-2 gap-y-3">
+      <div className="flex flex-wrap gap-2">
         {tools.map((tool, index) => (
           <span 
             key={index}
-            className="text-gray-600 mb-4"
+            // className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm hover:bg-blue-200 transition-colors"
           >
             {tool}
           </span>

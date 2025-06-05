@@ -15,9 +15,9 @@ const CURRENT_STEP = 5;
 
 const ToolSkills: React.FC = () => {
   const [form, setForm] = useState({
-    primary_tools: "",
-    technical_skills: "",
-    soft_skills: "",
+    primary_tools: [] as string[],
+    technical_skills: [] as string[],
+    soft_skills: [] as string[],
     skills_description: "",
   });
 
@@ -30,14 +30,21 @@ const ToolSkills: React.FC = () => {
     dispatch(fetchSkills());
   }, [dispatch]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
   const handleSkillSelect = (value: string, field: string) => {
-    setForm({ ...form, [field]: value });
+    setForm(prev => {
+      const currentValues = prev[field as keyof typeof prev] as string[];
+      if (currentValues.includes(value)) {
+        return {
+          ...prev,
+          [field]: currentValues.filter(v => v !== value)
+        };
+      } else {
+        return {
+          ...prev,
+          [field]: [...currentValues, value]
+        };
+      }
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,13 +59,17 @@ const ToolSkills: React.FC = () => {
         skills_description: form.skills_description,
       };
 
+      console.log('Submitting profile data:', profileData); // Debug log
+
       const result = await dispatch(createUserProfile(profileData)).unwrap();
       
       if (result) {
+        console.log('Profile update result:', result); // Debug log
         toast.success("Tools and skills saved successfully!");
         navigate("/create-profile/portfolio");
       }
     } catch (err) {
+      console.error('Error submitting profile:', err); // Debug log
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to save tools and skills");
     }
@@ -96,7 +107,7 @@ const ToolSkills: React.FC = () => {
             Primary Tools
           </label>
           <Select
-            value={form.primary_tools}
+            value={form.primary_tools.join(',')}
             onValueChange={(value) => handleSkillSelect(value, 'primary_tools')}
           >
             <SelectTrigger className="w-full bg-gray-50">
@@ -110,6 +121,13 @@ const ToolSkills: React.FC = () => {
               ))}
             </SelectContent>
           </Select>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {form.primary_tools.map((tool, index) => (
+              <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+                {tool}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -117,7 +135,7 @@ const ToolSkills: React.FC = () => {
             Technical Skills
           </label>
           <Select
-            value={form.technical_skills}
+            value={form.technical_skills.join(',')}
             onValueChange={(value) => handleSkillSelect(value, 'technical_skills')}
           >
             <SelectTrigger className="w-full bg-gray-50">
@@ -131,6 +149,13 @@ const ToolSkills: React.FC = () => {
               ))}
             </SelectContent>
           </Select>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {form.technical_skills.map((skill, index) => (
+              <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                {skill}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -138,7 +163,7 @@ const ToolSkills: React.FC = () => {
             Soft Skills
           </label>
           <Select
-            value={form.soft_skills}
+            value={form.soft_skills.join(',')}
             onValueChange={(value) => handleSkillSelect(value, 'soft_skills')}
           >
             <SelectTrigger className="w-full bg-gray-50">
@@ -152,6 +177,13 @@ const ToolSkills: React.FC = () => {
               ))}
             </SelectContent>
           </Select>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {form.soft_skills.map((skill, index) => (
+              <span key={index} className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-sm">
+                {skill}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -163,7 +195,7 @@ const ToolSkills: React.FC = () => {
             name="skills_description"
             placeholder="Provide more details about your expertise..."
             value={form.skills_description}
-            onChange={handleChange}
+            onChange={(e) => setForm(prev => ({ ...prev, skills_description: e.target.value }))}
             className="bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-0 focus:border-[#5A8DB8] min-h-[120px]"
             required
           />

@@ -1,4 +1,4 @@
-import {  Pencil } from 'lucide-react';
+import {  ChevronDown, Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -41,10 +41,11 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
  useEffect(() => {
   const techSkills = Array.isArray(technical_skills) ? technical_skills : [];
   const softSkills = Array.isArray(soft_skills) ? soft_skills : [];
+  console.log('SkillsSection received props:', { technical_skills, soft_skills, skills_description }); // Debug log
   setTechnicalSkills(techSkills);
   setSoftSkills(softSkills);
   setDescription(skills_description || '');
-}, []);
+}, [technical_skills, soft_skills, skills_description]);
 
   const handleAddTechnicalSkill = () => {
     if (newTechnicalSkill.trim()) {
@@ -78,12 +79,19 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       formData.append('soft_skills', JSON.stringify(softSkills));
       formData.append('skills_description', description);
 
+      console.log('Submitting skills update:', { // Debug log
+        technical_skills: technicalSkills,
+        soft_skills: softSkills,
+        description
+      });
+
       const result = await dispatch(updateProfile({
         data: formData,
         profileId: profileData?.id || ''
       })).unwrap();
       
       if (result) {
+        console.log('Skills update result:', result); // Debug log
         dispatch(updateProfileData({
           ...profileData,
           technical_skills: technicalSkills,
@@ -95,6 +103,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         setIsDialogOpen(false);
       }
     } catch (err) {
+      console.error('Error updating skills:', err); // Debug log
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to update skills");
     }
@@ -248,48 +257,52 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       </Dialog>
 
       {description && (
-        <p className="text-gray-600 mb-4">{description}</p>
+        <p className="text-gray-600 mb-6">{description}</p>
       )}
 
-      {technicalSkills.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3">Technical Skills</h3>
-          <div className="flex flex-wrap gap-x-2 gap-y-3">
-            {technicalSkills.map((skill, index) => (
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-3">Technical Skills</h3>
+        <div className="flex flex-wrap gap-2">
+          {technicalSkills.length > 0 ? (
+            technicalSkills.map((skill, index) => (
               <span 
                 key={index}
                 className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
               >
                 {skill}
               </span>
-            ))}
-          </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No technical skills added yet</p>
+          )}
         </div>
-      )}
+      </div>
 
-      {softSkills.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3">Soft Skills</h3>
-          <div className="flex flex-wrap gap-x-2 gap-y-3">
-            {softSkills.map((skill, index) => (
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-3">Soft Skills</h3>
+        <div className="flex flex-wrap gap-2">
+          {softSkills.length > 0 ? (
+            softSkills.map((skill, index) => (
               <span 
                 key={index}
                 className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full hover:bg-green-200 transition-colors"
               >
                 {skill}
               </span>
-            ))}
-          </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No soft skills added yet</p>
+          )}
         </div>
-      )}
+      </div>
       
-      {/* <Button 
+      <Button 
         variant="link" 
         className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
       >
         <span>Show all skills</span>
         <ChevronDown className="ml-1 h-4 w-4" />
-      </Button> */}
+      </Button>
     </div>
   );
 };
