@@ -8,8 +8,8 @@ import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ProfileData } from '../../types/profile';
-import { useParams } from 'react-router-dom';
+// import { ProfileData } from '../../types/profile';
+// import { useParams } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -44,7 +44,6 @@ interface PortfolioSectionProps {
 }
 
 const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
-  const { profileId } = useParams();
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
@@ -52,7 +51,6 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Project | null>(null);
   const [projectItems, setProjectItems] = useState<Project[]>([]);
-  const isInitialMount = useRef(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<Project & { project_images: ProjectImage[] }>({
     project_title: "",
@@ -64,13 +62,13 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
 
   // Initialize projectItems from profileData
   useEffect(() => {
-    if (profileData?.portfolio) {
-      console.log('Profile Data Portfolio:', profileData.portfolio);
-      const parsedPortfolio = parseProjects(profileData.portfolio);
-      console.log('Parsed Portfolio:', parsedPortfolio);
-      setProjectItems(parsedPortfolio);
+    if (profileData?.projects) {
+      console.log('Profile Data Projects:', profileData.projects);
+      const parsedProjects = parseProjects(profileData.projects);
+      console.log('Parsed Projects:', parsedProjects);
+      setProjectItems(parsedProjects);
     }
-  }, [profileData?.portfolio]);
+  }, [profileData?.projects]);
 
   // Parse project data
   const parseProjects = (data: Project[] | string | undefined): Project[] => {

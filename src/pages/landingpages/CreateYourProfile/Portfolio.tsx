@@ -102,7 +102,7 @@ const Portfolio: React.FC = () => {
       };
       
       // Append the portfolio item as a JSON string
-      formData.append('portfolio', JSON.stringify([portfolioItem]));
+      formData.append('projects', JSON.stringify([portfolioItem]));
       
       // Append all image files
       form.project_images.forEach((image, index) => {
@@ -113,7 +113,7 @@ const Portfolio: React.FC = () => {
       console.log('Uploading portfolio:', portfolioItem);
       console.log('FormData contents:', {
         subscription_type: formData.get('subscription_type'),
-        portfolio: formData.get('portfolio'),
+        projects: formData.get('projects'),
         images: form.project_images.map(img => img.file.name)
       });
 
