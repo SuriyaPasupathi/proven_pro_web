@@ -135,6 +135,11 @@ export function LoginForm() {
     }
   };
 
+  // Facebook Sign In
+  const handleFacebookLogin = () => {
+    console.log("Facebook Sign In");
+  };
+
   return (
     <div className="flex min-h-screen">
       {/* Left: Form */}
@@ -201,23 +206,36 @@ export function LoginForm() {
               {isLoading ? 'Signing in...' : 'Log in'}
             </Button>
             
-            {/* OR Divider */}
-            <div className="relative flex items-center justify-center my-4">
-              <div className="flex-grow border-t border-gray-300"></div>
-              <span className="flex-shrink mx-4 text-gray-500">OR</span>
-              <div className="flex-grow border-t border-gray-300"></div>
-            </div>
+            {/* OR CONTINUE WITH Separator */}
+            <div className="flex items-center my-4">
+                <div className="flex-grow h-px bg-gray-300" />
+                <span className="mx-3 text-gray-400 text-xs font-semibold">OR CONTINUE WITH</span>
+                <div className="flex-grow h-px bg-gray-300" />
+              </div>
 
-            {/* Google Sign In */}
-            <div className="w-full flex items-center justify-center">
-              <GoogleLogin
-                onSuccess={handleGoogleLogin}
-                onError={() => {
-                  console.log("Login failed");
-                  toast.error("Google login failed. Please try again.");
-                }}
-              />
-            </div>
+               {/* Google & Facebook Sign Up */}
+               <div className="w-full flex flex-col md:flex-row gap-4 items-center justify-center">
+                <div className="w-full md:w-1/2 flex items-center justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleLogin}
+                    onError={() => {
+                      console.log("Signup failed");
+                      toast.error("Google signup failed. Please try again.");
+                    }}
+                  />
+                </div>
+                <div className="w-full md:w-1/2 flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-center border border-gray-300 rounded-md py-2 px-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold shadow-sm transition"
+                    onClick={handleFacebookLogin}
+                    disabled={isLoading}
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.325 24h11.495v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.406 24 24 23.408 24 22.674V1.326C24 .592 23.406 0 22.675 0"/></svg>
+                    Facebook
+                  </button>
+                </div>
+              </div>
             {error && (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
                 <p className="text-sm text-red-600">{error.message}</p>
