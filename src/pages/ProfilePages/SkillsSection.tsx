@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil } from 'lucide-react';
+import {  Pencil } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -37,14 +37,14 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   const [newTechnicalSkill, setNewTechnicalSkill] = useState('');
   const [newSoftSkill, setNewSoftSkill] = useState('');
 
-  // Initialize state only once when component mounts
-  useEffect(() => {
-    const techSkills = Array.isArray(technical_skills) ? technical_skills : [];
-    const softSkills = Array.isArray(soft_skills) ? soft_skills : [];
-    setTechnicalSkills(techSkills);
-    setSoftSkills(softSkills);
-    setDescription(skills_description || '');
-  }, []); // Empty dependency array means this runs only once on mount
+ // Initialize state only once when component mounts
+ useEffect(() => {
+  const techSkills = Array.isArray(technical_skills) ? technical_skills : [];
+  const softSkills = Array.isArray(soft_skills) ? soft_skills : [];
+  setTechnicalSkills(techSkills);
+  setSoftSkills(softSkills);
+  setDescription(skills_description || '');
+}, []);
 
   const handleAddTechnicalSkill = () => {
     if (newTechnicalSkill.trim()) {
@@ -78,23 +78,9 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       formData.append('soft_skills', JSON.stringify(softSkills));
       formData.append('skills_description', description);
 
-      if (profileData) {
-        Object.entries(profileData).forEach(([key, value]) => {
-          if (!['technical_skills', 'soft_skills', 'skills_description', 'subscription_type'].includes(key) && value !== undefined) {
-            if (Array.isArray(value)) {
-              formData.append(key, JSON.stringify(value));
-            } else if (value instanceof File) {
-              formData.append(key, value);
-            } else if (typeof value === 'string') {
-              formData.append(key, value);
-            }
-          }
-        });
-      }
-
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileData?.profile_url || ''
+        profileId: profileData?.id || ''
       })).unwrap();
       
       if (result) {
@@ -297,13 +283,13 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         </div>
       )}
       
-      <Button 
+      {/* <Button 
         variant="link" 
         className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
       >
         <span>Show all skills</span>
         <ChevronDown className="ml-1 h-4 w-4" />
-      </Button>
+      </Button> */}
     </div>
   );
 };

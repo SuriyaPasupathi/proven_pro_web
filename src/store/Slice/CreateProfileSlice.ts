@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews } from '../Services/CreateProfileService';
+import { ProfileData } from '../../types/profile';
 
 interface ProfileError {
   message: string;
@@ -25,91 +26,6 @@ interface VerificationDetails {
   };
 }
 
-interface ProfileData {
-  subscription_type: 'free' | 'standard' | 'premium';
-  first_name?: string;
-  last_name?: string;
-  bio?: string;
-  job_title?: string;
-  job_specialization?: string;
-  mobile?: string;
-  profile_mail?: string;
-  profile_url?: string;
-  rating?: number;
-  
-  // Profile Images
-  profile_pic?: string;
-  profile_pic_url?: string;
-  video_intro?: string;
-  video_intro_url?: string;
-  video_description?: string;
-
-  // Services
-  categories?: {
-    id?: number;
-    services_categories: string;
-    services_description: string;
-    rate_range: string;
-    availability: string;
-  }[];
- 
-
-  // Portfolio
-  projects?: {
-    id?: number;
-    project_title: string;
-    project_description: string;
-    project_url: string;
-    project_image?: string;
-    project_image_url?: string;
-  }[];
-  portfolio?: {
-    project_title: string;
-    project_description: string;
-    project_url: string;
-    project_image: string;
-    project_image_url: string;
-  }[];
-
-  // Experience
-  experiences?: {
-    company_name: string;
-    position: string;
-    key_responsibilities: string;
-    experience_start_date: string;
-    experience_end_date: string;
-  }[];
-
-  // Skills & Tools
-  primary_tools?: string[];
-  technical_skills?: string[];
-  soft_skills?: string[];
-  skills_description?: string;
-
-  // Certifications
-  certifications?: {
-    certifications_name: string;
-    certifications_issuer: string;
-    certifications_issued_date: string;
-    certifications_expiration_date: string;
-    certifications_id: string;
-    certifications_image: string;
-    certifications_image_url: string;
-  }[];
-
-  // Reviews
-  reviews?: any[];
-
-  // Verification
-  verification_status?: string;
-  gov_id_verified?: boolean;
-  address_verified?: boolean;
-  mobile_verified?: boolean;
-  has_gov_id_document?: boolean;
-  has_address_document?: boolean;
-  verification_details?: VerificationDetails;
-}
-
 interface Review {
   id: number;
   reviewer_name: string;
@@ -133,23 +49,7 @@ interface CreateProfileState {
   reviewSubmissionSuccess: boolean;
   reviewsLoading: boolean;
   reviews: Review[];
-  verificationDetails: {
-    government_id: {
-      uploaded: boolean;
-      verified: boolean;
-      percentage: number;
-    };
-    address_proof: {
-      uploaded: boolean;
-      verified: boolean;
-      percentage: number;
-    };
-    mobile: {
-      provided: boolean;
-      verified: boolean;
-      percentage: number;
-    };
-  } | null;
+  verificationDetails: VerificationDetails | null;
 }
 
 const initialState: CreateProfileState = {
@@ -157,6 +57,7 @@ const initialState: CreateProfileState = {
   error: null,
   success: false,
   profileData: {
+    id: '',
     subscription_type: 'premium',
   },
   hasProfile: false,

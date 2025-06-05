@@ -8,7 +8,7 @@ import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ProfileData } from '../ProfilePages/Profile';
+import { ProfileData } from '../../types/profile';
 import { useParams } from 'react-router-dom';
 import {
   Dialog,
@@ -43,7 +43,7 @@ interface PortfolioSectionProps {
   portfolio?: Project[];
 }
 
-const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], portfolio = [] }) => {
+const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
   const { profileId } = useParams();
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const { isEditMode } = useEditMode();
@@ -62,6 +62,16 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
     project_images: [],
   });
 
+  // Initialize projectItems from profileData
+  useEffect(() => {
+    if (profileData?.portfolio) {
+      console.log('Profile Data Portfolio:', profileData.portfolio);
+      const parsedPortfolio = parseProjects(profileData.portfolio);
+      console.log('Parsed Portfolio:', parsedPortfolio);
+      setProjectItems(parsedPortfolio);
+    }
+  }, [profileData?.portfolio]);
+
   // Parse project data
   const parseProjects = (data: Project[] | string | undefined): Project[] => {
     if (Array.isArray(data)) return data;
@@ -75,15 +85,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
     return [];
   };
 
-  // Initialize project items only once on mount
-  useEffect(() => {
-    if (isInitialMount.current) {
-      // Use projects if available, otherwise fallback to portfolio
-      const items = projects.length > 0 ? projects : parseProjects(portfolio);
-      setProjectItems(items);
-      isInitialMount.current = false;
-    }
-  }, []);
+  
 
   // Update form when dialog opens/closes
   useEffect(() => {
@@ -178,64 +180,35 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
     e.preventDefault();
     
     try {
-      let updatedProjects: Project[];
-      
-      if (editingItem) {
-        // Update existing project item
-        updatedProjects = projectItems.map(item => 
-          item === editingItem ? form : item
-        );
-      } else {
-        // Add new project item
-        updatedProjects = [...projectItems, form];
-      }
-
-      // Create FormData object
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('projects', JSON.stringify(updatedProjects));
+      
+      // Create updated portfolio array
+      const updatedPortfolio = editingItem 
+        ? projectItems.map(item => 
+            item === editingItem ? form : item
+          )
+        : [...projectItems, form];
+      
+      formData.append('portfolio', JSON.stringify(updatedPortfolio));
 
-      // Add project images
+      // Append project images if any
       form.project_images.forEach((image, index) => {
         formData.append(`project_image_${index}`, image.file);
       });
 
-      // Add other profile data
-      if (profileData) {
-        Object.entries(profileData).forEach(([key, value]) => {
-          if (key !== 'projects' && key !== 'portfolio' && key !== 'subscription_type' && value !== undefined) {
-            if (Array.isArray(value)) {
-              formData.append(key, JSON.stringify(value));
-            } else if (value instanceof File) {
-              formData.append(key, value);
-            } else if (typeof value === 'string') {
-              formData.append(key, value);
-            }
-          }
-        });
-      }
-
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileId || ''
+        profileId: profileData?.id || ''
       })).unwrap();
       
       if (result) {
-        // Update Redux store
         dispatch(updateProfileData({
           ...profileData,
-          projects: updatedProjects
+          portfolio: updatedPortfolio
         }));
 
-        // Update local state
-        setProjectItems(updatedProjects);
-
-        // Clean up all preview URLs
-        form.project_images.forEach(image => {
-          URL.revokeObjectURL(image.previewUrl);
-        });
-
-        toast.success(editingItem ? "Project updated successfully!" : "Project added successfully!");
+        toast.success("Portfolio updated successfully!");
         setIsDialogOpen(false);
         setEditingItem(null);
         setForm({
@@ -248,7 +221,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ projects = [], port
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to update project");
+      toast.error(error.message || "Failed to update portfolio");
     }
   };
 

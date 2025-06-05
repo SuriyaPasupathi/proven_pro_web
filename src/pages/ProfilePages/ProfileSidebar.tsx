@@ -1,7 +1,7 @@
 import { Video, Award, Pencil } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ProfileData } from './Profile';
+import { ProfileData } from '../../types/profile';
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -39,6 +39,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
   const { profileData: reduxProfileData } = useAppSelector((state) => state.createProfile);
+  const [imageError, setImageError] = useState(false);
   
   // Dialog states
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
@@ -100,6 +101,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!profileData.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
       setIsProfileUpdating(true);
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
@@ -116,7 +121,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileData.profile_url || ''
+        profileId: profileData.id as string
       })).unwrap();
       
       if (result) {
@@ -166,6 +171,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     }
 
     try {
+      if (!profileData.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
       setIsImageUploading(true);
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
@@ -181,7 +190,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileData.profile_url || ''
+        profileId: profileData.id as string
       })).unwrap();
       
       if (result) {
@@ -233,6 +242,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const handleVideoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!profileData.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
       setIsVideoUpdating(true);
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
@@ -255,7 +268,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileData.profile_url || ''
+        profileId: profileData.id as string
       })).unwrap();
       
       if (result) {
@@ -306,6 +319,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const handleCertSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!profileData.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
       setIsCertUpdating(true);
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
@@ -322,7 +339,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       };
 
       // Update certifications array
-      const updatedCerts = profileData.certifications?.map(cert => 
+      const updatedCerts = profileData.certifications?.map((cert: Certification) => 
         cert.certifications_id === certForm.certifications_id ? updatedCert : cert
       ) || [];
 
@@ -337,7 +354,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileData.profile_url || ''
+        profileId: profileData.id as string
       })).unwrap();
       
       if (result) {
@@ -439,23 +456,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       {/* Profile Image */}
       <div className="pb-8 border-b-2 border-gray-200">
         <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-gray-200 to-blue-900">
-          {profileData.profile_pic_url || profileData.profile_pic ? (
+          {!imageError && (profileData.profile_pic_url || profileData.profile_pic) ? (
             <div className="relative">
               <img 
                 src={getFullImageUrl(profileData.profile_pic_url || profileData.profile_pic)}
                 alt={`${profileData.first_name || ''} ${profileData.last_name || ''}`}
                 className="w-full aspect-square object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const parent = target.parentElement;
-                  if (parent) {
-                    const initials = `${profileData.first_name?.[0] || ''}${profileData.last_name?.[0] || ''}`.toUpperCase();
-                    const fallbackDiv = document.createElement('div');
-                    fallbackDiv.className = 'w-full aspect-square bg-gray-200 flex items-center justify-center text-2xl font-semibold text-gray-600';
-                    fallbackDiv.textContent = initials || '?';
-                    parent.replaceChild(fallbackDiv, target);
-                  }
-                }}
+                onError={() => setImageError(true)}
               />
               {isEditMode && (
                 <Button 

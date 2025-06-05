@@ -201,9 +201,10 @@ export const getProfile = createAsyncThunk(
         }
       );
 
-      // Transform the response data to include verification details
+      // Transform the response data to include verification details and profile ID
       const transformedData = {
         ...response.data,
+        id: profileId,
         verification_details: {
           government_id: {
             uploaded: response.data.has_gov_id_document || false,
@@ -298,9 +299,13 @@ export const checkProfileStatus = createAsyncThunk(
 
 export const updateProfile = createAsyncThunk(
   'profile/updateProfile',
-    async (payload: { data: ProfilePayload | FormData; profileId: string }, { rejectWithValue }) => {
+  async (payload: { data: ProfilePayload | FormData; profileId: string }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
       const formData = payload.data instanceof FormData ? payload.data : new FormData();
       const { profileId } = payload;
       
@@ -348,6 +353,19 @@ export const updateProfile = createAsyncThunk(
       for (let [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
       }
+      console.log('Profile ID:', profileId);
+
+      // First try to get the profile to verify the ID
+      try {
+        await axios.get(`${baseUrl}profile/${profileId}/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      } catch (error) {
+        console.error('Profile verification failed:', error);
+        throw new Error('Invalid profile ID or profile not found');
+      }
 
       const response = await axios.put(`${baseUrl}profile/`, formData, {
         headers: {
@@ -362,11 +380,29 @@ export const updateProfile = createAsyncThunk(
       // Debug logging
       console.log('Update Profile Response:', response.data);
 
-      return response.data;
+      // Ensure the response includes the profile ID
+      const responseData = {
+        ...response.data,
+        id: profileId
+      };
+
+      return responseData;
     } catch (error) {
-      console.error('Profile update error:', error);
-      const profileError = handleProfileError(error);
-      return rejectWithValue(profileError);
+      console.error('Error updating profile:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Error response:', error.response?.data);
+        console.error('Error status:', error.response?.status);
+        console.error('Error headers:', error.response?.headers);
+        return rejectWithValue({
+          message: error.response?.data?.message || 'Failed to update profile',
+          status: error.response?.status,
+          code: error.code
+        });
+      }
+      return rejectWithValue({
+        message: 'An unexpected error occurred',
+        code: 'UNKNOWN_ERROR'
+      });
     }
   }
 );

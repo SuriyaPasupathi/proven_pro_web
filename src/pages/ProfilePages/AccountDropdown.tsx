@@ -3,7 +3,7 @@ import { User, ShieldCheck, Users, Settings, LogOut, Edit } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
-import { ProfileData } from './Profile';
+import { ProfileData } from '../../types/profile';
 import { logout } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
 import { useEditMode } from '../../context/EditModeContext';
@@ -20,14 +20,9 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
 
   const handleLogout = async () => {
     try {
-      // Clear auth tokens and user data first
       const refreshToken = localStorage.getItem('refresh_token');
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('user_email');
       
-      // Only attempt API call if we have a refresh token
+      // First attempt API call if we have a refresh token
       if (refreshToken) {
         try {
           await dispatch(logout());
@@ -36,6 +31,12 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
           // Continue with local logout even if API call fails
         }
       }
+      
+      // Then clear local storage
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('user_email');
       
       toast.success('Logged out successfully', {
         description: 'You have been logged out of your account.',

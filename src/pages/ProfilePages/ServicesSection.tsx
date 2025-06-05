@@ -158,7 +158,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
       const result = await dispatch(updateProfile({
         data: profileData,
-        profileId: reduxProfileData?.profile_url || ''
+        profileId: reduxProfileData?.id || ''
       })).unwrap();
       
       if (result) {

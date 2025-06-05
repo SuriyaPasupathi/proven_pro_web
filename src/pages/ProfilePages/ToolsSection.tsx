@@ -37,20 +37,12 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     return [];
   };
 
-  // Initialize tools only once on mount
   useEffect(() => {
     if (isInitialMount.current) {
       setTools(getToolsArray(primary_tools));
       isInitialMount.current = false;
     }
   }, []);
-
-  // Update tools when dialog closes
-  useEffect(() => {
-    if (!isDialogOpen && !isInitialMount.current) {
-      setTools(getToolsArray(primary_tools));
-    }
-  }, [isDialogOpen]);
 
   const handleAddTool = () => {
     if (newTool.trim()) {
@@ -79,23 +71,9 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       formData.append('primary_tools', JSON.stringify(tools));
 
-      if (profileData) {
-        Object.entries(profileData).forEach(([key, value]) => {
-          if (key !== 'primary_tools' && key !== 'subscription_type' && value !== undefined) {
-            if (Array.isArray(value)) {
-              formData.append(key, JSON.stringify(value));
-            } else if (value instanceof File) {
-              formData.append(key, value);
-            } else if (typeof value === 'string') {
-              formData.append(key, value);
-            }
-          }
-        });
-      }
-
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileData?.profile_url || ''
+        profileId: profileData?.id || ''
       })).unwrap();
       
       if (result) {

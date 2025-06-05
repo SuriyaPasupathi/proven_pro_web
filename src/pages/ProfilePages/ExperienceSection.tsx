@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { ProfileData } from '../../types/profile';
 
 interface Experience {
   company_name: string;
@@ -34,7 +35,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
   const { profileData } = useAppSelector((state) => state.createProfile);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
-  const [localExperiences, setLocalExperiences] = useState<Experience[]>(experiences);
+  const [localExperiences, setLocalExperiences] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState<Experience>({
     company_name: "",
@@ -44,20 +45,39 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     key_responsibilities: "",
   });
 
-  // Update local experiences when prop changes
+  // Initialize experiences only when the component mounts or experiences prop changes
   useEffect(() => {
-    setLocalExperiences(experiences);
-  }, [experiences]);
+    const parsedExperiences = Array.isArray(experiences) ? experiences : [];
+    if (JSON.stringify(parsedExperiences) !== JSON.stringify(localExperiences)) {
+      setLocalExperiences(parsedExperiences);
+    }
+  }, [experiences]); // Only depend on experiences prop
+
+  // Update form when dialog opens/closes
+  useEffect(() => {
+    if (isDialogOpen) {
+      if (editingExperience) {
+        setForm(editingExperience);
+      } else {
+        setForm({
+          company_name: "",
+          position: "",
+          experience_start_date: "",
+          experience_end_date: "",
+          key_responsibilities: "",
+        });
+      }
+    }
+  }, [isDialogOpen, editingExperience]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleEdit = (experience: Experience) => {
     setEditingExperience(experience);
-    setForm(experience);
     setIsDialogOpen(true);
   };
 
@@ -66,54 +86,48 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     setIsLoading(true);
     
     try {
-      let updatedExperiences: Experience[];
-      
-      if (editingExperience) {
-        // Update existing experience
-        updatedExperiences = localExperiences.map(exp => 
-          exp === editingExperience ? form : exp
-        );
-      } else {
-        // Add new experience
-        updatedExperiences = [...localExperiences, form];
-      }
-
-      // Create FormData object
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('experiences', JSON.stringify(updatedExperiences));
+      
+      // Create updated experiences array
+      const updatedExperiences = editingExperience 
+        ? localExperiences.map(exp => 
+            exp === editingExperience ? form : exp
+          )
+        : [...localExperiences, form];
+      
+      // Convert experiences to string array format expected by the API
+      const experiencesArray = updatedExperiences.map(exp => ({
+        company_name: exp.company_name,
+        position: exp.position,
+        experience_start_date: exp.experience_start_date,
+        experience_end_date: exp.experience_end_date,
+        key_responsibilities: exp.key_responsibilities
+      }));
+      
+      formData.append('experiences', JSON.stringify(experiencesArray));
 
-      // Add other profile data
-      if (profileData) {
-        Object.entries(profileData).forEach(([key, value]) => {
-          if (key !== 'experiences' && key !== 'subscription_type' && value !== undefined) {
-            if (Array.isArray(value)) {
-              formData.append(key, JSON.stringify(value));
-            } else if (value instanceof File) {
-              formData.append(key, value);
-            } else if (typeof value === 'string') {
-              formData.append(key, value);
-            }
-          }
-        });
+      if (!profileData?.id) {
+        toast.error("Profile ID is missing");
+        return;
       }
 
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileData?.profile_url || ''
+        profileId: profileData.id
       })).unwrap();
       
       if (result) {
-        // Update local state
+        // Update local state immediately
         setLocalExperiences(updatedExperiences);
         
-        // Update Redux store
+        // Update Redux store with the complete profile data
         dispatch(updateProfileData({
           ...profileData,
-          experiences: updatedExperiences
+          experiences: experiencesArray
         }));
 
-        toast.success(editingExperience ? "Experience updated successfully!" : "Experience added successfully!");
+        toast.success("Experience updated successfully!");
         setIsDialogOpen(false);
         setEditingExperience(null);
         setForm({

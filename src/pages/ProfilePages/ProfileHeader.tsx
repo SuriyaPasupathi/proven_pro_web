@@ -1,7 +1,7 @@
 import { Copy, Star, Pencil, Share2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ProfileData } from './Profile';
+import { ProfileData } from '../../types/profile';
 import { useEditMode } from '../../context/EditModeContext';
 import { useState } from 'react';
 import { useAppDispatch } from '../../store/store';
@@ -45,7 +45,7 @@ interface VerificationDetails {
 
 interface ProfileHeaderProps {
   profileData: {
-    id: string;
+    id?: string;
     subscription_type: 'free' | 'standard' | 'premium';
     first_name?: string;
     last_name?: string;
@@ -92,7 +92,7 @@ interface ShareProfileDialogProps {
   isOpen: boolean;
   onClose: () => void;
   profileData: {
-    id: string;
+    id?: string;
     first_name?: string;
     last_name?: string;
   };
@@ -305,13 +305,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
 
   const handleSaveProfile = async (data: Partial<ProfileData>) => {
     try {
+      if (!profileData.id) {
+        toast({
+          title: "Error",
+          description: "Profile ID is required for updates",
+          variant: "destructive",
+        });
+        return;
+      }
       const updateData = {
         data: {
           subscription_type: profileData.subscription_type || 'free',
-          first_name: data.first_name,
-          last_name: data.last_name,
-          bio: data.bio,
-          profile_mail: data.profile_mail
+          first_name: data.first_name || '',
+          last_name: data.last_name || '',
+          bio: data.bio || '',
+          profile_mail: data.profile_mail || ''
         },
         profileId: profileData.id
       };
@@ -321,7 +329,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
     }
   };
 
-  const handleReviewSubmit = (review: { rating: number; content: string; name: string; company: string }) => {
+  const handleReviewSubmit = (review: { rating: number; content: string; name: string; company?: string }) => {
     // TODO: Implement review submission logic
     console.log('Review submitted:', review);
     toast({

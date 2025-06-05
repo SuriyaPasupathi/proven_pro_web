@@ -99,7 +99,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
   };
 
   return (
-    <header className="border-b bg-white sticky top-0 z-50 w-full">
+    <header className="border-b bg-gray-100 sticky top-0 z-50 w-full">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center w-full md:w-auto gap-4">
