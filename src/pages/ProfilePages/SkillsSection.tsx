@@ -37,15 +37,17 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   const [newTechnicalSkill, setNewTechnicalSkill] = useState('');
   const [newSoftSkill, setNewSoftSkill] = useState('');
 
- // Initialize state only once when component mounts
- useEffect(() => {
-  const techSkills = Array.isArray(technical_skills) ? technical_skills : [];
-  const softSkills = Array.isArray(soft_skills) ? soft_skills : [];
-  console.log('SkillsSection received props:', { technical_skills, soft_skills, skills_description }); // Debug log
-  setTechnicalSkills(techSkills);
-  setSoftSkills(softSkills);
-  setDescription(skills_description || '');
-}, [technical_skills, soft_skills, skills_description]);
+  // Initialize state only once when component mounts
+  useEffect(() => {
+    if (technical_skills || soft_skills || skills_description) {
+      const techSkills = Array.isArray(technical_skills) ? technical_skills : [];
+      const softSkills = Array.isArray(soft_skills) ? soft_skills : [];
+      console.log('SkillsSection received props:', { technical_skills, soft_skills, skills_description }); // Debug log
+      setTechnicalSkills(techSkills);
+      setSoftSkills(softSkills);
+      setDescription(skills_description || '');
+    }
+  }, []); // Empty dependency array since we only want to initialize once
 
   const handleAddTechnicalSkill = () => {
     if (newTechnicalSkill.trim()) {

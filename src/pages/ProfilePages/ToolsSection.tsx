@@ -44,10 +44,12 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   };
 
   useEffect(() => {
-    const toolsArray = getToolsArray(primary_tools);
-    console.log('ToolsSection received props:', { primary_tools, toolsArray }); // Debug log
-    setTools(toolsArray);
-  }, [primary_tools]);
+    if (primary_tools) {
+      const toolsArray = getToolsArray(primary_tools);
+      console.log('ToolsSection received props:', { primary_tools, toolsArray }); // Debug log
+      setTools(toolsArray);
+    }
+  }, []); // Empty dependency array since we only want to initialize once
 
   const handleAddTool = () => {
     if (newTool.trim()) {

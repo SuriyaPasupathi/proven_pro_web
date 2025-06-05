@@ -68,7 +68,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       console.log('Parsed Projects:', parsedProjects);
       setProjectItems(parsedProjects);
     }
-  }, [profileData?.projects]);
+  }, []); // Empty dependency array since we only want to initialize once
 
   // Parse project data
   const parseProjects = (data: Project[] | string | undefined): Project[] => {
