@@ -273,8 +273,8 @@ const WorkExp: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 {jobPositions.map((position: any) => (
-                  <SelectItem key={position.id} value={position.name}>
-                    {position.name}
+                  <SelectItem key={position.id} value={position.title}>
+                    {position.title}
                   </SelectItem>
                 ))}
               </SelectContent>

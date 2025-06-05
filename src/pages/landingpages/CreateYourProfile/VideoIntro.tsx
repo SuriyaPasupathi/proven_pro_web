@@ -79,6 +79,8 @@ const VideoIntro: React.FC = () => {
       const result = await dispatch(createUserProfile(formData)).unwrap();
       
       if (result) {
+        // Store the profile ID in localStorage
+        localStorage.setItem('userProfileId', result.id);
         toast.success("Profile created successfully!");
         navigate(`/profile/${result.id}`);
       }

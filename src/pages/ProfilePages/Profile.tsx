@@ -133,6 +133,7 @@ function App() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        if (!profileId) return;
         await dispatch(getProfile(profileId));
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
