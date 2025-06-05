@@ -58,9 +58,15 @@ const ShareProfilePage = () => {
       toast.success('Review submitted successfully!');
       dispatch(resetReviewState());
       setIsSubmitting(false);
-      // Refresh reviews after successful submission
+      // Refresh both profile and reviews after successful submission
       if (profileId) {
-        dispatch(getProfileReviews(profileId));
+        Promise.all([
+          dispatch(getProfile(profileId)),
+          dispatch(getProfileReviews(profileId))
+        ]).catch(err => {
+          console.error('Error refreshing data:', err);
+          toast.error('Failed to refresh data. Please try again.');
+        });
       }
     }
   }, [reviewSubmissionSuccess, dispatch, profileId]);
@@ -137,31 +143,6 @@ const ShareProfilePage = () => {
             <div className="lg:col-span-2 space-y-8">
               <ProfileHeader profileData={{ ...profileData, id: profileId || '' }} />
               
-              {profileData.experiences && profileData.experiences.length > 0 && (
-                <ExperienceSection experiences={profileData.experiences} />
-              )}
-
-              {profileData.projects && profileData.projects.length > 0 && (
-                <PortfolioSection projects={profileData.projects} />
-              )}
-
-              {profileData.categories && profileData.categories.length > 0 && (
-                <ServicesSection categories={profileData.categories} />
-              )}
-
-              {((profileData.technical_skills && profileData.technical_skills.length > 0) || 
-                (profileData.soft_skills && profileData.soft_skills.length > 0)) && (
-                <SkillsSection 
-                  technical_skills={profileData.technical_skills}
-                  soft_skills={profileData.soft_skills}
-                  skills_description={profileData.skills_description}
-                />
-              )}
-
-              {profileData.primary_tools && profileData.primary_tools.length > 0 && (
-                <ToolsSection primary_tools={profileData.primary_tools} />
-              )}
-
               {/* Reviews Section */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-xl font-semibold mb-4">Reviews</h3>
@@ -177,6 +158,31 @@ const ShareProfilePage = () => {
                   />
                 )}
               </div>
+
+              {profileData.categories && profileData.categories.length > 0 && (
+                <ServicesSection categories={profileData.categories} />
+              )}
+
+              {profileData.experiences && profileData.experiences.length > 0 && (
+                <ExperienceSection experiences={profileData.experiences} />
+              )}
+
+              {((profileData.technical_skills && profileData.technical_skills.length > 0) || 
+                (profileData.soft_skills && profileData.soft_skills.length > 0)) && (
+                <SkillsSection 
+                  technical_skills={profileData.technical_skills}
+                  soft_skills={profileData.soft_skills}
+                  skills_description={profileData.skills_description}
+                />
+              )}
+
+              {profileData.primary_tools && profileData.primary_tools.length > 0 && (
+                <ToolsSection primary_tools={profileData.primary_tools} />
+              )}
+
+              {profileData.projects && profileData.projects.length > 0 && (
+                <PortfolioSection projects={profileData.projects} />
+              )}
             </div>
           </div>
         </main>

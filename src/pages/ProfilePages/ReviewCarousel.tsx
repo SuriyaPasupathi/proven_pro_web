@@ -11,6 +11,7 @@ interface Review {
   name: string;
   rating: number;
   content: string;
+  company?: string;
 }
 
 interface ReviewCarouselProps {
@@ -31,11 +32,9 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
   const visibleReviews = 3; // Number of reviews visible at once on desktop
   const totalReviews = reviews.length;
 
-  // Only update reviews when initialReviews changes and they are different
+  // Update reviews whenever initialReviews changes
   useEffect(() => {
-    if (JSON.stringify(initialReviews) !== JSON.stringify(reviews)) {
-      setReviews(initialReviews);
-    }
+    setReviews(initialReviews);
   }, [initialReviews]);
 
   const goToPrevious = () => {
@@ -43,15 +42,21 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
   };
 
   const goToNext = () => {
-    setActiveIndex((prevIndex) => (prevIndex === totalReviews - 1 ? 0 : prevIndex + 1));
+    setActiveIndex((prevIndex) => (prevIndex === 0 ? totalReviews - 1 : prevIndex + 1));
   };
 
   // Calculate which reviews to show based on the active index
   const getVisibleReviews = () => {
+    if (totalReviews === 0) return [];
     const result = [];
     for (let i = 0; i < visibleReviews; i++) {
       const index = (activeIndex + i) % totalReviews;
-      result.push(reviews[index]);
+      if (reviews[index]) {
+        result.push({
+          ...reviews[index],
+          displayIndex: i // Add a unique display index for key
+        });
+      }
     }
     return result;
   };
@@ -107,36 +112,43 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
       </div>
       <div className="hidden md:grid md:grid-cols-3 gap-6">
         {getVisibleReviews().map((review) => (
-          <ReviewCard key={review.id} review={review} />
+          <ReviewCard key={`${review.id}-${review.displayIndex}`} review={review} />
         ))}
       </div>
 
       {/* Mobile version - show only one review */}
       <div className="md:hidden">
-        <ReviewCard review={reviews[activeIndex]} />
+        {reviews[activeIndex] && (
+          <ReviewCard 
+            key={`${reviews[activeIndex].id}-mobile`} 
+            review={reviews[activeIndex]} 
+          />
+        )}
       </div>
 
       {/* Navigation buttons */}
-      <div className="flex justify-between mt-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-1/2 -left-4 -translate-y-1/2 md:static md:translate-y-0 bg-white border shadow-sm"
-          onClick={goToPrevious}
-        >
-          <ChevronLeft className="h-5 w-5" />
-          <span className="sr-only">Previous</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-1/2 -right-4 -translate-y-1/2 md:static md:translate-y-0 bg-white border shadow-sm"
-          onClick={goToNext}
-        >
-          <ChevronRight className="h-5 w-5" />
-          <span className="sr-only">Next</span>
-        </Button>
-      </div>
+      {totalReviews > 1 && (
+        <div className="flex justify-between mt-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-1/2 -left-4 -translate-y-1/2 md:static md:translate-y-0 bg-white border shadow-sm"
+            onClick={goToPrevious}
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span className="sr-only">Previous</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-1/2 -right-4 -translate-y-1/2 md:static md:translate-y-0 bg-white border shadow-sm"
+            onClick={goToNext}
+          >
+            <ChevronRight className="h-5 w-5" />
+            <span className="sr-only">Next</span>
+          </Button>
+        </div>
+      )}
 
       <ReviewDialog
         isOpen={isReviewDialogOpen}
@@ -157,6 +169,9 @@ const ReviewCard = ({ review }: ReviewCardProps) => {
       <CardContent className="p-6">
         <div className="mb-4">
           <h3 className="font-medium">{review.name}</h3>
+          {review.company && (
+            <p className="text-sm text-gray-500">{review.company}</p>
+          )}
         </div>
         
         <div className="flex mb-3">
