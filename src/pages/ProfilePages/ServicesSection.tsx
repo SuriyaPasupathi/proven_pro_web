@@ -1,10 +1,11 @@
-import { ChevronDown, Pencil, Plus, X } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
+import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import {
@@ -49,127 +50,121 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   const { isEditMode } = useEditMode();
   const dispatch = useDispatch<AppDispatch>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [serviceForms, setServiceForms] = useState<ServiceForm[]>([{
+  const [editingService, setEditingService] = useState<ServiceCategory | null>(null);
+  const [localServices, setLocalServices] = useState<ServiceCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [form, setForm] = useState<ServiceForm>({
     services_categories: '',
     services_description: '',
     rate_range: '',
     availability: '',
-  }]);
-  const { loading, profileData: reduxProfileData } = useSelector((state: RootState) => state.createProfile);
+  });
+  const { profileData: reduxProfileData } = useSelector((state: RootState) => state.createProfile);
 
-  // Initialize form with current values when dialog opens
+  // Initialize services when component mounts or categories prop changes
+  useEffect(() => {
+    const parsedServices = Array.isArray(categories) ? categories : [];
+    if (JSON.stringify(parsedServices) !== JSON.stringify(localServices)) {
+      setLocalServices(parsedServices);
+    }
+  }, [categories]);
+
+  // Update form when dialog opens/closes
   useEffect(() => {
     if (isDialogOpen) {
-      if (categories && categories.length > 0) {
-        const formattedCategories = categories.map(category => ({
-          services_categories: category.services_categories || '',
-          services_description: category.services_description || '',
-          rate_range: category.rate_range || '',
-          availability: category.availability || ''
-        }));
-        setServiceForms(formattedCategories);
+      if (editingService) {
+        setForm({
+          services_categories: editingService.services_categories || '',
+          services_description: editingService.services_description || '',
+          rate_range: editingService.rate_range || '',
+          availability: editingService.availability || '',
+        });
       } else {
-        setServiceForms([{
-          services_categories: Array.isArray(services_categories) 
-            ? services_categories.join(', ')
-            : services_categories || '',
-          services_description: services_description || '',
-          rate_range: rate_range || '',
-          availability: availability || '',
-        }]);
+        setForm({
+          services_categories: '',
+          services_description: '',
+          rate_range: '',
+          availability: '',
+        });
       }
     }
-  }, [isDialogOpen, categories, services_categories, services_description, rate_range, availability]);
+  }, [isDialogOpen, editingService]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    index: number
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const newForms = [...serviceForms];
-    newForms[index] = {
-      ...newForms[index],
-      [e.target.name]: e.target.value
-    };
-    setServiceForms(newForms);
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const addNewService = () => {
-    setServiceForms([
-      ...serviceForms,
-      {
-        services_categories: '',
-        services_description: '',
-        rate_range: '',
-        availability: '',
-      }
-    ]);
-  };
-
-  const removeService = (index: number) => {
-    if (serviceForms.length > 1) {
-      const newForms = serviceForms.filter((_, i) => i !== index);
-      setServiceForms(newForms);
-    } else {
-      toast.error("You must have at least one service category");
-    }
-  };
-
-  const validateForm = () => {
-    for (const form of serviceForms) {
-      if (!form.services_categories || form.services_categories.trim() === '') {
-        toast.error("Please enter at least one service category");
-        return false;
-      }
-      if (!form.services_description || form.services_description.trim() === '') {
-        toast.error("Please provide a service description");
-        return false;
-      }
-      if (!form.rate_range || form.rate_range.trim() === '') {
-        toast.error("Please enter a rate range");
-        return false;
-      }
-      if (!form.availability || form.availability.trim() === '') {
-        toast.error("Please enter availability");
-        return false;
-      }
-    }
-    return true;
+  const handleEdit = (service: ServiceCategory) => {
+    setEditingService(service);
+    setIsDialogOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
+    setIsLoading(true);
     
     try {
-      const formattedCategories = serviceForms.map(form => ({
-        services_categories: form.services_categories,
-        services_description: form.services_description,
-        rate_range: form.rate_range,
-        availability: form.availability
-      }));
+      const formData = new FormData();
+      formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
+      
+      // Create updated services array
+      const updatedServices = editingService 
+        ? localServices.map(service => 
+            service === editingService ? form : service
+          )
+        : [...localServices, form];
+      
+      formData.append('categories', JSON.stringify(updatedServices));
 
-      const profileData = {
-        subscription_type: 'premium' as const,
-        categories: formattedCategories
-      };
+      if (!reduxProfileData?.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
 
       const result = await dispatch(updateProfile({
-        data: profileData,
-        profileId: reduxProfileData?.id || ''
+        data: formData,
+        profileId: reduxProfileData.id
       })).unwrap();
       
       if (result) {
-        toast.success("Services information updated successfully!");
+        // Update local state immediately
+        setLocalServices(updatedServices);
+        
+        // Update Redux store with the complete profile data
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          categories: updatedServices
+        }));
+
+        toast.success(editingService ? "Service updated successfully!" : "Service added successfully!");
         setIsDialogOpen(false);
+        setEditingService(null);
+        setForm({
+          services_categories: '',
+          services_description: '',
+          rate_range: '',
+          availability: '',
+        });
       }
     } catch (err) {
-      console.error('Services update error:', err);
       const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to update services information");
+      toast.error(error.message || "Failed to update service");
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    setIsDialogOpen(false);
+    setEditingService(null);
+    setForm({
+      services_categories: '',
+      services_description: '',
+      rate_range: '',
+      availability: '',
+    });
   };
 
   if (!categories.length && !services_description && !services_categories && !rate_range && !availability) {
@@ -178,133 +173,27 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Services</h2>
           {isEditMode && (
-            <Button 
-              variant="ghost" 
-              className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-              onClick={() => setIsDialogOpen(true)}
-            >
-              <Pencil className="w-4 h-4" />
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+                onClick={() => {
+                  setEditingService(null);
+                  setForm({
+                    services_categories: '',
+                    services_description: '',
+                    rate_range: '',
+                    availability: '',
+                  });
+                  setIsDialogOpen(true);
+                }}
+              >
+                <Plus className="w-5 h-5" />
+              </Button>
+            </div>
           )}
         </div>
         <p className="text-gray-600">No services information available.</p>
-
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>Edit Services</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {serviceForms.map((form, index) => (
-                <div key={index} className="border rounded-lg p-6 space-y-4 relative">
-                  {index > 0 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-4 right-4 text-gray-500 hover:text-red-500"
-                      onClick={() => removeService(index)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  )}
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Service Category {index + 1}
-                  </h3>
-
-                  <div>
-                    <label htmlFor={`services_categories_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                      Main Service Category
-                    </label>
-                    <Input
-                      id={`services_categories_${index}`}
-                      name="services_categories"
-                      placeholder="Enter your service categories (comma-separated)..."
-                      value={form.services_categories}
-                      onChange={(e) => handleChange(e, index)}
-                      className="bg-gray-50"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor={`services_description_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                      Service Description
-                    </label>
-                    <Textarea
-                      id={`services_description_${index}`}
-                      name="services_description"
-                      placeholder="Describe your main services and expertise..."
-                      value={form.services_description}
-                      onChange={(e) => handleChange(e, index)}
-                      className="bg-gray-50 min-h-[120px]"
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor={`rate_range_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                        Rate Range
-                      </label>
-                      <Input
-                        id={`rate_range_${index}`}
-                        name="rate_range"
-                        placeholder="Enter your rate range..."
-                        value={form.rate_range}
-                        onChange={(e) => handleChange(e, index)}
-                        className="bg-gray-50"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor={`availability_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                        Availability
-                      </label>
-                      <Input
-                        id={`availability_${index}`}
-                        name="availability"
-                        placeholder="Enter your availability..."
-                        value={form.availability}
-                        onChange={(e) => handleChange(e, index)}
-                        className="bg-gray-50"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              <Button
-                type="button"
-                onClick={addNewService}
-                className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white flex items-center justify-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Add Another Service
-              </Button>
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
-                  disabled={loading}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-                  disabled={loading}
-                >
-                  {loading ? "Saving..." : "Save Changes"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
       </div>
     );
   }
@@ -314,176 +203,164 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Services</h2>
         {isEditMode && (
-          <Button 
-            variant="ghost" 
-            className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-            onClick={() => setIsDialogOpen(true)}
-          >
-            <Pencil className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+              onClick={() => {
+                setEditingService(null);
+                setForm({
+                  services_categories: '',
+                  services_description: '',
+                  rate_range: '',
+                  availability: '',
+                });
+                setIsDialogOpen(true);
+              }}
+            >
+              <Plus className="w-5 h-5" />
+            </Button>
+          </div>
         )}
       </div>
-      
-      {categories.map((category, index) => (
-        <div key={index} className="mb-8 last:mb-0">
-          {category.services_description && (
-            <p className="text-gray-600 mb-4">{category.services_description}</p>
-          )}
-
-          {category.services_categories && (
-            <div className="flex flex-wrap gap-x-2 gap-y-3 mb-4">
-              {category.services_categories.split(',').map((service, serviceIndex) => (
-                <span 
-                  key={serviceIndex}
-                  className="text-sm bg-gray-100 text-gray-800 px-3 py-1 rounded-full hover:bg-gray-200 transition-colors"
-                >
-                  {service.trim()}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {(category.rate_range || category.availability) && (
-            <div className="space-y-2 mb-4">
-              {category.rate_range && (
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Rate Range:</span> {category.rate_range}
-                </p>
-              )}
-              {category.availability && (
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Availability:</span> {category.availability}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-      ))}
-      
-      <Button 
-        variant="link" 
-        className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
-      >
-        <span>Show all services</span>
-        <ChevronDown className="ml-1 h-4 w-4" />
-      </Button>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Edit Services</DialogTitle>
+            <DialogTitle>
+              {editingService ? 'Edit Service' : 'Add Service'}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {serviceForms.map((form, index) => (
-              <div key={index} className="border rounded-lg p-6 space-y-4 relative">
-                {index > 0 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-4 right-4 text-gray-500 hover:text-red-500"
-                    onClick={() => removeService(index)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                )}
-                <h3 className="text-lg font-semibold text-gray-800">
-                  Service Category {index + 1}
-                </h3>
+            <div>
+              <label htmlFor="services_categories" className="block font-medium mb-1 text-sm">
+                Service Categories
+              </label>
+              <Input
+                id="services_categories"
+                name="services_categories"
+                placeholder="Enter service categories (comma-separated)..."
+                value={form.services_categories}
+                onChange={handleChange}
+                className="bg-gray-50"
+                required
+              />
+            </div>
 
-                <div>
-                  <label htmlFor={`services_categories_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                    Main Service Category
-                  </label>
-                  <Input
-                    id={`services_categories_${index}`}
-                    name="services_categories"
-                    placeholder="Enter your service categories (comma-separated)..."
-                    value={form.services_categories}
-                    onChange={(e) => handleChange(e, index)}
-                    className="bg-gray-50"
-                    required
-                  />
-                </div>
+            <div>
+              <label htmlFor="services_description" className="block font-medium mb-1 text-sm">
+                Service Description
+              </label>
+              <Textarea
+                id="services_description"
+                name="services_description"
+                placeholder="Describe your services and expertise..."
+                value={form.services_description}
+                onChange={handleChange}
+                className="bg-gray-50 min-h-[120px]"
+                required
+              />
+            </div>
 
-                <div>
-                  <label htmlFor={`services_description_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                    Service Description
-                  </label>
-                  <Textarea
-                    id={`services_description_${index}`}
-                    name="services_description"
-                    placeholder="Describe your main services and expertise..."
-                    value={form.services_description}
-                    onChange={(e) => handleChange(e, index)}
-                    className="bg-gray-50 min-h-[120px]"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor={`rate_range_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                      Rate Range
-                    </label>
-                    <Input
-                      id={`rate_range_${index}`}
-                      name="rate_range"
-                      placeholder="Enter your rate range..."
-                      value={form.rate_range}
-                      onChange={(e) => handleChange(e, index)}
-                      className="bg-gray-50"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor={`availability_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                      Availability
-                    </label>
-                    <Input
-                      id={`availability_${index}`}
-                      name="availability"
-                      placeholder="Enter your availability..."
-                      value={form.availability}
-                      onChange={(e) => handleChange(e, index)}
-                      className="bg-gray-50"
-                      required
-                    />
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="rate_range" className="block font-medium mb-1 text-sm">
+                  Rate Range
+                </label>
+                <Input
+                  id="rate_range"
+                  name="rate_range"
+                  placeholder="Enter your rate range..."
+                  value={form.rate_range}
+                  onChange={handleChange}
+                  className="bg-gray-50"
+                  required
+                />
               </div>
-            ))}
-
-            <Button
-              type="button"
-              onClick={addNewService}
-              className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white flex items-center justify-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Add Another Service
-            </Button>
+              <div>
+                <label htmlFor="availability" className="block font-medium mb-1 text-sm">
+                  Availability
+                </label>
+                <Input
+                  id="availability"
+                  name="availability"
+                  placeholder="Enter your availability..."
+                  value={form.availability}
+                  onChange={handleChange}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+            </div>
 
             <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsDialogOpen(false)}
-                disabled={loading}
+                onClick={handleCancel}
+                disabled={isLoading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-                disabled={loading}
+                disabled={isLoading}
               >
-                {loading ? "Saving..." : "Save Changes"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {editingService ? 'Saving Changes...' : 'Adding Service...'}
+                  </>
+                ) : (
+                  editingService ? 'Save Changes' : 'Add Service'
+                )}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
+
+      <div className="space-y-6">
+        {localServices.map((service, index) => (
+          <div key={index} className="border rounded-lg p-6 space-y-4 relative bg-white shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {service.services_categories}
+                </h3>
+                <p className="text-gray-600 mt-2">{service.services_description}</p>
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Rate Range:</span> {service.rate_range}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Availability:</span> {service.availability}
+                  </p>
+                </div>
+              </div>
+              {isEditMode && (
+                <Button
+                  variant="ghost"
+                  className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+                  onClick={() => handleEdit(service)}
+                  disabled={isLoading}
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <Button 
+        variant="link" 
+        className="mt-6 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
+      >
+        <span>Show all services</span>
+        <ChevronDown className="ml-1 h-4 w-4" />
+      </Button>
     </div>
   );
 };
