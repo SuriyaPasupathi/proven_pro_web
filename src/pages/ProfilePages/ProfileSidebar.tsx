@@ -1,4 +1,4 @@
-import { Video, Award, Pencil } from 'lucide-react';
+import { Video, Award, Pencil, Plus } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProfileData } from '../../types/profile';
@@ -84,6 +84,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const [isCertUpdating, setIsCertUpdating] = useState(false);
   const [selectedCertImage, setSelectedCertImage] = useState<File | null>(null);
   const certImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Add new state for tracking if we're adding a new certification
+  const [isAddingNewCert, setIsAddingNewCert] = useState(false);
 
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
@@ -332,19 +335,32 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         formData.append('certifications_image', selectedCertImage);
       }
 
-      // Create updated certification object
+      // Add individual certification fields
+      formData.append('certifications_name', certForm.certifications_name);
+      formData.append('certifications_issuer', certForm.certifications_issuer);
+      formData.append('certifications_issued_date', certForm.certifications_issued_date);
+      formData.append('certifications_id', certForm.certifications_id);
+      
+      if (certForm.certifications_expiration_date) {
+        formData.append('certifications_expiration_date', certForm.certifications_expiration_date);
+      }
+
+      // Create updated certification object for optimistic update
       const updatedCert = {
         ...certForm,
+        certifications_id: isAddingNewCert ? `cert_${Date.now()}` : certForm.certifications_id,
         certifications_image: selectedCertImage ? selectedCertImage.name : certForm.certifications_image
       };
 
-      // Update certifications array
-      const updatedCerts = profileData.certifications?.map((cert: Certification) => 
-        cert.certifications_id === certForm.certifications_id ? updatedCert : cert
-      ) || [];
-
-      // Add certifications to form data
-      formData.append('certifications', JSON.stringify(updatedCerts));
+      // Update certifications array for optimistic update
+      let updatedCerts: Certification[]; 
+      if (isAddingNewCert) {
+        updatedCerts = [...(profileData.certifications || []), updatedCert];
+      } else {
+        updatedCerts = (profileData.certifications || []).map((cert: Certification) => 
+          cert.certifications_id === certForm.certifications_id ? updatedCert : cert
+        );
+      }
 
       // Optimistically update the UI
       dispatch(updateProfileData({
@@ -363,7 +379,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           ...reduxProfileData,
           certifications: result.certifications
         }));
-        toast.success("Certification updated successfully!");
+        toast.success(isAddingNewCert ? "Certification added successfully!" : "Certification updated successfully!");
         setIsCertDialogOpen(false);
         setSelectedCertImage(null);
         setCertForm({
@@ -378,7 +394,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to update certification");
+      toast.error(error.message || (isAddingNewCert ? "Failed to add certification" : "Failed to update certification"));
       // Revert optimistic update on error
       dispatch(updateProfileData({
         ...reduxProfileData,
@@ -390,17 +406,32 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   };
 
   // Function to handle opening the certification edit dialog
-  const handleOpenCertDialog = (certification: Certification) => {
-    // Set the form data with the existing certification
-    setCertForm({
-      certifications_name: certification.certifications_name || '',
-      certifications_issuer: certification.certifications_issuer || '',
-      certifications_issued_date: certification.certifications_issued_date || '',
-      certifications_expiration_date: certification.certifications_expiration_date || '',
-      certifications_id: certification.certifications_id || '',
-      certifications_image: certification.certifications_image || '',
-      certifications_image_url: certification.certifications_image_url || ''
-    });
+  const handleOpenCertDialog = (certification?: Certification) => {
+    if (certification) {
+      // Editing existing certification
+      setCertForm({
+        certifications_name: certification.certifications_name || '',
+        certifications_issuer: certification.certifications_issuer || '',
+        certifications_issued_date: certification.certifications_issued_date || '',
+        certifications_expiration_date: certification.certifications_expiration_date || '',
+        certifications_id: certification.certifications_id || '',
+        certifications_image: certification.certifications_image || '',
+        certifications_image_url: certification.certifications_image_url || ''
+      });
+      setIsAddingNewCert(false);
+    } else {
+      // Adding new certification
+      setCertForm({
+        certifications_name: '',
+        certifications_issuer: '',
+        certifications_issued_date: '',
+        certifications_expiration_date: '',
+        certifications_id: '',
+        certifications_image: '',
+        certifications_image_url: ''
+      });
+      setIsAddingNewCert(true);
+    }
     setIsCertDialogOpen(true);
   };
 
@@ -408,6 +439,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const handleCloseCertDialog = () => {
     setIsCertDialogOpen(false);
     setSelectedCertImage(null);
+    setIsAddingNewCert(false);
     setCertForm({
       certifications_name: '',
       certifications_issuer: '',
@@ -419,20 +451,23 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     });
   };
 
-  // Add edit button back to each certification
+  // Update the renderCertification function to better display certification details
   const renderCertification = (cert: Certification, index: number) => (
-    <div key={index} className="space-y-1 text-sm">
-      <div>
-        <p className="font-medium">{cert.certifications_name}</p>
-        <p className="text-gray-600">{cert.certifications_issuer}</p>
-        <p className="text-gray-500 text-xs">
-          {cert.certifications_issued_date} - {cert.certifications_expiration_date}
-        </p>
-        {cert.certifications_id && (
-          <p className="text-gray-500 text-xs mt-1">
-            ID: {cert.certifications_id}
-          </p>
-        )}
+    <div key={index} className="space-y-2 p-4 bg-gray-50 rounded-lg">
+      <div className="flex justify-between items-start">
+        <div className="space-y-1">
+          <h4 className="font-semibold text-gray-900">{cert.certifications_name}</h4>
+          <p className="text-sm text-gray-600">{cert.certifications_issuer}</p>
+          <div className="flex gap-2 text-xs text-gray-500">
+            <span>Issued: {new Date(cert.certifications_issued_date).toLocaleDateString()}</span>
+            {cert.certifications_expiration_date && (
+              <span>Expires: {new Date(cert.certifications_expiration_date).toLocaleDateString()}</span>
+            )}
+          </div>
+          {cert.certifications_id && (
+            <p className="text-xs text-gray-500">ID: {cert.certifications_id}</p>
+          )}
+        </div>
       </div>
       {cert.certifications_image_url && (
         <div className="mt-2">
@@ -447,7 +482,6 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           />
         </div>
       )}
-     
     </div>
   );
 
@@ -556,29 +590,58 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       )}
 
       {/* Certifications */}
-      {profileData.certifications && profileData.certifications.length > 0 && (
-        <div className="pb-8 border-b-2 border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-[#70a4d8]" />
-              <h3 className="font-semibold">Certifications</h3>
-            </div>
-            {isEditMode && profileData.certifications && profileData.certifications.length > 0 && (
+      <div className="pb-8 border-b-2 border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Award className="h-5 w-5 text-[#70a4d8]" />
+            <h3 className="font-semibold">Certifications</h3>
+          </div>
+          {isEditMode && (
+            <div className="flex gap-2">
               <Button 
-                variant="ghost" 
+                    variant="ghost" 
                 className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-                onClick={() => profileData.certifications && handleOpenCertDialog(profileData.certifications[0])}
+                onClick={() => handleOpenCertDialog()}
               >
-                <Pencil className="w-4 h-4" />
+                <Plus className="w-5 h-5 mr-1" />
               </Button>
-            )}
-          </div>
-          
-          <div className="space-y-4">
-            {profileData.certifications.map(renderCertification)}
-          </div>
+            </div>
+          )}
         </div>
-      )}
+        
+        <div className="space-y-4">
+          {profileData.certifications && profileData.certifications.length > 0 ? (
+            profileData.certifications.map((cert, index) => (
+              <div key={index} className="relative group">
+                {renderCertification(cert, index)}
+                {isEditMode && (
+                  <Button 
+                    variant="ghost" 
+                    className="absolute top-2 right-2 p-2 h-auto bg-white/80 hover:bg-white text-[#3C5979] hover:text-[#3C5979] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => handleOpenCertDialog(cert)}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 bg-gray-50 rounded-lg">
+              <p className="text-gray-500 text-sm italic">No certifications added yet</p>
+              {isEditMode && (
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+                  onClick={() => handleOpenCertDialog()}
+                >
+                  Add Your First Certification
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Profile Edit Dialog */}
       <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
@@ -786,7 +849,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       <Dialog open={isCertDialogOpen} onOpenChange={handleCloseCertDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Certification</DialogTitle>
+            <DialogTitle>{isAddingNewCert ? 'Add New Certification' : 'Edit Certification'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCertSubmit} className="space-y-4">
             <div>
@@ -798,10 +861,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 className="bg-gray-50"
                 required
                 disabled={isCertUpdating}
+                placeholder="Enter certification name"
               />
             </div>
             <div>
-              <label className="block font-medium mb-1 text-sm">Issuer</label>
+              <label className="block font-medium mb-1 text-sm">Issuing Organization</label>
               <Input
                 name="certifications_issuer"
                 value={certForm.certifications_issuer}
@@ -809,6 +873,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 className="bg-gray-50"
                 required
                 disabled={isCertUpdating}
+                placeholder="Enter organization name"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -825,14 +890,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 />
               </div>
               <div>
-                <label className="block font-medium mb-1 text-sm">Expiration Date</label>
+                <label className="block font-medium mb-1 text-sm">Expiration Date (Optional)</label>
                 <Input
                   name="certifications_expiration_date"
                   type="date"
                   value={certForm.certifications_expiration_date}
                   onChange={handleCertChange}
                   className="bg-gray-50"
-                  required
                   disabled={isCertUpdating}
                 />
               </div>
@@ -846,6 +910,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 className="bg-gray-50"
                 required
                 disabled={isCertUpdating}
+                placeholder="Enter certification ID"
               />
             </div>
             <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
@@ -864,7 +929,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               ) : certForm.certifications_image_url ? (
                 <div className="mb-4">
                   <img 
-                    src={certForm.certifications_image_url} 
+                    src={getFullImageUrl(certForm.certifications_image_url)} 
                     alt="Current certification"
                     className="w-32 h-32 mx-auto object-cover rounded"
                   />
@@ -902,7 +967,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
                 disabled={isCertUpdating}
               >
-                {isCertUpdating ? 'Updating...' : 'Save Changes'}
+                {isCertUpdating ? 'Saving...' : (isAddingNewCert ? 'Add Certification' : 'Save Changes')}
               </Button>
             </DialogFooter>
           </form>
