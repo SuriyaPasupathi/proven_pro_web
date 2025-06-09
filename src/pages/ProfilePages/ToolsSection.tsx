@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
 import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
 import { toast } from 'sonner';
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ToolsSectionProps {
   primary_tools?: string[] | string;
@@ -23,20 +23,19 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
   const { profileData } = useAppSelector((state) => state.createProfile);
+  const { skills } = useAppSelector((state) => state.dropdown);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tools, setTools] = useState<string[]>([]);
-  const [newTool, setNewTool] = useState('');
+  const [selectedTool, setSelectedTool] = useState('');
 
   // Convert tools input to array
   const getToolsArray = (input: string[] | string): string[] => {
     if (Array.isArray(input)) return input;
     if (typeof input === 'string') {
       try {
-        // Try to parse if it's a JSON string
         const parsed = JSON.parse(input);
         return Array.isArray(parsed) ? parsed : [];
       } catch {
-        // If not JSON, split by comma
         return input.split(',').map(tool => tool.trim()).filter(Boolean);
       }
     }
@@ -46,28 +45,19 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   useEffect(() => {
     if (primary_tools) {
       const toolsArray = getToolsArray(primary_tools);
-      console.log('ToolsSection received props:', { primary_tools, toolsArray }); // Debug log
       setTools(toolsArray);
     }
-  }, []); // Empty dependency array since we only want to initialize once
+  }, [primary_tools]);
 
-  const handleAddTool = () => {
-    if (newTool.trim()) {
-      setTools(prevTools => [...prevTools, newTool.trim()]);
-      setNewTool('');
+  const handleToolSelect = (value: string) => {
+    if (!tools.includes(value)) {
+      setTools(prevTools => [...prevTools, value]);
     }
+    setSelectedTool('');
   };
 
-  const handleRemoveTool = (index: number) => {
-    setTools(prevTools => prevTools.filter((_, i) => i !== index));
-  };
-
-  const handleToolChange = (index: number, value: string) => {
-    setTools(prevTools => {
-      const newTools = [...prevTools];
-      newTools[index] = value;
-      return newTools;
-    });
+  const handleRemoveTool = (toolToRemove: string) => {
+    setTools(prevTools => prevTools.filter(tool => tool !== toolToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,15 +68,12 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       formData.append('primary_tools', JSON.stringify(tools));
 
-      console.log('Submitting tools update:', { tools }); // Debug log
-
       const result = await dispatch(updateProfile({
         data: formData,
         profileId: profileData?.id || ''
       })).unwrap();
       
       if (result) {
-        console.log('Tools update result:', result); // Debug log
         dispatch(updateProfileData({
           ...profileData,
           primary_tools: tools
@@ -96,7 +83,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         setIsDialogOpen(false);
       }
     } catch (err) {
-      console.error('Error updating tools:', err); // Debug log
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to update tools");
     }
@@ -106,9 +92,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     setTools(getToolsArray(primary_tools));
     setIsDialogOpen(false);
   };
-
-  // Debug log for current tools state
-  console.log('Current tools state:', tools);
 
   if (!tools || tools.length === 0) {
     return (
@@ -153,37 +136,40 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-4">
-              {tools.map((tool, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    value={tool}
-                    onChange={(e) => handleToolChange(index, e.target.value)}
-                    className="bg-gray-50"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => handleRemoveTool(index)}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
-              <div className="flex items-center gap-2">
-                <Input
-                  value={newTool}
-                  onChange={(e) => setNewTool(e.target.value)}
-                  placeholder="Add new tool"
-                  className="bg-gray-50"
-                />
-                <Button
-                  type="button"
-                  onClick={handleAddTool}
-                  className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+              <div>
+                <label className="block font-medium mb-1 text-sm">
+                  Select Tools
+                </label>
+                <Select
+                  value={selectedTool}
+                  onValueChange={handleToolSelect}
                 >
-                  Add
-                </Button>
+                  <SelectTrigger className="w-full bg-gray-50">
+                    <SelectValue placeholder="Select tools" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {skills.map((skill: any) => (
+                      <SelectItem key={skill.id} value={skill.name}>
+                        {skill.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {tools.map((tool, index) => (
+                  <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                    <span>{tool}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTool(tool)}
+                      className="text-blue-800 hover:text-blue-900"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -210,7 +196,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         {tools.map((tool, index) => (
           <span 
             key={index}
-            // className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm hover:bg-blue-200 transition-colors"
+            className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
           >
             {tool}
           </span>

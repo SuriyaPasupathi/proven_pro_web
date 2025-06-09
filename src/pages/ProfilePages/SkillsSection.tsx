@@ -1,13 +1,14 @@
-import {  ChevronDown, Pencil } from 'lucide-react';
+import { ChevronDown, Pencil, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
 import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
+import { fetchSkills } from '../../store/Services/DropDownService';
 import { toast } from 'sonner';
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +16,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+
+interface SkillsForm {
+  technical_skills: string[];
+  soft_skills: string[];
+  skills_description: string;
+}
 
 interface SkillsSectionProps {
   technical_skills?: string[];
@@ -29,95 +36,93 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 }) => {
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
-  const { profileData } = useAppSelector((state) => state.createProfile);
+  const { profileData: reduxProfileData } = useAppSelector((state) => state.createProfile);
+  const { skills, loading: skillsLoading } = useAppSelector((state) => state.dropdown);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [technicalSkills, setTechnicalSkills] = useState<string[]>([]);
-  const [softSkills, setSoftSkills] = useState<string[]>([]);
-  const [description, setDescription] = useState('');
-  const [newTechnicalSkill, setNewTechnicalSkill] = useState('');
-  const [newSoftSkill, setNewSoftSkill] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [form, setForm] = useState<SkillsForm>({
+    technical_skills: [],
+    soft_skills: [],
+    skills_description: ''
+  });
 
-  // Initialize state only once when component mounts
+  // Fetch skills when component mounts
   useEffect(() => {
-    if (technical_skills || soft_skills || skills_description) {
-      const techSkills = Array.isArray(technical_skills) ? technical_skills : [];
-      const softSkills = Array.isArray(soft_skills) ? soft_skills : [];
-      console.log('SkillsSection received props:', { technical_skills, soft_skills, skills_description }); // Debug log
-      setTechnicalSkills(techSkills);
-      setSoftSkills(softSkills);
-      setDescription(skills_description || '');
-    }
-  }, []); // Empty dependency array since we only want to initialize once
+    dispatch(fetchSkills());
+  }, [dispatch]);
 
-  const handleAddTechnicalSkill = () => {
-    if (newTechnicalSkill.trim()) {
-      setTechnicalSkills([...technicalSkills, newTechnicalSkill.trim()]);
-      setNewTechnicalSkill('');
-    }
-  };
+  // Initialize form when component mounts or props change
+  useEffect(() => {
+    setForm({
+      technical_skills: Array.isArray(technical_skills) ? technical_skills : [],
+      soft_skills: Array.isArray(soft_skills) ? soft_skills : [],
+      skills_description: skills_description || ''
+    });
+  }, [technical_skills, soft_skills, skills_description]);
 
-  const handleAddSoftSkill = () => {
-    if (newSoftSkill.trim()) {
-      setSoftSkills([...softSkills, newSoftSkill.trim()]);
-      setNewSoftSkill('');
-    }
-  };
-
-  const handleRemoveTechnicalSkill = (index: number) => {
-    setTechnicalSkills(technicalSkills.filter((_, i) => i !== index));
-  };
-
-  const handleRemoveSoftSkill = (index: number) => {
-    setSoftSkills(softSkills.filter((_, i) => i !== index));
+  const handleSkillSelect = (value: string, field: 'technical_skills' | 'soft_skills') => {
+    setForm(prev => {
+      const currentValues = prev[field];
+      if (currentValues.includes(value)) {
+        return {
+          ...prev,
+          [field]: currentValues.filter(v => v !== value)
+        };
+      } else {
+        return {
+          ...prev,
+          [field]: [...currentValues, value]
+        };
+      }
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
-      const formData = new FormData();
-      formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('technical_skills', JSON.stringify(technicalSkills));
-      formData.append('soft_skills', JSON.stringify(softSkills));
-      formData.append('skills_description', description);
+      if (!reduxProfileData?.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
 
-      console.log('Submitting skills update:', { // Debug log
-        technical_skills: technicalSkills,
-        soft_skills: softSkills,
-        description
-      });
+      const formData = new FormData();
+      formData.append('subscription_type', reduxProfileData.subscription_type || 'premium');
+      formData.append('technical_skills', JSON.stringify(form.technical_skills));
+      formData.append('soft_skills', JSON.stringify(form.soft_skills));
+      formData.append('skills_description', form.skills_description);
 
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileData?.id || ''
+        profileId: reduxProfileData.id
       })).unwrap();
       
       if (result) {
-        console.log('Skills update result:', result); // Debug log
         dispatch(updateProfileData({
-          ...profileData,
-          technical_skills: technicalSkills,
-          soft_skills: softSkills,
-          skills_description: description
+          ...reduxProfileData,
+          technical_skills: form.technical_skills,
+          soft_skills: form.soft_skills,
+          skills_description: form.skills_description
         }));
 
         toast.success("Skills updated successfully!");
         setIsDialogOpen(false);
       }
     } catch (err) {
-      console.error('Error updating skills:', err); // Debug log
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to update skills");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    // Reset to original values
-    const techSkills = Array.isArray(technical_skills) ? technical_skills : [];
-    const softSkills = Array.isArray(soft_skills) ? soft_skills : [];
-    setTechnicalSkills(techSkills);
-    setSoftSkills(softSkills);
-    setDescription(skills_description || '');
+    setForm({
+      technical_skills: Array.isArray(technical_skills) ? technical_skills : [],
+      soft_skills: Array.isArray(soft_skills) ? soft_skills : [],
+      skills_description: skills_description || ''
+    });
     setIsDialogOpen(false);
   };
 
@@ -146,8 +151,8 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
             <div>
               <label className="block font-medium mb-2">Skills Description</label>
               <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={form.skills_description}
+                onChange={(e) => setForm(prev => ({ ...prev, skills_description: e.target.value }))}
                 placeholder="Describe your skills and expertise..."
                 className="bg-gray-50 min-h-[100px]"
               />
@@ -156,85 +161,53 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
             <div className="space-y-4">
               <div>
                 <label className="block font-medium mb-2">Technical Skills</label>
-                <div className="space-y-2">
-                  {technicalSkills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        value={skill}
-                        onChange={(e) => {
-                          const newSkills = [...technicalSkills];
-                          newSkills[index] = e.target.value;
-                          setTechnicalSkills(newSkills);
-                        }}
-                        className="bg-gray-50"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleRemoveTechnicalSkill(index)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
+                <Select
+                  value={form.technical_skills.join(',')}
+                  onValueChange={(value) => handleSkillSelect(value, 'technical_skills')}
+                >
+                  <SelectTrigger className="w-full bg-gray-50">
+                    <SelectValue placeholder="Select technical skills" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {skills.map((skill: any) => (
+                      <SelectItem key={skill.id} value={skill.name}>
+                        {skill.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {form.technical_skills.map((skill, index) => (
+                    <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+                      {skill}
+                    </span>
                   ))}
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={newTechnicalSkill}
-                      onChange={(e) => setNewTechnicalSkill(e.target.value)}
-                      placeholder="Add new technical skill"
-                      className="bg-gray-50"
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleAddTechnicalSkill}
-                      className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-                    >
-                      Add
-                    </Button>
-                  </div>
                 </div>
               </div>
 
               <div>
                 <label className="block font-medium mb-2">Soft Skills</label>
-                <div className="space-y-2">
-                  {softSkills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        value={skill}
-                        onChange={(e) => {
-                          const newSkills = [...softSkills];
-                          newSkills[index] = e.target.value;
-                          setSoftSkills(newSkills);
-                        }}
-                        className="bg-gray-50"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleRemoveSoftSkill(index)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
+                <Select
+                  value={form.soft_skills.join(',')}
+                  onValueChange={(value) => handleSkillSelect(value, 'soft_skills')}
+                >
+                  <SelectTrigger className="w-full bg-gray-50">
+                    <SelectValue placeholder="Select soft skills" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {skills.map((skill: any) => (
+                      <SelectItem key={skill.id} value={skill.name}>
+                        {skill.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {form.soft_skills.map((skill, index) => (
+                    <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                      {skill}
+                    </span>
                   ))}
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={newSoftSkill}
-                      onChange={(e) => setNewSoftSkill(e.target.value)}
-                      placeholder="Add new soft skill"
-                      className="bg-gray-50"
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleAddSoftSkill}
-                      className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-                    >
-                      Add
-                    </Button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -244,29 +217,38 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
+                disabled={isLoading || skillsLoading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                disabled={isLoading || skillsLoading}
               >
-                Save Changes
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving Changes...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {description && (
-        <p className="text-gray-600 mb-6">{description}</p>
+      {form.skills_description && (
+        <p className="text-gray-600 mb-6">{form.skills_description}</p>
       )}
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-3">Technical Skills</h3>
         <div className="flex flex-wrap gap-2">
-          {technicalSkills.length > 0 ? (
-            technicalSkills.map((skill, index) => (
+          {form.technical_skills.length > 0 ? (
+            form.technical_skills.map((skill, index) => (
               <span 
                 key={index}
                 className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
@@ -283,8 +265,8 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-3">Soft Skills</h3>
         <div className="flex flex-wrap gap-2">
-          {softSkills.length > 0 ? (
-            softSkills.map((skill, index) => (
+          {form.soft_skills.length > 0 ? (
+            form.soft_skills.map((skill, index) => (
               <span 
                 key={index}
                 className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full hover:bg-green-200 transition-colors"

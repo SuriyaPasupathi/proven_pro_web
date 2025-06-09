@@ -182,11 +182,20 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       
       // Create updated portfolio array
-      const updatedPortfolio = editingItem 
-        ? projectItems.map(item => 
-            item === editingItem ? form : item
-          )
-        : [...projectItems, form];
+      let updatedPortfolio;
+      if (editingItem) {
+        // If editing, replace the existing item
+        updatedPortfolio = projectItems.map(item => 
+          item.id === editingItem.id ? { ...form, id: editingItem.id } : item
+        );
+      } else {
+        // If adding new, append to existing items
+        const newItem = {
+          ...form,
+          id: Date.now() // Temporary ID for new items
+        };
+        updatedPortfolio = [...projectItems, newItem];
+      }
       
       formData.append('portfolio', JSON.stringify(updatedPortfolio));
 
@@ -201,10 +210,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       })).unwrap();
       
       if (result) {
+        // Update local state only after successful API call
         dispatch(updateProfileData({
           ...profileData,
           portfolio: updatedPortfolio
         }));
+
+        // Update local project items state
+        setProjectItems(updatedPortfolio);
 
         toast.success("Portfolio updated successfully!");
         setIsDialogOpen(false);
