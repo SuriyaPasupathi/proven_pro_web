@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Loader2 } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -15,12 +15,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { ProfileData } from '../../types/profile';
+// import { ProfileData } from '../../types/profile';
 
 interface Experience {
   company_name: string;
   position: string;
-  key_responsibilities: string;
+  key_responsibilities: string; 
   experience_start_date: string;
   experience_end_date: string;
 }
@@ -127,7 +127,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
           experiences: experiencesArray
         }));
 
-        toast.success("Experience updated successfully!");
+        toast.success(editingExperience ? "Experience updated successfully!" : "Experience added successfully!");
         setIsDialogOpen(false);
         setEditingExperience(null);
         setForm({
@@ -158,28 +158,62 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     });
   };
 
+  if (!experiences.length) {
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Experience</h2>
+          {isEditMode && (
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+                onClick={() => {
+                  setEditingExperience(null);
+                  setForm({
+                    company_name: "",
+                    position: "",
+                    experience_start_date: "",
+                    experience_end_date: "",
+                    key_responsibilities: "",
+                  });
+                  setIsDialogOpen(true);
+                }}
+              >
+                <Plus className="w-5 h-5" />
+              </Button>
+            </div>
+          )}
+        </div>
+        <p className="text-gray-600">No experience information available.</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Experience</h2>
         {isEditMode && (
-          <Button 
-            variant="ghost" 
-            className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-            onClick={() => {
-              setEditingExperience(null);
-              setForm({
-                company_name: "",
-                position: "",
-                experience_start_date: "",
-                experience_end_date: "",
-                key_responsibilities: "",
-              });
-              setIsDialogOpen(true);
-            }}
-          >
-            <Pencil className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+              onClick={() => {
+                setEditingExperience(null);
+                setForm({
+                  company_name: "",
+                  position: "",
+                  experience_start_date: "",
+                  experience_end_date: "",
+                  key_responsibilities: "",
+                });
+                setIsDialogOpen(true);
+              }}
+            >
+              <Plus className="w-5 h-5" />
+            </Button>
+          </div>
         )}
       </div>
       
@@ -297,17 +331,17 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
 
       <div className="space-y-6">
         {localExperiences.map((exp, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="md:col-span-3">
-              <h3 className="font-semibold text-lg">{exp.position}</h3>
-              <p className="text-gray-600">{exp.company_name}</p>
-              <p className="text-sm text-gray-500 mt-1">
-                {exp.experience_start_date} - {exp.experience_end_date}
-              </p>
-              <p className="mt-2 text-gray-700">{exp.key_responsibilities}</p>
-            </div>
-            {isEditMode && (
-              <div className="flex justify-end">
+          <div key={index} className="border rounded-lg p-6 space-y-4 relative bg-white shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">{exp.position}</h3>
+                <p className="text-gray-600 mt-2">{exp.company_name}</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {exp.experience_start_date} - {exp.experience_end_date}
+                </p>
+                <p className="mt-2 text-gray-700">{exp.key_responsibilities}</p>
+              </div>
+              {isEditMode && (
                 <Button
                   variant="ghost"
                   className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
@@ -316,8 +350,8 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 >
                   <Pencil className="w-4 h-4" />
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         ))}
       </div>
