@@ -20,12 +20,12 @@ import { useEditMode } from '../../context/EditModeContext';
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isEditMode } = useEditMode();
+  useEditMode();
   const dispatch = useDispatch<AppDispatch>();
   const { profileId } = useParams();
   console.log(profileId);
   const { profileData, loading, error } = useSelector((state: RootState) => state.createProfile);
-  const { reviews, reviewsLoading } = useSelector((state: RootState) => state.createProfile);
+  const { reviews } = useSelector((state: RootState) => state.createProfile);
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData>({
     id: '',

@@ -28,7 +28,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
-  const { toast } = useToast();
+  useToast();
   const visibleReviews = 3; // Number of reviews visible at once on desktop
   const totalReviews = reviews.length;
 
