@@ -25,8 +25,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const { profileData } = useAppSelector((state) => state.createProfile);
   const { skills } = useAppSelector((state) => state.dropdown);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [tools, setTools] = useState<string[]>([]);
-  const [selectedTool, setSelectedTool] = useState('');
 
   // Convert tools input to array
   const getToolsArray = (input: string[] | string): string[] => {
@@ -42,12 +40,24 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     return [];
   };
 
+  const [tools, setTools] = useState<string[]>(() => getToolsArray(primary_tools));
+  const [selectedTool, setSelectedTool] = useState('');
+
+  // Update tools when dialog opens or primary_tools changes
   useEffect(() => {
-    if (primary_tools) {
+    if (isDialogOpen) {
       const toolsArray = getToolsArray(primary_tools);
       setTools(toolsArray);
     }
-  }, [primary_tools]);
+  }, [isDialogOpen, primary_tools]);
+
+  // Update tools from Redux store
+  useEffect(() => {
+    if (profileData?.primary_tools) {
+      const toolsArray = getToolsArray(profileData.primary_tools);
+      setTools(toolsArray);
+    }
+  }, [profileData?.primary_tools]);
 
   const handleToolSelect = (value: string) => {
     if (!tools.includes(value)) {
