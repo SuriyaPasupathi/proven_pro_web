@@ -118,6 +118,9 @@ const ServicesOffer: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Prevent multiple submissions while loading
+    if (loading) return;
+    
     if (!validateForm()) {
       return;
     }
@@ -138,8 +141,20 @@ const ServicesOffer: React.FC = () => {
       const result = await dispatch(createUserProfile(profileData)).unwrap();
       
       if (result) {
+        // Reset form state after successful submission
+        setServiceForms([{
+          services_categories: "",
+          services_description: "",
+          rate_range: "",
+          availability: "",
+        }]);
+        
         toast.success("Services information saved successfully!");
-        navigate("/create-profile/work-exp");
+        
+        // Use setTimeout to ensure state updates are complete before navigation
+        setTimeout(() => {
+          navigate("/create-profile/work-exp");
+        }, 100);
       }
     } catch (err) {
       const error = err as { message: string; code?: string };

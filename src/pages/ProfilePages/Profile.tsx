@@ -23,10 +23,9 @@ const App: React.FC = () => {
   useEditMode();
   const dispatch = useDispatch<AppDispatch>();
   const { profileId } = useParams();
-  console.log(profileId);
+  const navigate = useNavigate();
   const { profileData, loading, error } = useSelector((state: RootState) => state.createProfile);
   const { reviews } = useSelector((state: RootState) => state.createProfile);
-  const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData>({
     id: '',
     subscription_type: 'premium',
@@ -59,12 +58,19 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        if (!profileId) return;
+        if (!profileId) {
+          const storedProfileId = localStorage.getItem('userProfileId');
+          if (storedProfileId) {
+            navigate(`/profile/${storedProfileId}`);
+            return;
+          }
+          navigate('/create-profile/personal-info');
+          return;
+        }
         await dispatch(getProfile(profileId));
         await dispatch(getProfileReviews(profileId));
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
-          // Redirect to login page if unauthorized
           navigate('/login');
         }
       }

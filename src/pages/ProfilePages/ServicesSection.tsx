@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Plus, Loader2 } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
@@ -16,6 +16,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import toast from 'react-hot-toast';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 
 interface ServiceForm {
   services_categories: string;
@@ -53,6 +54,8 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   const [editingService, setEditingService] = useState<ServiceCategory | null>(null);
   const [localServices, setLocalServices] = useState<ServiceCategory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [serviceToDelete, setServiceToDelete] = useState<ServiceCategory | null>(null);
   const [form, setForm] = useState<ServiceForm>({
     services_categories: '',
     services_description: '',
@@ -106,17 +109,70 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     setIsLoading(true);
     
     try {
+      // Validate form data
+      if (!form.services_categories.trim() || !form.services_description.trim() || 
+          !form.rate_range.trim() || !form.availability.trim()) {
+        toast.error("All fields are required!");
+        setIsLoading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
       
-      // Create updated services array
-      const updatedServices = editingService 
-        ? localServices.map(service => 
-            service === editingService ? form : service
-          )
-        : [...localServices, form];
+      // Create updated services array using ID for comparison
+      let updatedServices;
+      if (editingService) {
+        // If editing, update the existing service
+        updatedServices = localServices.map(service => 
+          service.id === editingService.id 
+            ? { ...form, id: editingService.id }
+            : service
+        );
+      } else {
+        // If adding new service, check for duplicates before adding
+        const isDuplicate = localServices.some(
+          service => 
+            service.services_categories.toLowerCase() === form.services_categories.toLowerCase() &&
+            service.services_description.toLowerCase() === form.services_description.toLowerCase() &&
+            service.rate_range.toLowerCase() === form.rate_range.toLowerCase() &&
+            service.availability.toLowerCase() === form.availability.toLowerCase()
+        );
+
+        if (isDuplicate) {
+          toast.error("This service already exists!");
+          setIsLoading(false);
+          return;
+        }
+
+        // Add new service with a temporary ID
+        const newService = {
+          ...form,
+          id: Date.now(),
+          services_categories: form.services_categories.trim(),
+          services_description: form.services_description.trim(),
+          rate_range: form.rate_range.trim(),
+          availability: form.availability.trim()
+        };
+        updatedServices = [...localServices, newService];
+      }
       
-      formData.append('categories', JSON.stringify(updatedServices));
+      // Remove any duplicate services before sending to backend
+      const uniqueServices = updatedServices.reduce((acc: ServiceCategory[], current) => {
+        const isDuplicate = acc.some(
+          service => 
+            service.services_categories.toLowerCase() === current.services_categories.toLowerCase() &&
+            service.services_description.toLowerCase() === current.services_description.toLowerCase() &&
+            service.rate_range.toLowerCase() === current.rate_range.toLowerCase() &&
+            service.availability.toLowerCase() === current.availability.toLowerCase()
+        );
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+
+      formData.append('categories', JSON.stringify(uniqueServices));
 
       if (!reduxProfileData?.id) {
         toast.error("Profile ID is missing");
@@ -125,17 +181,17 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: reduxProfileData.id
+        profileId: reduxProfileData.id as string
       })).unwrap();
       
       if (result) {
-        // Update local state immediately
-        setLocalServices(updatedServices);
+        // Update local state immediately with unique services
+        setLocalServices(uniqueServices);
         
         // Update Redux store with the complete profile data
         dispatch(updateProfileData({
           ...reduxProfileData,
-          categories: updatedServices
+          categories: uniqueServices
         }));
 
         toast.success(editingService ? "Service updated successfully!" : "Service added successfully!");
@@ -156,6 +212,34 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     }
   };
 
+  // Add useEffect to clean up duplicates when component mounts
+  useEffect(() => {
+    if (categories && categories.length > 0) {
+      const uniqueServices = categories.reduce((acc: ServiceCategory[], current) => {
+        const isDuplicate = acc.some(
+          service => 
+            service.services_categories.toLowerCase() === current.services_categories.toLowerCase() &&
+            service.services_description.toLowerCase() === current.services_description.toLowerCase() &&
+            service.rate_range.toLowerCase() === current.rate_range.toLowerCase() &&
+            service.availability.toLowerCase() === current.availability.toLowerCase()
+        );
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      if (uniqueServices.length !== categories.length) {
+        setLocalServices(uniqueServices);
+        // Update Redux store with unique services
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          categories: uniqueServices
+        }));
+      }
+    }
+  }, [categories]);
+
   const handleCancel = () => {
     setIsDialogOpen(false);
     setEditingService(null);
@@ -167,35 +251,51 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     });
   };
 
+  const handleDeleteClick = (service: ServiceCategory) => {
+    setServiceToDelete(service);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!serviceToDelete?.id) return;
+
+    setIsLoading(true);
+    try {
+      const updatedServices = localServices.filter(service => service.id !== serviceToDelete.id);
+      
+      const formData = new FormData();
+      formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
+      formData.append('categories', JSON.stringify(updatedServices));
+
+      if (!reduxProfileData?.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
+
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: reduxProfileData.id as string
+      })).unwrap();
+      
+      if (result) {
+        setLocalServices(updatedServices);
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          categories: updatedServices
+        }));
+        toast.success("Service deleted successfully!");
+        setDeleteDialogOpen(false);
+        setServiceToDelete(null);
+      }
+    } catch (error) {
+      toast.error("Failed to delete service");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!categories.length && !services_description && !services_categories && !rate_range && !availability) {
-    return (
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Services</h2>
-          {isEditMode && (
-            <div className="flex gap-2">
-              <Button 
-                variant="ghost" 
-                className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-                onClick={() => {
-                  setEditingService(null);
-                  setForm({
-                    services_categories: '',
-                    services_description: '',
-                    rate_range: '',
-                    availability: '',
-                  });
-                  setIsDialogOpen(true);
-                }}
-              >
-                <Plus className="w-5 h-5" />
-              </Button>
-            </div>
-          )}
-        </div>
-        <p className="text-gray-600">No services information available.</p>
-      </div>
-    );
+  
   }
 
   return (
@@ -306,6 +406,10 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
                 disabled={isLoading}
+                onClick={(e) => {
+                  // Prevent any additional click handling
+                  e.stopPropagation();
+                }}
               >
                 {isLoading ? (
                   <>
@@ -323,31 +427,36 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
       <div className="space-y-6">
         {localServices.map((service, index) => (
-          <div key={index} className="border rounded-lg p-6 space-y-4 relative bg-white shadow-sm hover:shadow-md transition-shadow">
+          <div key={service.id || index} className="relative p-4 border rounded-lg bg-white">
             <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {service.services_categories}
-                </h3>
-                <p className="text-gray-600 mt-2">{service.services_description}</p>
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Rate Range:</span> {service.rate_range}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Availability:</span> {service.availability}
-                  </p>
+              <div className="space-y-2 flex-grow">
+                <h3 className="font-semibold">{service.services_categories}</h3>
+                <p className="text-sm text-gray-600">{service.services_description}</p>
+                <div className="flex gap-4 text-sm text-gray-500">
+                  <span>Rate: {service.rate_range}</span>
+                  <span>Availability: {service.availability}</span>
                 </div>
               </div>
               {isEditMode && (
-                <Button
-                  variant="ghost"
-                  className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-                  onClick={() => handleEdit(service)}
-                  disabled={isLoading}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-500 hover:text-blue-600"
+                    onClick={() => handleEdit(service)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-500 hover:text-red-600"
+                    onClick={() => handleDeleteClick(service)}
+                    disabled={isLoading}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               )}
             </div>
           </div>
@@ -361,6 +470,18 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         <span>Show all services</span>
         <ChevronDown className="ml-1 h-4 w-4" />
       </Button>
+
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setServiceToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Service"
+        description={`Are you sure you want to delete the service "${serviceToDelete?.services_categories}"? This action cannot be undone.`}
+        isLoading={isLoading}
+      />
     </div>
   );
 };

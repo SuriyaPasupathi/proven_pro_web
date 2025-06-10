@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Pencil, X } from 'lucide-react';
+import { Pencil, X, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -59,6 +60,8 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
     project_image: "",
     project_images: [],
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<Project | null>(null);
 
   // Initialize projectItems from profileData
   useEffect(() => {
@@ -178,48 +181,98 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
     e.preventDefault();
     
     try {
+      // Validate form data
+      if (!form.project_title.trim() || !form.project_description.trim() || 
+          !form.project_url.trim()) {
+        toast.error("All fields are required!");
+        return;
+      }
+
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       
       // Create updated portfolio array
       let updatedPortfolio;
       if (editingItem) {
-        // If editing, replace the existing item
+        // If editing, update the existing item
         updatedPortfolio = projectItems.map(item => 
           item.id === editingItem.id ? { ...form, id: editingItem.id } : item
         );
       } else {
-        // If adding new, append to existing items
-        const newItem = {
-          ...form,
+        // If adding new, check for duplicates before adding
+        const isDuplicate = projectItems.some(
+          item => 
+            item.project_title.toLowerCase() === form.project_title.toLowerCase() &&
+            item.project_description.toLowerCase() === form.project_description.toLowerCase() &&
+            item.project_url.toLowerCase() === form.project_url.toLowerCase()
+        );
+
+        if (isDuplicate) {
+          toast.error("This project already exists!");
+          return;
+        }
+
+        // Add new project with trimmed values
+        const newProject = {
+          project_title: form.project_title.trim(),
+          project_description: form.project_description.trim(),
+          project_url: form.project_url.trim(),
           id: Date.now() // Temporary ID for new items
         };
-        updatedPortfolio = [...projectItems, newItem];
+        updatedPortfolio = [...projectItems, newProject];
       }
       
-      formData.append('portfolio', JSON.stringify(updatedPortfolio));
+      // Remove any duplicate projects before sending to backend
+      const uniqueProjects = updatedPortfolio.reduce((acc: Project[], current) => {
+        const isDuplicate = acc.some(
+          item => 
+            item.project_title.toLowerCase() === current.project_title.toLowerCase() &&
+            item.project_description.toLowerCase() === current.project_description.toLowerCase() &&
+            item.project_url.toLowerCase() === current.project_url.toLowerCase()
+        );
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+
+      // Format projects for API
+      const formattedProjects = uniqueProjects.map(project => ({
+        project_title: project.project_title,
+        project_description: project.project_description,
+        project_url: project.project_url,
+        id: project.id
+      }));
+
+      // Add projects to formData
+      formData.append('projects', JSON.stringify(formattedProjects));
 
       // Append project images if any
       form.project_images.forEach((image, index) => {
         formData.append(`project_image_${index}`, image.file);
       });
 
+      if (!profileData?.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
+
       const result = await dispatch(updateProfile({
         data: formData,
-        profileId: profileData?.id || ''
+        profileId: profileData.id
       })).unwrap();
       
       if (result) {
-        // Update local state only after successful API call
+        // Update local state immediately with unique projects
+        setProjectItems(uniqueProjects);
+        
+        // Update Redux store with the complete profile data
         dispatch(updateProfileData({
           ...profileData,
-          portfolio: updatedPortfolio
+          projects: formattedProjects
         }));
 
-        // Update local project items state
-        setProjectItems(updatedPortfolio);
-
-        toast.success("Portfolio updated successfully!");
+        toast.success(editingItem ? "Project updated successfully!" : "Project added successfully!");
         setIsDialogOpen(false);
         setEditingItem(null);
         setForm({
@@ -232,9 +285,43 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to update portfolio");
+      toast.error(error.message || "Failed to update project");
     }
   };
+
+  // Add useEffect to clean up duplicates when component mounts
+  useEffect(() => {
+    if (profileData?.projects && profileData.projects.length > 0) {
+      const uniqueProjects = profileData.projects.reduce((acc: Project[], current) => {
+        const isDuplicate = acc.some(
+          item => 
+            item.project_title.toLowerCase() === current.project_title.toLowerCase() &&
+            item.project_description.toLowerCase() === current.project_description.toLowerCase() &&
+            item.project_url.toLowerCase() === current.project_url.toLowerCase()
+        );
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      if (uniqueProjects.length !== profileData.projects.length) {
+        setProjectItems(uniqueProjects);
+        // Update Redux store with unique projects
+        dispatch(updateProfileData({
+          ...profileData,
+          projects: uniqueProjects
+        }));
+      }
+    }
+  }, [profileData?.projects]);
+
+  // Add useEffect to sync with Redux store
+  useEffect(() => {
+    if (profileData?.projects) {
+      setProjectItems(profileData.projects);
+    }
+  }, [profileData?.projects]);
 
   const handleCancel = () => {
     // Clean up any preview URLs before closing
@@ -251,6 +338,46 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       project_image: "",
       project_images: [],
     });
+  };
+
+  const handleDeleteClick = (item: Project) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete?.id) return;
+
+    try {
+      const updatedProjects = projectItems.filter(item => item.id !== itemToDelete.id);
+      
+      const formData = new FormData();
+      formData.append('subscription_type', profileData?.subscription_type || 'premium');
+      formData.append('projects', JSON.stringify(updatedProjects));
+
+      if (!profileData?.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
+
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData.id
+      })).unwrap();
+      
+      if (result) {
+        setProjectItems(updatedProjects);
+        dispatch(updateProfileData({
+          ...profileData,
+          projects: updatedProjects
+        }));
+        toast.success("Project deleted successfully!");
+        setDeleteDialogOpen(false);
+        setItemToDelete(null);
+      }
+    } catch (error) {
+      toast.error("Failed to delete project");
+    }
   };
 
   if (!projectItems || projectItems.length === 0) {
@@ -441,16 +568,28 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
                 </div>
               </div>
               {isEditMode && (
-                <Button
-                  variant="ghost"
-                  className="absolute top-2 right-2 p-2 h-auto bg-white/80 hover:bg-white text-[#3C5979] hover:text-[#3C5979] rounded-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(item);
-                  }}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <Button
+                    variant="ghost"
+                    className="p-2 h-auto bg-white/80 hover:bg-white text-[#3C5979] hover:text-[#3C5979] rounded-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(item);
+                    }}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="p-2 h-auto bg-white/80 hover:bg-white text-red-600 hover:text-red-700 rounded-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(item);
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               )}
             </div>
           );
@@ -613,6 +752,18 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Add DeleteConfirmationDialog */}
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setItemToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Project"
+        description={`Are you sure you want to delete "${itemToDelete?.project_title}"? This action cannot be undone.`}
+      />
     </div>
   );
 };

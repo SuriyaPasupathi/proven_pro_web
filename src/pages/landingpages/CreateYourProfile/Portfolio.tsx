@@ -85,6 +85,9 @@ const Portfolio: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Prevent multiple submissions while loading
+    if (loading) return;
+    
     try {
       if (form.project_images.length === 0) {
         toast.error('Please upload at least one project image');
@@ -109,26 +112,28 @@ const Portfolio: React.FC = () => {
         formData.append(`project_image_${index}`, image.file);
       });
 
-      // Debug logging
-      console.log('Uploading portfolio:', portfolioItem);
-      console.log('FormData contents:', {
-        subscription_type: formData.get('subscription_type'),
-        projects: formData.get('projects'),
-        images: form.project_images.map(img => img.file.name)
-      });
-
       const result = await dispatch(createUserProfile(formData)).unwrap();
-      
-      // Debug logging
-      console.log('Upload result:', result);
       
       if (result) {
         // Clean up all preview URLs
         form.project_images.forEach(image => {
           URL.revokeObjectURL(image.previewUrl);
         });
+        
+        // Reset form state
+        setForm({
+          project_title: "",
+          project_description: "",
+          project_url: "",
+          project_images: [],
+        });
+        
         toast.success("Portfolio saved successfully!");
-        navigate("/create-profile/licenses");
+        
+        // Use setTimeout to ensure state updates are complete before navigation
+        setTimeout(() => {
+          navigate("/create-profile/licenses");
+        }, 100);
       }
     } catch (err) {
       console.error('Upload error:', err);

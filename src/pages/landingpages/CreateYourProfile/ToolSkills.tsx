@@ -13,6 +13,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 5;
 
+interface Skill {
+  id: number;
+  name: string;
+}
+
+interface CategorySkills {
+  id: number;
+  name: string;
+  skills: Skill[];
+}
+
 const ToolSkills: React.FC = () => {
   const [form, setForm] = useState({
     primary_tools: [] as string[],
@@ -21,14 +32,37 @@ const ToolSkills: React.FC = () => {
     skills_description: "",
   });
 
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
+
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.createProfile);
   const { skills, loading: skillsLoading } = useSelector((state: RootState) => state.dropdown);
 
+  // Initial fetch of all skills
   useEffect(() => {
-    dispatch(fetchSkills());
+    dispatch(fetchSkills(undefined));
   }, [dispatch]);
+
+  // Update available skills when skills data changes
+  useEffect(() => {
+    if (skills && Array.isArray(skills)) {
+      if (selectedCategory) {
+        // Find the selected category and its skills
+        const categoryData = skills.find((cat: CategorySkills) => 
+          cat.name.toLowerCase() === selectedCategory.toLowerCase()
+        );
+        setAvailableSkills(categoryData?.skills || []);
+      } else {
+        // Flatten all skills from all categories
+        const allSkills = skills.reduce((acc: Skill[], category: CategorySkills) => {
+          return [...acc, ...(category.skills || [])];
+        }, []);
+        setAvailableSkills(allSkills);
+      }
+    }
+  }, [skills, selectedCategory]);
 
   const handleSkillSelect = (value: string, field: string) => {
     setForm(prev => {
@@ -47,6 +81,11 @@ const ToolSkills: React.FC = () => {
     });
   };
 
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    dispatch(fetchSkills(category));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -59,17 +98,13 @@ const ToolSkills: React.FC = () => {
         skills_description: form.skills_description,
       };
 
-      console.log('Submitting profile data:', profileData); // Debug log
-
       const result = await dispatch(createUserProfile(profileData)).unwrap();
       
       if (result) {
-        console.log('Profile update result:', result); // Debug log
         toast.success("Tools and skills saved successfully!");
         navigate("/create-profile/portfolio");
       }
     } catch (err) {
-      console.error('Error submitting profile:', err); // Debug log
       const error = err as { message: string; code?: string };
       toast.error(error.message || "Failed to save tools and skills");
     }
@@ -109,12 +144,13 @@ const ToolSkills: React.FC = () => {
           <Select
             value={form.primary_tools.join(',')}
             onValueChange={(value) => handleSkillSelect(value, 'primary_tools')}
+            onOpenChange={(open) => open && handleCategorySelect('Primary Skills')}
           >
             <SelectTrigger className="w-full bg-gray-50">
               <SelectValue placeholder="Select primary tools" />
             </SelectTrigger>
             <SelectContent>
-              {skills.map((skill: any) => (
+              {availableSkills.map((skill) => (
                 <SelectItem key={skill.id} value={skill.name}>
                   {skill.name}
                 </SelectItem>
@@ -137,12 +173,13 @@ const ToolSkills: React.FC = () => {
           <Select
             value={form.technical_skills.join(',')}
             onValueChange={(value) => handleSkillSelect(value, 'technical_skills')}
+            onOpenChange={(open) => open && handleCategorySelect('Technical skills')}
           >
             <SelectTrigger className="w-full bg-gray-50">
               <SelectValue placeholder="Select technical skills" />
             </SelectTrigger>
             <SelectContent>
-              {skills.map((skill: any) => (
+              {availableSkills.map((skill) => (
                 <SelectItem key={skill.id} value={skill.name}>
                   {skill.name}
                 </SelectItem>
@@ -165,12 +202,13 @@ const ToolSkills: React.FC = () => {
           <Select
             value={form.soft_skills.join(',')}
             onValueChange={(value) => handleSkillSelect(value, 'soft_skills')}
+            onOpenChange={(open) => open && handleCategorySelect('Soft skills')}
           >
             <SelectTrigger className="w-full bg-gray-50">
               <SelectValue placeholder="Select soft skills" />
             </SelectTrigger>
             <SelectContent>
-              {skills.map((skill: any) => (
+              {availableSkills.map((skill) => (
                 <SelectItem key={skill.id} value={skill.name}>
                   {skill.name}
                 </SelectItem>

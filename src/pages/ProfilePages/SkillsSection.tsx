@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Loader2 } from 'lucide-react';
+import { ChevronDown, Pencil, Loader2, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 
 interface SkillsForm {
   technical_skills: string[];
@@ -45,6 +46,8 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
     soft_skills: [],
     skills_description: ''
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [skillToDelete, setSkillToDelete] = useState<{ skill: string; type: 'technical_skills' | 'soft_skills' } | null>(null);
 
   // Fetch skills when component mounts
   useEffect(() => {
@@ -139,18 +142,71 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
     setIsDialogOpen(false);
   };
 
+  const handleDeleteClick = (skill: string, type: 'technical_skills' | 'soft_skills') => {
+    setSkillToDelete({ skill, type });
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!skillToDelete) return;
+
+    setIsLoading(true);
+    try {
+      const updatedSkills = {
+        ...form,
+        [skillToDelete.type]: form[skillToDelete.type].filter(s => s !== skillToDelete.skill)
+      };
+
+      const formData = new FormData();
+      formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
+      formData.append('technical_skills', JSON.stringify(updatedSkills.technical_skills));
+      formData.append('soft_skills', JSON.stringify(updatedSkills.soft_skills));
+      formData.append('skills_description', updatedSkills.skills_description);
+
+      if (!reduxProfileData?.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
+
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: reduxProfileData.id
+      })).unwrap();
+      
+      if (result) {
+        setForm(updatedSkills);
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          technical_skills: updatedSkills.technical_skills,
+          soft_skills: updatedSkills.soft_skills,
+          skills_description: updatedSkills.skills_description
+        }));
+        toast.success("Skill removed successfully!");
+        setDeleteDialogOpen(false);
+        setSkillToDelete(null);
+      }
+    } catch (error) {
+      toast.error("Failed to remove skill");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Skills</h2>
         {isEditMode && (
-          <Button 
-            variant="ghost" 
-            className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-            onClick={() => setIsDialogOpen(true)}
-          >
-            <Pencil className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="h-8 w-8 text-gray-500 hover:text-blue-600"
+              onClick={() => setIsDialogOpen(true)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </div>
         )}
       </div>
 
@@ -191,9 +247,18 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 </Select>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.technical_skills.map((skill, index) => (
-                    <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
-                      {skill}
-                    </span>
+                    <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+                      <span>{skill}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-4 w-4 text-blue-800 hover:text-red-600 hover:bg-transparent"
+                        onClick={() => handleDeleteClick(skill, 'technical_skills')}
+                        disabled={isLoading}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -217,9 +282,18 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 </Select>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.soft_skills.map((skill, index) => (
-                    <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
-                      {skill}
-                    </span>
+                    <div key={index} className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                      <span>{skill}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-4 w-4 text-green-800 hover:text-red-600 hover:bg-transparent"
+                        onClick={() => handleDeleteClick(skill, 'soft_skills')}
+                        disabled={isLoading}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -300,6 +374,18 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         <span>Show all skills</span>
         <ChevronDown className="ml-1 h-4 w-4" />
       </Button>
+
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setSkillToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Skill"
+        description={`Are you sure you want to remove "${skillToDelete?.skill}" from your ${skillToDelete?.type === 'technical_skills' ? 'technical' : 'soft'} skills?`}
+        isLoading={isLoading}
+      />
     </div>
   );
 };

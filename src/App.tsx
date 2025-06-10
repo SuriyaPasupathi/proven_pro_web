@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { Toaster } from 'sonner';
 import LandingPage from './pages/landingpages/landingpage';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import SignUpForm from './pages/authpages/SignupPage'; // adjust path as needed
 import { LoginForm } from './pages/authpages/LoginPage';
 import ForgetPassword from './pages/authpages/ForgetPassword';
@@ -81,7 +81,7 @@ function App() {
                 <Route path="/create-profile/video-intro" element={<VideoIntro />} />
 
                 {/* Profile Routes */}
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile" element={<Navigate to={`/profile/${localStorage.getItem('userProfileId')}`} replace />} />
                 <Route path="/profile/:profileId" element={<Profile />} />
                 <Route path="/share-profile/:profileId/:shareToken" element={<ShareProfilePage />} />
                 <Route path="/profile/account-settings/:profileId" element={<AccountSettings />} />

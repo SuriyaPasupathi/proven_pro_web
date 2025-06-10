@@ -1,4 +1,4 @@
-import { Video, Award, Pencil, Plus } from 'lucide-react';
+import { Video, Award, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProfileData } from '../../types/profile';
@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -87,6 +88,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
   // Add new state for tracking if we're adding a new certification
   const [isAddingNewCert, setIsAddingNewCert] = useState(false);
+
+  // Delete states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteType, setDeleteType] = useState<'image' | 'video' | 'certification' | null>(null);
+  const [certificationToDelete, setCertificationToDelete] = useState<string | null>(null);
 
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
@@ -451,7 +457,93 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     });
   };
 
-  // Update the renderCertification function to better display certification details
+  const handleDeleteClick = (type: 'image' | 'video' | 'certification', certId?: string) => {
+    setDeleteType(type);
+    if (type === 'certification' && certId) {
+      setCertificationToDelete(certId);
+    }
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteType) return;
+
+    try {
+      if (!profileData.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
+      let updatedCerts: Certification[] = [];
+
+      switch (deleteType) {
+        case 'image':
+          formData.append('profile_pic', '');
+          // Optimistically update the UI
+          dispatch(updateProfileData({
+            ...reduxProfileData,
+            profile_pic: '',
+            profile_pic_url: ''
+          }));
+          break;
+
+        case 'video':
+          formData.append('video_intro', '');
+          formData.append('video_description', '');
+          // Optimistically update the UI
+          dispatch(updateProfileData({
+            ...reduxProfileData,
+            video_intro: '',
+            video_intro_url: '',
+            video_description: ''
+          }));
+          break;
+
+        case 'certification':
+          if (!certificationToDelete) return;
+          updatedCerts = (profileData.certifications || []).filter(
+            cert => cert.certifications_id !== certificationToDelete
+          );
+          formData.append('certifications', JSON.stringify(updatedCerts));
+          // Optimistically update the UI
+          dispatch(updateProfileData({
+            ...reduxProfileData,
+            certifications: updatedCerts
+          }));
+          break;
+      }
+
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData.id
+      })).unwrap();
+      
+      if (result) {
+        // Update with the actual server response
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          ...result
+        }));
+        toast.success(`${deleteType.charAt(0).toUpperCase() + deleteType.slice(1)} deleted successfully!`);
+      }
+    } catch (err) {
+      const error = err as { message: string; code?: string };
+      toast.error(error.message || `Failed to delete ${deleteType}`);
+      // Revert optimistic update on error
+      dispatch(updateProfileData({
+        ...reduxProfileData,
+        ...profileData
+      }));
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeleteType(null);
+      setCertificationToDelete(null);
+    }
+  };
+
+  // Update the renderCertification function to use the new delete handler
   const renderCertification = (cert: Certification, index: number) => (
     <div key={index} className="space-y-2 p-4 bg-gray-50 rounded-lg">
       <div className="flex justify-between items-start">
@@ -468,6 +560,26 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             <p className="text-xs text-gray-500">ID: {cert.certifications_id}</p>
           )}
         </div>
+        {isEditMode && (
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="h-8 w-8 text-gray-500 hover:text-blue-600"
+              onClick={() => handleOpenCertDialog(cert)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="h-8 w-8 text-gray-500 hover:text-red-600"
+              onClick={() => handleDeleteClick('certification', cert.certifications_id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
       {cert.certifications_image_url && (
         <div className="mt-2">
@@ -499,13 +611,24 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 onError={() => setImageError(true)}
               />
               {isEditMode && (
-                <Button 
-                  variant="ghost" 
-                  className="absolute top-2 right-2 p-2 h-auto bg-white/80 hover:bg-white text-[#3C5979] hover:text-[#3C5979] rounded-full"
-                  onClick={() => setIsImageDialogOpen(true)}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-blue-600"
+                    onClick={() => setIsImageDialogOpen(true)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-red-600"
+                    onClick={() => handleDeleteClick('image')}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               )}
             </div>
           ) : (
@@ -516,10 +639,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               {isEditMode && (
                 <Button 
                   variant="ghost" 
-                  className="absolute top-2 right-2 p-2 h-auto bg-white/80 hover:bg-white text-[#3C5979] hover:text-[#3C5979] rounded-full"
+                  size="icon"
+                  className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-blue-600"
                   onClick={() => setIsImageDialogOpen(true)}
                 >
-                  <Pencil className="w-4 h-4" />
+                  <Pencil className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -559,13 +683,24 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               <h3 className="font-semibold">Video Introduction</h3>
             </div>
             {isEditMode && (
-              <Button 
-                variant="ghost" 
-                className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-                onClick={() => setIsVideoDialogOpen(true)}
-              >
-                <Pencil className="w-4 h-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-8 w-8 text-gray-500 hover:text-blue-600"
+                  onClick={() => setIsVideoDialogOpen(true)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-8 w-8 text-gray-500 hover:text-red-600"
+                  onClick={() => handleDeleteClick('video')}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             )}
           </div>
           
@@ -614,15 +749,6 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             profileData.certifications.map((cert, index) => (
               <div key={index} className="relative group">
                 {renderCertification(cert, index)}
-                {isEditMode && (
-                  <Button 
-                    variant="ghost" 
-                    className="absolute top-2 right-2 p-2 h-auto bg-white/80 hover:bg-white text-[#3C5979] hover:text-[#3C5979] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleOpenCertDialog(cert)}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                )}
               </div>
             ))
           ) : (
@@ -973,6 +1099,23 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* DeleteConfirmationDialog */}
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setDeleteType(null);
+          setCertificationToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title={`Delete ${deleteType ? deleteType.charAt(0).toUpperCase() + deleteType.slice(1) : ''}`}
+        description={
+          deleteType === 'certification' && certificationToDelete
+            ? `Are you sure you want to delete this certification? This action cannot be undone.`
+            : `Are you sure you want to delete your ${deleteType}? This action cannot be undone.`
+        }
+      />
     </div>
   );
 };

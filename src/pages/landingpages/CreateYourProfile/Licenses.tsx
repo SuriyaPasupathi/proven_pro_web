@@ -88,7 +88,22 @@ const Licenses: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Prevent multiple submissions while loading
+    if (loading) return;
+    
     try {
+      // Validate certifications
+      const hasEmptyFields = certifications.some(cert => 
+        !cert.certifications_name || 
+        !cert.certifications_issuer || 
+        !cert.certifications_issued_date
+      );
+
+      if (hasEmptyFields) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+
       // Convert certifications to strings as expected by the API
       const formattedCertifications = certifications.map(cert => 
         JSON.stringify({
@@ -109,8 +124,23 @@ const Licenses: React.FC = () => {
       const result = await dispatch(createUserProfile(profileData)).unwrap();
       
       if (result) {
+        // Reset form state after successful submission
+        setCertifications([{
+          certifications_name: "",
+          certifications_issuer: "",
+          certifications_issued_date: "",
+          certifications_expiration_date: "",
+          certifications_id: "",
+          certifications_image: null,
+          certifications_image_url: "",
+        }]);
+        
         toast.success("Licenses and certifications saved successfully!");
-        navigate("/create-profile/video-intro");
+        
+        // Use setTimeout to ensure state updates are complete before navigation
+        setTimeout(() => {
+          navigate("/create-profile/video-intro");
+        }, 100);
       }
     } catch (err) {
       const error = err as { message: string; code?: string };

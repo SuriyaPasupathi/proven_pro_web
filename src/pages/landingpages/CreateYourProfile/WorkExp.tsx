@@ -9,7 +9,7 @@ import { createUserProfile, updateProfile } from "../../../store/Services/Create
 import { updateProfileData } from "../../../store/Slice/CreateProfileSlice";
 import { fetchJobPositions } from "../../../store/Services/DropDownService";
 import toast from "react-hot-toast";
-import { Trash2, Edit2 } from "lucide-react";
+import { Trash2, Edit2, Plus, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const TOTAL_STEPS = 8;
@@ -25,15 +25,13 @@ interface WorkExperience {
 }
 
 const WorkExp: React.FC = () => {
-  const [experiences, setExperiences] = useState<WorkExperience[]>([]);
-  const [currentExperience, setCurrentExperience] = useState<WorkExperience>({
+  const [workForms, setWorkForms] = useState<WorkExperience[]>([{
     company_name: "",
     position: "",
     experience_start_date: "",
     experience_end_date: "",
     key_responsibilities: "",
-  });
-  const [editingId, setEditingId] = useState<string | null>(null);
+  }]);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const navigate = useNavigate();
@@ -45,105 +43,101 @@ const WorkExp: React.FC = () => {
     dispatch(fetchJobPositions());
   }, [dispatch]);
 
+  // Initialize form with existing data if available
+  useEffect(() => {
+    if (profileData?.experiences && profileData.experiences.length > 0) {
+      setWorkForms(profileData.experiences);
+    }
+  }, [profileData]);
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    index: number
   ) => {
-    setCurrentExperience({ ...currentExperience, [e.target.name]: e.target.value });
+    const newForms = [...workForms];
+    newForms[index] = {
+      ...newForms[index],
+      [e.target.name]: e.target.value
+    };
+    setWorkForms(newForms);
   };
 
-  const handlePositionSelect = (value: string) => {
-    setCurrentExperience({ ...currentExperience, position: value });
+  const handlePositionSelect = (value: string, index: number) => {
+    const newForms = [...workForms];
+    newForms[index] = {
+      ...newForms[index],
+      position: value
+    };
+    setWorkForms(newForms);
   };
 
-  const updateExperiencesInNetwork = async (updatedExperiences: WorkExperience[]) => {
-    try {
-      setIsUpdating(true);
-      const formData = new FormData();
-      formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('work_experiences', JSON.stringify(updatedExperiences));
-
-      // Add other profile data
-      if (profileData) {
-        Object.entries(profileData).forEach(([key, value]) => {
-          if (key !== 'work_experiences' && key !== 'subscription_type' && value !== undefined) {
-            if (Array.isArray(value)) {
-              formData.append(key, JSON.stringify(value));
-            } else if (value instanceof File) {
-              formData.append(key, value);
-            } else if (typeof value === 'string') {
-              formData.append(key, value);
-            }
-          }
-        });
+  const addNewWorkExperience = () => {
+    setWorkForms([
+      ...workForms,
+      {
+        company_name: "",
+        position: "",
+        experience_start_date: "",
+        experience_end_date: "",
+        key_responsibilities: "",
       }
-
-      const result = await dispatch(updateProfile({
-        data: formData,
-        profileId: profileData?.profile_url || ''
-      })).unwrap();
-      
-      if (result) {
-        dispatch(updateProfileData({
-          ...profileData,
-          work_experiences: updatedExperiences
-        }));
-        toast.success("Work experiences updated successfully!");
-      }
-    } catch (err) {
-      const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to update work experiences");
-      // Revert to previous state on error
-      setExperiences(experiences);
-    } finally {
-      setIsUpdating(false);
-    }
+    ]);
   };
 
-  const addOrUpdateExperience = async () => {
-    if (!currentExperience.company_name || !currentExperience.position || 
-        !currentExperience.experience_start_date || !currentExperience.experience_end_date || 
-        !currentExperience.key_responsibilities) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
-    // Check for duplicate experience
-    const isDuplicate = experiences.some(exp => 
-      exp.company_name.toLowerCase() === currentExperience.company_name.toLowerCase() && 
-      exp.position.toLowerCase() === currentExperience.position.toLowerCase() &&
-      exp.id !== editingId
-    );
-
-    if (isDuplicate) {
-      toast.error("This work experience already exists");
-      return;
-    }
-
-    let updatedExperiences: WorkExperience[];
-    
-    if (editingId) {
-      updatedExperiences = experiences.map(exp => 
-        exp.id === editingId ? { ...currentExperience, id: editingId } : exp
-      );
+  const removeWorkExperience = (index: number) => {
+    if (workForms.length > 1) {
+      const newForms = workForms.filter((_, i) => i !== index);
+      setWorkForms(newForms);
     } else {
-      // Add new experience with a unique ID
-      const newExperience = {
-        ...currentExperience,
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      };
-      updatedExperiences = [...experiences, newExperience];
+      toast.error("You must have at least one work experience");
     }
+  };
 
+  const validateForm = () => {
+    for (const form of workForms) {
+      if (!form.company_name || form.company_name.trim() === '') {
+        toast.error("Please enter company name");
+        return false;
+      }
+      if (!form.position || form.position.trim() === '') {
+        toast.error("Please select a position");
+        return false;
+      }
+      if (!form.experience_start_date || form.experience_start_date.trim() === '') {
+        toast.error("Please enter start date");
+        return false;
+      }
+      if (!form.experience_end_date || form.experience_end_date.trim() === '') {
+        toast.error("Please enter end date");
+        return false;
+      }
+      if (!form.key_responsibilities || form.key_responsibilities.trim() === '') {
+        toast.error("Please enter key responsibilities");
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (loading || isUpdating) return;
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     try {
       setIsUpdating(true);
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('work_experiences', JSON.stringify(updatedExperiences));
+      formData.append('experiences', JSON.stringify(workForms));
 
       // Add other profile data
       if (profileData) {
         Object.entries(profileData).forEach(([key, value]) => {
-          if (key !== 'work_experiences' && key !== 'subscription_type' && value !== undefined) {
+          if (key !== 'experiences' && key !== 'subscription_type' && value !== undefined) {
             if (Array.isArray(value)) {
               formData.append(key, JSON.stringify(value));
             } else if (value instanceof File) {
@@ -158,60 +152,22 @@ const WorkExp: React.FC = () => {
       const result = await dispatch(createUserProfile(formData)).unwrap();
       
       if (result) {
-        // Update local state only after successful API call
-        setExperiences(updatedExperiences);
         dispatch(updateProfileData({
           ...profileData,
-          work_experiences: updatedExperiences
+          experiences: workForms
         }));
         
-        // Reset form
-        setCurrentExperience({
-          company_name: "",
-          position: "",
-          experience_start_date: "",
-          experience_end_date: "",
-          key_responsibilities: "",
-        });
-        setEditingId(null);
-        toast.success(editingId ? "Experience updated successfully!" : "Experience added successfully!");
+        toast.success("Work experiences saved successfully!");
+        
+        setTimeout(() => {
+          navigate("/create-profile/tool-skills");
+        }, 100);
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to save experience");
+      toast.error(error.message || "Failed to save work experiences");
     } finally {
       setIsUpdating(false);
-    }
-  };
-
-  const editExperience = (experience: WorkExperience) => {
-    setCurrentExperience(experience);
-    setEditingId(experience.id || null);
-  };
-
-  const deleteExperience = async (id: string) => {
-    const updatedExperiences = experiences.filter(exp => exp.id !== id);
-    
-    // Optimistically update UI
-    setExperiences(updatedExperiences);
-    
-    // Update in network
-    await updateExperiencesInNetwork(updatedExperiences);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (experiences.length === 0) {
-      toast.error("Please add at least one work experience");
-      return;
-    }
-
-    try {
-      navigate("/create-profile/tool-skills");
-    } catch (err) {
-      const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to proceed to next step");
     }
   };
 
@@ -238,141 +194,121 @@ const WorkExp: React.FC = () => {
       </div>
 
       {/* Form */}
-      <div className="w-full max-w-4xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col gap-6">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">
-          Work Experience
-        </h1>
-
-        {/* Current Experience Form */}
-        <form onSubmit={(e) => { e.preventDefault(); addOrUpdateExperience(); }} className="flex flex-col gap-6">
-          <div>
-            <label htmlFor="company_name" className="block font-medium mb-1 text-sm">
-              Company Name
-            </label>
-            <Input
-              id="company_name"
-              name="company_name"
-              placeholder="Enter company name"
-              value={currentExperience.company_name}
-              onChange={handleChange}
-              className="bg-gray-50"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="position" className="block font-medium mb-1 text-sm">
-              Position
-            </label>
-            <Select
-              value={currentExperience.position}
-              onValueChange={handlePositionSelect}
-            >
-              <SelectTrigger className="w-full bg-gray-50">
-                <SelectValue placeholder="Select a position" />
-              </SelectTrigger>
-              <SelectContent>
-                {jobPositions.map((position: any) => (
-                  <SelectItem key={position.id} value={position.title}>
-                    {position.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="experience_start_date" className="block font-medium mb-1 text-sm">
-                Start Date
-              </label>
-              <Input
-                id="experience_start_date"
-                name="experience_start_date"
-                type="date"
-                value={currentExperience.experience_start_date}
-                onChange={handleChange}
-                className="bg-gray-50"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="experience_end_date" className="block font-medium mb-1 text-sm">
-                End Date
-              </label>
-              <Input
-                id="experience_end_date"
-                name="experience_end_date"
-                type="date"
-                value={currentExperience.experience_end_date}
-                onChange={handleChange}
-                className="bg-gray-50"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="key_responsibilities" className="block font-medium mb-1 text-sm">
-              Key Responsibilities
-            </label>
-            <Textarea
-              id="key_responsibilities"
-              name="key_responsibilities"
-              placeholder="Describe your key responsibilities and achievements..."
-              value={currentExperience.key_responsibilities}
-              onChange={handleChange}
-              className="bg-gray-50 min-h-[120px]"
-              required
-            />
-          </div>
-
+      <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col gap-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+            Work Experience
+          </h1>
           <Button
-            type="submit"
-            className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-            disabled={isUpdating || jobPositionsLoading}
+            type="button"
+            onClick={addNewWorkExperience}
+            className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white flex items-center gap-2"
           >
-            {isUpdating ? "Updating..." : editingId ? "Update Experience" : "Add Experience"}
+            <Plus className="w-4 h-4" />
+            Add Experience
           </Button>
-        </form>
+        </div>
 
-        {/* List of Added Experiences */}
-        {experiences.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Added Experiences</h2>
-            <div className="space-y-4">
-              {experiences.map((exp) => (
-                <div key={exp.id} className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold">{exp.position} at {exp.company_name}</h3>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => editExperience(exp)}
-                        disabled={isUpdating || jobPositionsLoading}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteExperience(exp.id!)}
-                        disabled={isUpdating || jobPositionsLoading}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    {exp.experience_start_date} - {exp.experience_end_date}
-                  </p>
-                  <p className="mt-2 text-sm">{exp.key_responsibilities}</p>
-                </div>
-              ))}
+        {workForms.map((form, index) => (
+          <div key={index} className="border rounded-lg p-6 space-y-6 relative">
+            {index > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 text-gray-500 hover:text-red-500"
+                onClick={() => removeWorkExperience(index)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
+            <h3 className="text-lg font-semibold text-gray-800">
+              Work Experience {index + 1}
+            </h3>
+
+            <div>
+              <label htmlFor={`company_name_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                Company Name
+              </label>
+              <Input
+                id={`company_name_${index}`}
+                name="company_name"
+                placeholder="Enter company name"
+                value={form.company_name}
+                onChange={(e) => handleChange(e, index)}
+                className="bg-gray-50"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor={`position_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                Position
+              </label>
+              <Select
+                value={form.position}
+                onValueChange={(value) => handlePositionSelect(value, index)}
+              >
+                <SelectTrigger className="w-full bg-gray-50">
+                  <SelectValue placeholder="Select a position" />
+                </SelectTrigger>
+                <SelectContent>
+                  {jobPositions.map((position: any) => (
+                    <SelectItem key={position.id} value={position.title}>
+                      {position.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor={`experience_start_date_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <Input
+                  id={`experience_start_date_${index}`}
+                  name="experience_start_date"
+                  type="date"
+                  value={form.experience_start_date}
+                  onChange={(e) => handleChange(e, index)}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor={`experience_end_date_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date
+                </label>
+                <Input
+                  id={`experience_end_date_${index}`}
+                  name="experience_end_date"
+                  type="date"
+                  value={form.experience_end_date}
+                  onChange={(e) => handleChange(e, index)}
+                  className="bg-gray-50"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor={`key_responsibilities_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+                Key Responsibilities
+              </label>
+              <Textarea
+                id={`key_responsibilities_${index}`}
+                name="key_responsibilities"
+                placeholder="Describe your key responsibilities and achievements..."
+                value={form.key_responsibilities}
+                onChange={(e) => handleChange(e, index)}
+                className="bg-gray-50 min-h-[120px]"
+                required
+              />
             </div>
           </div>
-        )}
+        ))}
 
         {/* Error Message */}
         {error && (
@@ -393,15 +329,14 @@ const WorkExp: React.FC = () => {
             Back
           </Button>
           <Button
-            type="button"
+            type="submit"
             className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-            onClick={handleSubmit}
             disabled={loading || isUpdating || jobPositionsLoading}
           >
-            {loading ? "Saving..." : "Save and Continue"}
+            {loading || isUpdating ? "Saving..." : "Save and Continue"}
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

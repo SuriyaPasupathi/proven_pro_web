@@ -11,7 +11,6 @@ interface Review {
   name: string;
   rating: number;
   content: string;
-  company?: string;
 }
 
 interface ReviewCarouselProps {
@@ -28,13 +27,34 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
-  useToast();
+  const { toast } = useToast();
   const visibleReviews = 3; // Number of reviews visible at once on desktop
   const totalReviews = reviews.length;
 
-  // Update reviews whenever initialReviews changes
+  // Update reviews whenever initialReviews changes and clean up duplicates
   useEffect(() => {
-    setReviews(initialReviews);
+    if (initialReviews && initialReviews.length > 0) {
+      // Remove duplicate reviews based on content and name
+      const uniqueReviews = initialReviews.reduce((acc: Review[], current) => {
+        const isDuplicate = acc.some(
+          review => 
+            review.content.toLowerCase().trim() === current.content.toLowerCase().trim() &&
+            review.name.toLowerCase().trim() === current.name.toLowerCase().trim()
+        );
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      if (uniqueReviews.length !== initialReviews.length) {
+        setReviews(uniqueReviews);
+      } else {
+        setReviews(initialReviews);
+      }
+    } else {
+      setReviews([]);
+    }
   }, [initialReviews]);
 
   const goToPrevious = () => {
@@ -63,6 +83,22 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
 
   const handleReviewSubmit = (review: { rating: number; content: string; name: string }) => {
     if (isSubmitting) return;
+
+    // Check for duplicate review before submitting
+    const isDuplicate = reviews.some(
+      existingReview => 
+        existingReview.content.toLowerCase().trim() === review.content.toLowerCase().trim() &&
+        existingReview.name.toLowerCase().trim() === review.name.toLowerCase().trim()
+    );
+
+    if (isDuplicate) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "A similar review already exists!"
+      });
+      return;
+    }
 
     if (onSubmit) {
       onSubmit(review);
@@ -169,9 +205,6 @@ const ReviewCard = ({ review }: ReviewCardProps) => {
       <CardContent className="p-6">
         <div className="mb-4">
           <h3 className="font-medium">{review.name}</h3>
-          {review.company && (
-            <p className="text-sm text-gray-500">{review.company}</p>
-          )}
         </div>
         
         <div className="flex mb-3">

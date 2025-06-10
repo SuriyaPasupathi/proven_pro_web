@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -18,32 +18,73 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
   const [name, setName] = useState('');
   const [hoverRating, setHoverRating] = useState(0);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!name.trim()) newErrors.name = 'Name is required';
-    if (rating === 0) newErrors.rating = 'Please select a rating';
-    if (!content.trim()) newErrors.content = 'Review content is required';
+    
+    // Validate name
+    if (!name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+    
+    // Validate rating
+    if (rating === 0) {
+      newErrors.rating = 'Please select a rating';
+    }
+    
+    // Validate content
+    if (!content.trim()) {
+      newErrors.content = 'Review content is required';
+    } else if (content.trim().length < 10) {
+      newErrors.content = 'Review must be at least 10 characters';
+    } else if (content.trim().length > 500) {
+      newErrors.content = 'Review must not exceed 500 characters';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = () => {
-    if (!validateForm()) return;
+    if (!validateForm() || isSubmitting) return;
     
-    onSubmit({ 
-      rating, 
-      content: content.trim(), 
-      name: name.trim()
-    });
+    setIsSubmitting(true);
     
-    // Reset form
-    setRating(0);
-    setContent('');
-    setName('');
-    setErrors({});
-    onClose();
+    try {
+      onSubmit({ 
+        rating, 
+        content: content.trim(), 
+        name: name.trim()
+      });
+      
+      // Reset form
+      setRating(0);
+      setContent('');
+      setName('');
+      setErrors({});
+      onClose();
+    } catch (error) {
+      setErrors({
+        submit: 'Failed to submit review. Please try again.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      setRating(0);
+      setContent('');
+      setName('');
+      setErrors({});
+      setIsSubmitting(false);
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -59,6 +100,7 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
               className={errors.name ? "border-red-500" : ""}
+              disabled={isSubmitting}
             />
             {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
           </div>
@@ -74,6 +116,7 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
                   onMouseLeave={() => setHoverRating(0)}
                   onClick={() => setRating(star)}
                   className="focus:outline-none"
+                  disabled={isSubmitting}
                 >
                   <Star
                     className={cn(
@@ -96,17 +139,29 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
               onChange={(e) => setContent(e.target.value)}
               placeholder="Write your review here..."
               className={cn("min-h-[100px]", errors.content ? "border-red-500" : "")}
+              disabled={isSubmitting}
             />
             {errors.content && <p className="text-sm text-red-500">{errors.content}</p>}
           </div>
+
+          {errors.submit && (
+            <p className="text-sm text-red-500">{errors.submit}</p>
+          )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
           <Button 
             onClick={handleSubmit}
             className="bg-[#70a4d8] hover:bg-[#3C5979] text-white"
+            disabled={isSubmitting}
           >
-            Submit Review
+            {isSubmitting ? 'Submitting...' : 'Submit Review'}
           </Button>
         </DialogFooter>
       </DialogContent>

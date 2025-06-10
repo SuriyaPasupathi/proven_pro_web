@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Plus, Loader2 } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 // import { ProfileData } from '../../types/profile';
 
 interface Experience {
@@ -44,6 +45,8 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     experience_end_date: "",
     key_responsibilities: "",
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [experienceToDelete, setExperienceToDelete] = useState<Experience | null>(null);
 
   // Initialize experiences only when the component mounts or experiences prop changes
   useEffect(() => {
@@ -86,26 +89,80 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     setIsLoading(true);
     
     try {
+      // Validate form data
+      if (!form.company_name.trim() || !form.position.trim() || 
+          !form.experience_start_date.trim() || !form.experience_end_date.trim() ||
+          !form.key_responsibilities.trim()) {
+        toast.error("All fields are required!");
+        setIsLoading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       
       // Create updated experiences array
-      const updatedExperiences = editingExperience 
-        ? localExperiences.map(exp => 
-            exp === editingExperience ? form : exp
-          )
-        : [...localExperiences, form];
+      let updatedExperiences;
+      if (editingExperience) {
+        // If editing, update the existing experience
+        updatedExperiences = localExperiences.map(exp => 
+          exp === editingExperience ? form : exp
+        );
+      } else {
+        // If adding new experience, check for duplicates before adding
+        const isDuplicate = localExperiences.some(
+          exp => 
+            exp.company_name.toLowerCase() === form.company_name.toLowerCase() &&
+            exp.position.toLowerCase() === form.position.toLowerCase() &&
+            exp.experience_start_date === form.experience_start_date &&
+            exp.experience_end_date === form.experience_end_date &&
+            exp.key_responsibilities.toLowerCase() === form.key_responsibilities.toLowerCase()
+        );
+
+        if (isDuplicate) {
+          toast.error("This experience already exists!");
+          setIsLoading(false);
+          return;
+        }
+
+        // Add new experience with trimmed values
+        const newExperience = {
+          company_name: form.company_name.trim(),
+          position: form.position.trim(),
+          experience_start_date: form.experience_start_date.trim(),
+          experience_end_date: form.experience_end_date.trim(),
+          key_responsibilities: form.key_responsibilities.trim()
+        };
+        updatedExperiences = [...localExperiences, newExperience];
+      }
       
-      // Convert experiences to string array format expected by the API
-      const experiencesArray = updatedExperiences.map(exp => ({
+      // Remove any duplicate experiences before sending to backend
+      const uniqueExperiences = updatedExperiences.reduce((acc: Experience[], current) => {
+        const isDuplicate = acc.some(
+          exp => 
+            exp.company_name.toLowerCase() === current.company_name.toLowerCase() &&
+            exp.position.toLowerCase() === current.position.toLowerCase() &&
+            exp.experience_start_date === current.experience_start_date &&
+            exp.experience_end_date === current.experience_end_date &&
+            exp.key_responsibilities.toLowerCase() === current.key_responsibilities.toLowerCase()
+        );
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+
+      // Format experiences for API
+      const formattedExperiences = uniqueExperiences.map(exp => ({
         company_name: exp.company_name,
         position: exp.position,
         experience_start_date: exp.experience_start_date,
         experience_end_date: exp.experience_end_date,
         key_responsibilities: exp.key_responsibilities
       }));
-      
-      formData.append('experiences', JSON.stringify(experiencesArray));
+
+      // Add experiences to formData
+      formData.append('experiences', JSON.stringify(formattedExperiences));
 
       if (!profileData?.id) {
         toast.error("Profile ID is missing");
@@ -118,13 +175,13 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
       })).unwrap();
       
       if (result) {
-        // Update local state immediately
-        setLocalExperiences(updatedExperiences);
+        // Update local state immediately with unique experiences
+        setLocalExperiences(uniqueExperiences);
         
         // Update Redux store with the complete profile data
         dispatch(updateProfileData({
           ...profileData,
-          experiences: experiencesArray
+          experiences: formattedExperiences
         }));
 
         toast.success(editingExperience ? "Experience updated successfully!" : "Experience added successfully!");
@@ -156,6 +213,91 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
       experience_end_date: "",
       key_responsibilities: "",
     });
+  };
+
+  // Add useEffect to clean up duplicates when component mounts
+  useEffect(() => {
+    if (experiences && experiences.length > 0) {
+      const uniqueExperiences = experiences.reduce((acc: Experience[], current) => {
+        const isDuplicate = acc.some(
+          exp => 
+            exp.company_name.toLowerCase() === current.company_name.toLowerCase() &&
+            exp.position.toLowerCase() === current.position.toLowerCase() &&
+            exp.experience_start_date === current.experience_start_date &&
+            exp.experience_end_date === current.experience_end_date &&
+            exp.key_responsibilities.toLowerCase() === current.key_responsibilities.toLowerCase()
+        );
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      if (uniqueExperiences.length !== experiences.length) {
+        setLocalExperiences(uniqueExperiences);
+        // Update Redux store with unique experiences
+        dispatch(updateProfileData({
+          ...profileData,
+          experiences: uniqueExperiences
+        }));
+      }
+    }
+  }, [experiences]);
+
+  // Add useEffect to sync with Redux store
+  useEffect(() => {
+    if (profileData?.experiences) {
+      setLocalExperiences(profileData.experiences);
+    }
+  }, [profileData?.experiences]);
+
+  const handleDeleteClick = (experience: Experience) => {
+    setExperienceToDelete(experience);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!experienceToDelete) return;
+
+    setIsLoading(true);
+    try {
+      const updatedExperiences = localExperiences.filter(exp => 
+        exp.company_name !== experienceToDelete.company_name ||
+        exp.position !== experienceToDelete.position ||
+        exp.experience_start_date !== experienceToDelete.experience_start_date ||
+        exp.experience_end_date !== experienceToDelete.experience_end_date ||
+        exp.key_responsibilities !== experienceToDelete.key_responsibilities
+      );
+
+      const formData = new FormData();
+      formData.append('subscription_type', profileData?.subscription_type || 'premium');
+      formData.append('experiences', JSON.stringify(updatedExperiences));
+
+      if (!profileData?.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
+
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: profileData.id
+      })).unwrap();
+      
+      if (result) {
+        setLocalExperiences(updatedExperiences);
+        dispatch(updateProfileData({
+          ...profileData,
+          experiences: updatedExperiences
+        }));
+        toast.success("Experience deleted successfully!");
+        setDeleteDialogOpen(false);
+        setExperienceToDelete(null);
+      }
+    } catch (error) {
+      toast.error("Failed to delete experience");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!experiences.length) {
@@ -330,26 +472,38 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
       </Dialog>
 
       <div className="space-y-6">
-        {localExperiences.map((exp, index) => (
-          <div key={index} className="border rounded-lg p-6 space-y-4 relative bg-white shadow-sm hover:shadow-md transition-shadow">
+        {localExperiences.map((experience, index) => (
+          <div key={index} className="relative p-4 border rounded-lg bg-white">
             <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800">{exp.position}</h3>
-                <p className="text-gray-600 mt-2">{exp.company_name}</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {exp.experience_start_date} - {exp.experience_end_date}
-                </p>
-                <p className="mt-2 text-gray-700">{exp.key_responsibilities}</p>
+              <div className="space-y-2 flex-grow">
+                <h3 className="font-semibold">{experience.position}</h3>
+                <p className="text-sm text-gray-600">{experience.company_name}</p>
+                <div className="flex gap-4 text-sm text-gray-500">
+                  <span>{experience.experience_start_date} - {experience.experience_end_date}</span>
+                </div>
+                <p className="text-sm text-gray-600">{experience.key_responsibilities}</p>
               </div>
               {isEditMode && (
-                <Button
-                  variant="ghost"
-                  className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
-                  onClick={() => handleEdit(exp)}
-                  disabled={isLoading}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-500 hover:text-blue-600"
+                    onClick={() => handleEdit(experience)}
+                    disabled={isLoading}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-500 hover:text-red-600"
+                    onClick={() => handleDeleteClick(experience)}
+                    disabled={isLoading}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               )}
             </div>
           </div>
@@ -363,6 +517,18 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
         <span>Show all experiences</span>
         <ChevronDown className="ml-1 h-4 w-4" />
       </Button>
+
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setExperienceToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Experience"
+        description={`Are you sure you want to delete your experience at "${experienceToDelete?.company_name}"? This action cannot be undone.`}
+        isLoading={isLoading}
+      />
     </div>
   );
 };
