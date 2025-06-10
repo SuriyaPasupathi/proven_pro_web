@@ -9,7 +9,7 @@ export const fetchServices = createAsyncThunk(
   async (_, { dispatch }) => {
     try {
       dispatch(setLoading(true));
-      const response = await axios.get(`${API_URL}dropdown/?type=services`);
+      const response = await axios.get(`${API_URL}/dropdown/?type=services`);
       dispatch(setServices(response.data));
       return response.data;
     } catch (error) {
@@ -26,7 +26,7 @@ export const fetchJobPositions = createAsyncThunk(
   async (_, { dispatch }) => {
     try {
       dispatch(setLoading(true));
-      const response = await axios.get(`${API_URL}dropdown/?type=jobpositions`);
+      const response = await axios.get(`${API_URL}/dropdown/?type=jobpositions`);
       dispatch(setJobPositions(response.data));
       return response.data;
     } catch (error) {
