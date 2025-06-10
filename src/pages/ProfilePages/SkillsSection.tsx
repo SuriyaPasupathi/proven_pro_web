@@ -5,10 +5,8 @@ import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
 import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
-import { fetchSkills } from '../../store/Services/DropDownService';
 import { toast } from 'sonner';
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -38,7 +36,6 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
   const { profileData: reduxProfileData } = useAppSelector((state) => state.createProfile);
-  const { skills, loading: skillsLoading } = useAppSelector((state) => state.dropdown);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState<SkillsForm>({
@@ -48,11 +45,6 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [skillToDelete, setSkillToDelete] = useState<{ skill: string; type: 'technical_skills' | 'soft_skills' } | null>(null);
-
-  // Fetch skills when component mounts
-  useEffect(() => {
-    dispatch(fetchSkills());
-  }, [dispatch]);
 
   // Initialize form when component mounts or props change
   useEffect(() => {
@@ -230,21 +222,21 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
             <div className="space-y-4">
               <div>
                 <label className="block font-medium mb-2">Technical Skills</label>
-                <Select
-                  value={form.technical_skills.join(',')}
-                  onValueChange={(value) => handleSkillSelect(value, 'technical_skills')}
-                >
-                  <SelectTrigger className="w-full bg-gray-50">
-                    <SelectValue placeholder="Select technical skills" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {skills.map((skill: any) => (
-                      <SelectItem key={skill.id} value={skill.name}>
-                        {skill.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded-md bg-gray-50"
+                  placeholder="Add technical skill"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const value = (e.target as HTMLInputElement).value.trim();
+                      if (value) {
+                        handleSkillSelect(value, 'technical_skills');
+                        (e.target as HTMLInputElement).value = '';
+                      }
+                    }
+                  }}
+                />
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.technical_skills.map((skill, index) => (
                     <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
@@ -265,21 +257,21 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
               <div>
                 <label className="block font-medium mb-2">Soft Skills</label>
-                <Select
-                  value={form.soft_skills.join(',')}
-                  onValueChange={(value) => handleSkillSelect(value, 'soft_skills')}
-                >
-                  <SelectTrigger className="w-full bg-gray-50">
-                    <SelectValue placeholder="Select soft skills" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {skills.map((skill: any) => (
-                      <SelectItem key={skill.id} value={skill.name}>
-                        {skill.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded-md bg-gray-50"
+                  placeholder="Add soft skill"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const value = (e.target as HTMLInputElement).value.trim();
+                      if (value) {
+                        handleSkillSelect(value, 'soft_skills');
+                        (e.target as HTMLInputElement).value = '';
+                      }
+                    }
+                  }}
+                />
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.soft_skills.map((skill, index) => (
                     <div key={index} className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
@@ -304,14 +296,14 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                disabled={isLoading || skillsLoading}
+                disabled={isLoading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-                disabled={isLoading || skillsLoading}
+                disabled={isLoading}
               >
                 {isLoading ? (
                   <>

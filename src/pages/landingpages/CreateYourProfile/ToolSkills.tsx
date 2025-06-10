@@ -1,28 +1,14 @@
-import React, { useState, useEffect } from "react";
-// import { Input } from "../../../components/ui/input";
+import React, { useState } from "react";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
-import { fetchSkills } from "../../../store/Services/DropDownService";
 import toast from "react-hot-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 5;
-
-interface Skill {
-  id: number;
-  name: string;
-}
-
-interface CategorySkills {
-  id: number;
-  name: string;
-  skills: Skill[];
-}
 
 const ToolSkills: React.FC = () => {
   const [form, setForm] = useState({
@@ -32,58 +18,35 @@ const ToolSkills: React.FC = () => {
     skills_description: "",
   });
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
+  const [newTool, setNewTool] = useState("");
+  const [newTechnicalSkill, setNewTechnicalSkill] = useState("");
+  const [newSoftSkill, setNewSoftSkill] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.createProfile);
-  const { skills, loading: skillsLoading } = useSelector((state: RootState) => state.dropdown);
 
-  // Initial fetch of all skills
-  useEffect(() => {
-    dispatch(fetchSkills(undefined));
-  }, [dispatch]);
-
-  // Update available skills when skills data changes
-  useEffect(() => {
-    if (skills && Array.isArray(skills)) {
-      if (selectedCategory) {
-        // Find the selected category and its skills
-        const categoryData = skills.find((cat: CategorySkills) => 
-          cat.name.toLowerCase() === selectedCategory.toLowerCase()
-        );
-        setAvailableSkills(categoryData?.skills || []);
-      } else {
-        // Flatten all skills from all categories
-        const allSkills = skills.reduce((acc: Skill[], category: CategorySkills) => {
-          return [...acc, ...(category.skills || [])];
-        }, []);
-        setAvailableSkills(allSkills);
-      }
+  const handleAddItem = (value: string, field: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
+    if (value.trim()) {
+      setForm(prev => {
+        const currentValues = prev[field as keyof typeof prev] as string[];
+        if (!currentValues.includes(value.trim())) {
+          return {
+            ...prev,
+            [field]: [...currentValues, value.trim()]
+          };
+        }
+        return prev;
+      });
+      setter("");
     }
-  }, [skills, selectedCategory]);
-
-  const handleSkillSelect = (value: string, field: string) => {
-    setForm(prev => {
-      const currentValues = prev[field as keyof typeof prev] as string[];
-      if (currentValues.includes(value)) {
-        return {
-          ...prev,
-          [field]: currentValues.filter(v => v !== value)
-        };
-      } else {
-        return {
-          ...prev,
-          [field]: [...currentValues, value]
-        };
-      }
-    });
   };
 
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
-    dispatch(fetchSkills(category));
+  const handleRemoveItem = (value: string, field: string) => {
+    setForm(prev => ({
+      ...prev,
+      [field]: (prev[field as keyof typeof prev] as string[]).filter(v => v !== value)
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -141,27 +104,40 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="primary_tools" className="block font-medium mb-1 text-sm">
             Primary Tools
           </label>
-          <Select
-            value={form.primary_tools.join(',')}
-            onValueChange={(value) => handleSkillSelect(value, 'primary_tools')}
-            onOpenChange={(open) => open && handleCategorySelect('Primary Skills')}
-          >
-            <SelectTrigger className="w-full bg-gray-50">
-              <SelectValue placeholder="Select primary tools" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableSkills.map((skill) => (
-                <SelectItem key={skill.id} value={skill.name}>
-                  {skill.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newTool}
+              onChange={(e) => setNewTool(e.target.value)}
+              className="flex-1 p-2 border rounded-md bg-gray-50"
+              placeholder="Enter tool name"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddItem(newTool, 'primary_tools', setNewTool);
+                }
+              }}
+            />
+            <Button
+              type="button"
+              onClick={() => handleAddItem(newTool, 'primary_tools', setNewTool)}
+              className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+            >
+              Add
+            </Button>
+          </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {form.primary_tools.map((tool, index) => (
-              <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
-                {tool}
-              </span>
+              <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+                <span>{tool}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveItem(tool, 'primary_tools')}
+                  className="text-blue-800 hover:text-red-600"
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -170,27 +146,40 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="technical_skills" className="block font-medium mb-1 text-sm">
             Technical Skills
           </label>
-          <Select
-            value={form.technical_skills.join(',')}
-            onValueChange={(value) => handleSkillSelect(value, 'technical_skills')}
-            onOpenChange={(open) => open && handleCategorySelect('Technical skills')}
-          >
-            <SelectTrigger className="w-full bg-gray-50">
-              <SelectValue placeholder="Select technical skills" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableSkills.map((skill) => (
-                <SelectItem key={skill.id} value={skill.name}>
-                  {skill.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newTechnicalSkill}
+              onChange={(e) => setNewTechnicalSkill(e.target.value)}
+              className="flex-1 p-2 border rounded-md bg-gray-50"
+              placeholder="Enter technical skill"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddItem(newTechnicalSkill, 'technical_skills', setNewTechnicalSkill);
+                }
+              }}
+            />
+            <Button
+              type="button"
+              onClick={() => handleAddItem(newTechnicalSkill, 'technical_skills', setNewTechnicalSkill)}
+              className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+            >
+              Add
+            </Button>
+          </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {form.technical_skills.map((skill, index) => (
-              <span key={index} className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
-                {skill}
-              </span>
+              <div key={index} className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                <span>{skill}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveItem(skill, 'technical_skills')}
+                  className="text-green-800 hover:text-red-600"
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -199,27 +188,40 @@ const ToolSkills: React.FC = () => {
           <label htmlFor="soft_skills" className="block font-medium mb-1 text-sm">
             Soft Skills
           </label>
-          <Select
-            value={form.soft_skills.join(',')}
-            onValueChange={(value) => handleSkillSelect(value, 'soft_skills')}
-            onOpenChange={(open) => open && handleCategorySelect('Soft skills')}
-          >
-            <SelectTrigger className="w-full bg-gray-50">
-              <SelectValue placeholder="Select soft skills" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableSkills.map((skill) => (
-                <SelectItem key={skill.id} value={skill.name}>
-                  {skill.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newSoftSkill}
+              onChange={(e) => setNewSoftSkill(e.target.value)}
+              className="flex-1 p-2 border rounded-md bg-gray-50"
+              placeholder="Enter soft skill"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddItem(newSoftSkill, 'soft_skills', setNewSoftSkill);
+                }
+              }}
+            />
+            <Button
+              type="button"
+              onClick={() => handleAddItem(newSoftSkill, 'soft_skills', setNewSoftSkill)}
+              className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+            >
+              Add
+            </Button>
+          </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {form.soft_skills.map((skill, index) => (
-              <span key={index} className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-sm">
-                {skill}
-              </span>
+              <div key={index} className="flex items-center gap-1 bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-sm">
+                <span>{skill}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveItem(skill, 'soft_skills')}
+                  className="text-purple-800 hover:text-red-600"
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -253,14 +255,14 @@ const ToolSkills: React.FC = () => {
             variant="outline"
             className="w-full sm:w-auto hover:bg-[#5A8DB8] text-black"
             onClick={() => navigate(-1)}
-            disabled={loading || skillsLoading}
+            disabled={loading}
           >
             Back
           </Button>
           <Button
             type="submit"
             className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
-            disabled={loading || skillsLoading}
+            disabled={loading}
           >
             {loading ? "Saving..." : "Save and Continue"}
           </Button>

@@ -13,7 +13,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 
 interface ToolsSectionProps {
@@ -24,7 +23,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
   const { profileData } = useAppSelector((state) => state.createProfile);
-  const { skills } = useAppSelector((state) => state.dropdown);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [toolToDelete, setToolToDelete] = useState<string | null>(null);
@@ -44,7 +42,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   };
 
   const [tools, setTools] = useState<string[]>(() => getToolsArray(primary_tools));
-  const [selectedTool, setSelectedTool] = useState('');
+  const [newTool, setNewTool] = useState('');
 
   // Update tools when dialog opens or primary_tools changes
   useEffect(() => {
@@ -62,11 +60,11 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     }
   }, [profileData?.primary_tools]);
 
-  const handleToolSelect = (value: string) => {
-    if (!tools.includes(value)) {
-      setTools(prevTools => [...prevTools, value]);
+  const handleToolAdd = () => {
+    if (newTool.trim() && !tools.includes(newTool.trim())) {
+      setTools(prevTools => [...prevTools, newTool.trim()]);
+      setNewTool('');
     }
-    setSelectedTool('');
   };
 
   const handleRemoveTool = (toolToRemove: string) => {
@@ -194,23 +192,30 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
             <div className="space-y-4">
               <div>
                 <label className="block font-medium mb-1 text-sm">
-                  Select Tools
+                  Add Tool
                 </label>
-                <Select
-                  value={selectedTool}
-                  onValueChange={handleToolSelect}
-                >
-                  <SelectTrigger className="w-full bg-gray-50">
-                    <SelectValue placeholder="Select tools" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {skills.map((skill: any) => (
-                      <SelectItem key={skill.id} value={skill.name}>
-                        {skill.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newTool}
+                    onChange={(e) => setNewTool(e.target.value)}
+                    className="flex-1 p-2 border rounded-md bg-gray-50"
+                    placeholder="Enter tool name"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleToolAdd();
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleToolAdd}
+                    className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                  >
+                    Add
+                  </Button>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-2">
