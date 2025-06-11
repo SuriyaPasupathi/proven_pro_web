@@ -2,14 +2,14 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { setServices, setJobPositions, setLoading, setError } from '../Slice/DropDownSlice';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
 
 export const fetchServices = createAsyncThunk(
   'dropdown/fetchServices',
   async (_, { dispatch }) => {
     try {
       dispatch(setLoading(true));
-      const response = await axios.get(`${API_URL}/dropdown/?type=services`);
+      const response = await axios.get(`${API_URL}dropdown/?type=services`);
       dispatch(setServices(response.data));
       return response.data;
     } catch (error) {
@@ -26,7 +26,7 @@ export const fetchJobPositions = createAsyncThunk(
   async (_, { dispatch }) => {
     try {
       dispatch(setLoading(true));
-      const response = await axios.get(`${API_URL}/dropdown/?type=jobpositions`);
+      const response = await axios.get(`${API_URL}dropdown/?type=jobpositions`);
       dispatch(setJobPositions(response.data));
       return response.data;
     } catch (error) {
