@@ -104,26 +104,37 @@ const Licenses: React.FC = () => {
         return;
       }
 
-      // Convert certifications to strings as expected by the API
-      const formattedCertifications = certifications.map(cert => 
-        JSON.stringify({
-          certifications_name: cert.certifications_name,
-          certifications_issuer: cert.certifications_issuer,
-          certifications_issued_date: cert.certifications_issued_date,
-          certifications_expiration_date: cert.certifications_expiration_date,
-          certifications_id: cert.certifications_id,
-          certifications_image_url: cert.certifications_image_url,
-        })
-      );
+      // Format certifications as expected by the API
+      const formattedCertifications = certifications.map(cert => ({
+        certifications_name: cert.certifications_name,
+        certifications_issuer: cert.certifications_issuer,
+        certifications_issued_date: cert.certifications_issued_date,
+        certifications_expiration_date: cert.certifications_expiration_date,
+        certifications_id: cert.certifications_id,
+        certifications_image_url: cert.certifications_image_url,
+      }));
 
-      const profileData = {
-        subscription_type: "premium" as const,
-        certifications: formattedCertifications,
-      };
+      const formData = new FormData();
+      formData.append('subscription_type', 'premium');
+      formData.append('certifications', JSON.stringify(formattedCertifications));
 
-      const result = await dispatch(createUserProfile(profileData)).unwrap();
+      // Append certification images if they exist
+      certifications.forEach((cert, index) => {
+        if (cert.certifications_image) {
+          formData.append(`certification_image_${index}`, cert.certifications_image);
+        }
+      });
+
+      const result = await dispatch(createUserProfile(formData)).unwrap();
       
       if (result) {
+        // Clean up object URLs
+        certifications.forEach(cert => {
+          if (cert.certifications_image_url) {
+            URL.revokeObjectURL(cert.certifications_image_url);
+          }
+        });
+
         // Reset form state after successful submission
         setCertifications([{
           certifications_name: "",

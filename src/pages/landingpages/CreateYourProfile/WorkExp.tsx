@@ -132,29 +132,14 @@ const WorkExp: React.FC = () => {
       setIsUpdating(true);
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('experiences', JSON.stringify(workForms));
-
-      // Add other profile data
-      if (profileData) {
-        Object.entries(profileData).forEach(([key, value]) => {
-          if (key !== 'experiences' && key !== 'subscription_type' && value !== undefined) {
-            if (Array.isArray(value)) {
-              formData.append(key, JSON.stringify(value));
-            } else if (value instanceof File) {
-              formData.append(key, value);
-            } else if (typeof value === 'string') {
-              formData.append(key, value);
-            }
-          }
-        });
-      }
+      formData.append('work_experiences', JSON.stringify(workForms));
 
       const result = await dispatch(createUserProfile(formData)).unwrap();
       
       if (result) {
         dispatch(updateProfileData({
           ...profileData,
-          experiences: workForms
+          work_experiences: workForms
         }));
         
         toast.success("Work experiences saved successfully!");

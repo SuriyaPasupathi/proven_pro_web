@@ -105,7 +105,7 @@ const Portfolio: React.FC = () => {
       };
       
       // Append the portfolio item as a JSON string
-      formData.append('projects', JSON.stringify([portfolioItem]));
+      formData.append('portfolio', JSON.stringify([portfolioItem]));
       
       // Append all image files
       form.project_images.forEach((image, index) => {

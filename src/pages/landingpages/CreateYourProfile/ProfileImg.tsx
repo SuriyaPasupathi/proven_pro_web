@@ -63,16 +63,7 @@ const ProfileImg: React.FC = () => {
       formData.append('subscription_type', 'premium');
       formData.append('profile_pic', form.profile_pic);
 
-      // Debug logging
-      console.log('Uploading image:', {
-        file: form.profile_pic,
-        previewUrl: form.profile_pic_url
-      });
-
       const result = await dispatch(createUserProfile(formData)).unwrap();
-      
-      // Debug logging
-      console.log('Upload result:', result);
       
       if (result) {
         // Clean up the preview URL
@@ -80,12 +71,9 @@ const ProfileImg: React.FC = () => {
           URL.revokeObjectURL(form.profile_pic_url);
         }
 
-        // Store the raw URL from the server
-        if (result.profile_pic_url) {
-          result.profile_pic_url = result.profile_pic_url;
-        }
-
         toast.success("Profile image saved successfully!");
+        
+        // Navigate to the next step
         navigate("/create-profile/services-offer");
       }
     } catch (err) {
