@@ -65,9 +65,9 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
 
   // Initialize projectItems from profileData
   useEffect(() => {
-    if (profileData?.projects) {
-      console.log('Profile Data Projects:', profileData.projects);
-      const parsedProjects = parseProjects(profileData.projects);
+    if (profileData?.portfolio) {
+      console.log('Profile Data Projects:', profileData.portfolio);
+      const parsedProjects = parseProjects(profileData.portfolio);
       console.log('Parsed Projects:', parsedProjects);
       setProjectItems(parsedProjects);
     }
@@ -245,7 +245,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       }));
 
       // Add projects to formData
-      formData.append('projects', JSON.stringify(formattedProjects));
+      formData.append('portfolio', JSON.stringify(formattedProjects));
 
       // Append project images if any
       form.project_images.forEach((image, index) => {
@@ -269,7 +269,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
         // Update Redux store with the complete profile data
         dispatch(updateProfileData({
           ...profileData,
-          projects: formattedProjects
+          portfolio: formattedProjects
         }));
 
         toast.success(editingItem ? "Project updated successfully!" : "Project added successfully!");
@@ -291,8 +291,8 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
 
   // Add useEffect to clean up duplicates when component mounts
   useEffect(() => {
-    if (profileData?.projects && profileData.projects.length > 0) {
-      const uniqueProjects = profileData.projects.reduce((acc: Project[], current) => {
+    if (profileData?.portfolio && profileData.portfolio.length > 0) {
+      const uniqueProjects = profileData.portfolio.reduce((acc: Project[], current) => {
         const isDuplicate = acc.some(
           item => 
             item.project_title.toLowerCase() === current.project_title.toLowerCase() &&
@@ -305,7 +305,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
         return acc;
       }, []);
       
-      if (uniqueProjects.length !== profileData.projects.length) {
+      if (uniqueProjects.length !== profileData.portfolio.length) {
         setProjectItems(uniqueProjects);
         // Update Redux store with unique projects
         dispatch(updateProfileData({
@@ -314,14 +314,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
         }));
       }
     }
-  }, [profileData?.projects]);
+  }, [profileData?.portfolio]);
 
   // Add useEffect to sync with Redux store
   useEffect(() => {
-    if (profileData?.projects) {
-      setProjectItems(profileData.projects);
+    if (profileData?.portfolio) {
+      setProjectItems(profileData.portfolio);
     }
-  }, [profileData?.projects]);
+  }, [profileData?.portfolio]);
 
   const handleCancel = () => {
     // Clean up any preview URLs before closing
@@ -353,7 +353,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('projects', JSON.stringify(updatedProjects));
+      formData.append('portfolio', JSON.stringify(updatedProjects));
 
       if (!profileData?.id) {
         toast.error("Profile ID is missing");
@@ -369,7 +369,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
         setProjectItems(updatedProjects);
         dispatch(updateProfileData({
           ...profileData,
-          projects: updatedProjects
+          portfolio: updatedProjects
         }));
         toast.success("Project deleted successfully!");
         setDeleteDialogOpen(false);

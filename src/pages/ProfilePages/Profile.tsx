@@ -145,7 +145,7 @@ const App: React.FC = () => {
                   rate_range={profile.rate_range}
                   availability={profile.availability}
                 />
-                <ExperienceSection experiences={profile.experiences} />
+                <ExperienceSection experiences={profile.work_experiences} />
                 <SkillsSection 
                   technical_skills={profile.technical_skills}
                   soft_skills={profile.soft_skills}
@@ -153,7 +153,7 @@ const App: React.FC = () => {
                 />
                 <ToolsSection primary_tools={profile.primary_tools} />
                 <PortfolioSection 
-                  projects={profile.projects}
+                  projects={profile.portfolio}
                   portfolio={profile.portfolio}
                 />
               </div>

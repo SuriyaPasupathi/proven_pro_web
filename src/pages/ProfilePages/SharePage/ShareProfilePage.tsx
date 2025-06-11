@@ -163,8 +163,8 @@ const ShareProfilePage = () => {
                 <ServicesSection categories={profileData.categories} />
               )}
 
-              {profileData.experiences && profileData.experiences.length > 0 && (
-                <ExperienceSection experiences={profileData.experiences} />
+              {profileData.work_experiences && profileData.work_experiences.length > 0 && (
+                <ExperienceSection experiences={profileData.work_experiences} />
               )}
 
               {((profileData.technical_skills && profileData.technical_skills.length > 0) || 
@@ -180,8 +180,8 @@ const ShareProfilePage = () => {
                 <ToolsSection primary_tools={profileData.primary_tools} />
               )}
 
-              {profileData.projects && profileData.projects.length > 0 && (
-                <PortfolioSection projects={profileData.projects} />
+              {profileData.portfolio && profileData.portfolio.length > 0 && (
+                <PortfolioSection projects={profileData.portfolio} />
               )}
             </div>
           </div>

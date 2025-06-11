@@ -45,8 +45,8 @@ const WorkExp: React.FC = () => {
 
   // Initialize form with existing data if available
   useEffect(() => {
-    if (profileData?.experiences && profileData.experiences.length > 0) {
-      setWorkForms(profileData.experiences);
+    if (profileData?.work_experiences && profileData.work_experiences.length > 0) {
+      setWorkForms(profileData.work_experiences);
     }
   }, [profileData]);
 

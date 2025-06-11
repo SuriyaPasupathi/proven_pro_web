@@ -28,7 +28,7 @@ export interface ProfileData {
   availability?: string;
 
   // Work Experience
-  experiences?: {
+  work_experiences?: {
     company_name: string;
     position: string;
     key_responsibilities: string;
@@ -43,14 +43,7 @@ export interface ProfileData {
   skills_description?: string;
 
   // Portfolio
-  projects?: {
-    id?: number;
-    project_title: string;
-    project_description: string;
-    project_url: string;
-    project_image?: string;
-    project_image_url?: string;
-  }[];
+ 
   portfolio?: {
     project_title: string;
     project_description: string;

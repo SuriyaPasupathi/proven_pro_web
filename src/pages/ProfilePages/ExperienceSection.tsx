@@ -246,10 +246,10 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
 
   // Add useEffect to sync with Redux store
   useEffect(() => {
-    if (profileData?.experiences) {
-      setLocalExperiences(profileData.experiences);
+    if (profileData?.work_experiences) {
+      setLocalExperiences(profileData.work_experiences);
     }
-  }, [profileData?.experiences]);
+  }, [profileData?.work_experiences]);
 
   const handleDeleteClick = (experience: Experience) => {
     setExperienceToDelete(experience);
