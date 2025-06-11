@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Plus, Loader2, Trash2 } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
@@ -56,6 +56,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState<ServiceCategory | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [form, setForm] = useState<ServiceForm>({
     services_categories: '',
     services_description: '',
@@ -299,14 +300,14 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Services</h2>
+    <div className="border-b border-[#5A8DB8]/20 pb-6 sm:pb-8">
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#5A8DB8]">Services</h2>
         {isEditMode && (
           <div className="flex gap-2">
             <Button 
               variant="ghost" 
-              className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+              className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10 transition-colors duration-300"
               onClick={() => {
                 setEditingService(null);
                 setForm({
@@ -318,7 +319,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                 setIsDialogOpen(true);
               }}
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5 text-[#5A8DB8] hover:text-[#3C5979]" />
             </Button>
           </div>
         )}
@@ -327,13 +328,13 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-xl text-[#5A8DB8]">
               {editingService ? 'Edit Service' : 'Add Service'}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="services_categories" className="block font-medium mb-1 text-sm">
+              <label htmlFor="services_categories" className="block font-medium mb-1 text-sm text-gray-700">
                 Service Categories
               </label>
               <Input
@@ -342,13 +343,13 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                 placeholder="Enter service categories (comma-separated)..."
                 value={form.services_categories}
                 onChange={handleChange}
-                className="bg-gray-50"
+                className="bg-gray-50 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="services_description" className="block font-medium mb-1 text-sm">
+              <label htmlFor="services_description" className="block font-medium mb-1 text-sm text-gray-700">
                 Service Description
               </label>
               <Textarea
@@ -357,14 +358,14 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                 placeholder="Describe your services and expertise..."
                 value={form.services_description}
                 onChange={handleChange}
-                className="bg-gray-50 min-h-[120px]"
+                className="bg-gray-50 min-h-[120px] border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="rate_range" className="block font-medium mb-1 text-sm">
+                <label htmlFor="rate_range" className="block font-medium mb-1 text-sm text-gray-700">
                   Rate Range
                 </label>
                 <Input
@@ -373,12 +374,12 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                   placeholder="Enter your rate range..."
                   value={form.rate_range}
                   onChange={handleChange}
-                  className="bg-gray-50"
+                  className="bg-gray-50 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="availability" className="block font-medium mb-1 text-sm">
+                <label htmlFor="availability" className="block font-medium mb-1 text-sm text-gray-700">
                   Availability
                 </label>
                 <Input
@@ -387,7 +388,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                   placeholder="Enter your availability..."
                   value={form.availability}
                   onChange={handleChange}
-                  className="bg-gray-50"
+                  className="bg-gray-50 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
                   required
                 />
               </div>
@@ -399,15 +400,15 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isLoading}
+                className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-colors duration-300"
                 disabled={isLoading}
                 onClick={(e) => {
-                  // Prevent any additional click handling
                   e.stopPropagation();
                 }}
               >
@@ -425,16 +426,27 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         </DialogContent>
       </Dialog>
 
-      <div className="space-y-6">
-        {localServices.map((service, index) => (
-          <div key={service.id || index} className="relative p-4 border rounded-lg bg-white">
-            <div className="flex justify-between items-start">
+      {/* Services Section */}
+      <div className="space-y-4 sm:space-y-6">
+        {localServices
+          .slice(0, isExpanded ? undefined : 2)
+          .map((service, index) => (
+          <div key={service.id || index} className="relative p-4 sm:p-6 border border-[#5A8DB8]/10 rounded-lg bg-gray-50 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex justify-between items-start gap-4">
               <div className="space-y-2 flex-grow">
-                <h3 className="font-semibold">{service.services_categories}</h3>
-                <p className="text-sm text-gray-600">{service.services_description}</p>
-                <div className="flex gap-4 text-sm text-gray-500">
-                  <span>Rate: {service.rate_range}</span>
-                  <span>Availability: {service.availability}</span>
+                <h3 className="text-base sm:text-lg text-[#5A8DB8] font-bold">
+                  Main Service Category: <span className="text-gray-700 font-semibold">{service.services_categories}</span>
+                </h3>
+                <p className="text-sm sm:text-base font-bold text-[#5A8DB8]">
+                  Description: <span className="text-gray-700 font-semibold">{service.services_description}</span>
+                </p>
+                <div className="flex flex-col sm:flex-row sm:gap-4 text-sm text-gray-600">
+                  <p className="font-bold">
+                    Rate: <span className="text-gray-700 font-semibold">{service.rate_range} $</span>
+                  </p>
+                  <p className="font-bold">
+                    Availability: <span className="text-gray-700 font-semibold">{service.availability}</span>
+                  </p>
                 </div>
               </div>
               {isEditMode && (
@@ -442,7 +454,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-gray-500 hover:text-blue-600"
+                    className="h-8 w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
                     onClick={() => handleEdit(service)}
                   >
                     <Pencil className="h-4 w-4" />
@@ -450,7 +462,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-gray-500 hover:text-red-600"
+                    className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-300"
                     onClick={() => handleDeleteClick(service)}
                     disabled={isLoading}
                   >
@@ -463,13 +475,20 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         ))}
       </div>
       
-      <Button 
-        variant="link" 
-        className="mt-6 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
-      >
-        <span>Show all services</span>
-        <ChevronDown className="ml-1 h-4 w-4" />
-      </Button>
+      {localServices.length > 2 && (
+        <Button 
+          variant="link" 
+          className="mt-4 sm:mt-6 text-[#5A8DB8] hover:text-[#3C5979] flex items-center p-0 transition-colors duration-300"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <span>{isExpanded ? 'Show less' : 'Show all services'}</span>
+          {isExpanded ? (
+            <ChevronUp className="ml-1 h-4 w-4" />
+          ) : (
+            <ChevronDown className="ml-1 h-4 w-4" />
+          )}
+        </Button>
+      )}
 
       <DeleteConfirmationDialog
         isOpen={deleteDialogOpen}

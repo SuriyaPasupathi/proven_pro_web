@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Pencil, X, Trash2 } from 'lucide-react';
+import { Pencil, X, Trash2, Plus, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -62,6 +62,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Project | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Initialize projectItems from profileData
   useEffect(() => {
@@ -384,7 +385,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Portfolio</h2>
+          <h2 className="text-2xl font-bold text-[#5A8DB8]">Portfolio</h2>
           {isEditMode && (
             <Button 
               variant="ghost" 
@@ -394,7 +395,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
                 setIsDialogOpen(true);
               }}
             >
-              <Pencil className="w-4 h-4" />
+              <Plus className="w-5 h-5 text-[#5A8DB8] hover:text-[#3C5979]" />
             </Button>
           )}
         </div>
@@ -541,7 +542,9 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {projectItems.map((item: Project, index: number) => {
+        {projectItems
+          .slice(0, isExpanded ? undefined : 1)
+          .map((item: Project, index: number) => {
           const imageUrl = getFullImageUrl(item.project_image_url || item.project_image);
           
           return (
@@ -596,6 +599,21 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
         })}
       </div>
       
+      {projectItems.length > 1 && (
+        <Button 
+          variant="link" 
+          className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <span>{isExpanded ? 'Show less' : 'Show all projects'}</span>
+          {isExpanded ? (
+            <ChevronUp className="ml-1 h-4 w-4" />
+          ) : (
+            <ChevronDown className="ml-1 h-4 w-4" />
+          )}
+        </Button>
+      )}
+
       {selectedItem !== null && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setSelectedItem(null)}>
           <div className="bg-white rounded-lg overflow-hidden max-w-3xl w-full max-h-[80vh]" onClick={(e) => e.stopPropagation()}>

@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
+import { ChevronDown, Pencil, Trash2, ChevronUp } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
@@ -26,6 +26,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [toolToDelete, setToolToDelete] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Convert tools input to array
   const getToolsArray = (input: string[] | string): string[] => {
@@ -65,10 +66,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       setTools(prevTools => [...prevTools, newTool.trim()]);
       setNewTool('');
     }
-  };
-
-  const handleRemoveTool = (toolToRemove: string) => {
-    setTools(prevTools => prevTools.filter(tool => tool !== toolToRemove));
   };
 
   const handleDeleteClick = (tool: string) => {
@@ -165,9 +162,9 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   }
 
   return (
-    <div>
+    <div className="border-b border-[#5A8DB8] pb-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Tools</h2>
+        <h2 className="text-2xl font-bold text-[#5A8DB8]">Tools</h2>
         {isEditMode && (
           <div className="flex gap-2">
             <Button 
@@ -218,9 +215,9 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              {/* <div className="flex flex-wrap gap-2">
                 {tools.map((tool, index) => (
-                  <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                  <div key={index} className="flex items-center gap-1 text-sm">
                     <span>{tool}</span>
                     {isEditMode && (
                       <Button
@@ -234,7 +231,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                     )}
                   </div>
                 ))}
-              </div>
+              </div> */}
             </div>
 
             <DialogFooter>
@@ -257,9 +254,13 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       </Dialog>
 
       <div className="flex flex-wrap gap-2">
-        {tools.map((tool, index) => (
-          <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-            <span>{tool}</span>
+        {tools
+          .slice(0, isExpanded ? undefined : 2)
+          .map((tool, index) => (
+          <div key={index} className="flex items-center gap-1  text-sm">
+            <div className="flex items-center gap-1">
+            <p className="text-sm font-bold text-[#5A8DB8]">Primary Tools : <span className="text-gray-600 font-semibold">{tool}</span></p>
+            </div>
             {isEditMode && (
               <Button
                 variant="ghost"
@@ -274,13 +275,20 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         ))}
       </div>
       
-      <Button 
-        variant="link" 
-        className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
-      >
-        <span>Show all tools</span>
-        <ChevronDown className="ml-1 h-4 w-4" />
-      </Button>
+      {tools.length > 2 && (
+        <Button 
+          variant="link" 
+          className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <span>{isExpanded ? 'Show less' : 'Show all tools'}</span>
+          {isExpanded ? (
+            <ChevronUp className="ml-1 h-4 w-4" />
+          ) : (
+            <ChevronDown className="ml-1 h-4 w-4" />
+          )}
+        </Button>
+      )}
 
       <DeleteConfirmationDialog
         isOpen={deleteDialogOpen}

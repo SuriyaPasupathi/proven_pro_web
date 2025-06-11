@@ -339,14 +339,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-4">
+    <div className="space-y-6 sm:space-y-8 p-4 sm:p-6 md:p-8">
+      <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex flex-col gap-4">
               {/* Top Section: Name and Edit Button */}
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl md:text-4xl font-bold">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#5A8DB8]">
                   {profileData.first_name} {profileData.last_name}
                 </h1>
                 {isEditMode && (
@@ -363,21 +363,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
               {/* Below Section: Verification */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                 <div className="flex items-center">
-                  <div className="text-green-700 rounded-full text-base font-medium w-[360px] h-[89px] flex items-center sm:w-[360px] md:w-[360px] lg:w-[360px]">
+                  <div className="text-green-700 rounded-lg bg-green-50 p-4 text-base font-medium w-full sm:w-[360px]">
                     {profileData.verification_details ? (
                       <div className="flex flex-col">
-                        <span>Profile Verified {calculateVerificationPercentage(profileData.verification_details)}%</span>
-                        {/* <div className="flex gap-2 text-sm">
+                        <span className="text-lg font-bold">Profile Verified {calculateVerificationPercentage(profileData.verification_details)}%</span>
+                        <div className="flex flex-wrap gap-2 text-sm mt-1">
                           {profileData.verification_details.government_id.verified && (
-                            <span className="text-green-600">✓ Government ID</span>
+                            <span className="text-green-600 bg-green-100 px-2 py-1 rounded">✓ Government ID</span>
                           )}
                           {profileData.verification_details.address_proof.verified && (
-                            <span className="text-green-600">✓ Address</span>
+                            <span className="text-green-600 bg-green-100 px-2 py-1 rounded">✓ Address</span>
                           )}
                           {profileData.verification_details.mobile.verified && (
-                            <span className="text-green-600">✓ Mobile</span>
+                            <span className="text-green-600 bg-green-100 px-2 py-1 rounded">✓ Mobile</span>
                           )}
-                        </div> */}
+                        </div>
                       </div>
                     ) : (
                       <span>Profile Verification Pending</span>
@@ -393,13 +393,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
       <div className="border-t-2 border-b-2 border-gray-200 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col">
-            <h2 className="text-xl font-semibold mb-4">Public profile & URL</h2>
+            <h2 className="text-xl font-bold mb-4 text-[#5A8DB8]">Public profile & URL</h2>
             <div className="flex items-center gap-2 max-w-md">
               <input
                 type="text"
                 value={profileData.profile_url || "https://www.mytrustworld.com/profile-d-ae111378"}
                 readOnly
-                className="flex-1 p-2 border rounded-md text-sm bg-gray-50"
+                className="flex-1 p-2 border rounded-md text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#5A8DB8]/20"
               />
               <TooltipProvider>
                 <Tooltip>
@@ -408,7 +408,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
                       variant="outline" 
                       size="icon"
                       onClick={copyToClipboard}
-                      className={`flex-shrink-0 transition-colors ${isCopied ? 'bg-green-50 text-green-600 border-green-200' : ''}`}
+                      className={`flex-shrink-0 transition-colors ${isCopied ? 'bg-green-50 text-green-600 border-green-200' : 'hover:bg-[#5A8DB8]/10'}`}
                     >
                       <Copy className={`h-4 w-4 ${isCopied ? 'text-green-600' : ''}`} />
                     </Button>
@@ -425,7 +425,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
                       variant="outline" 
                       size="icon"
                       onClick={() => setIsShareDialogOpen(true)}
-                      className="flex-shrink-0"
+                      className="flex-shrink-0 hover:bg-[#5A8DB8]/10"
                     >
                       <Share2 className="h-4 w-4" />
                     </Button>
@@ -439,20 +439,20 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
           </div>
 
           <div className="w-full flex justify-center">
-            <div className="flex flex-row items-center bg-white shadow-md rounded-xl p-6 w-full max-w-2xl">
+            <div className="flex flex-col sm:flex-row items-center bg-gray-50 shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl p-4 sm:p-6 w-full max-w-2xl border border-[#5A8DB8]/10">
               {/* Left: Rating, label, stars, reviews */}
-              <div className="flex flex-col items-start flex-1 min-w-[160px]">
-                <span className="text-5xl font-extrabold leading-tight">{profileData.rating?.toFixed(1) || "5.0"}</span>
-                <span className="text-lg font-semibold mt-1 mb-1">Exceptional</span>
+              <div className="flex flex-col items-center sm:items-start flex-1 min-w-[160px] mb-4 sm:mb-0">
+                <span className="text-4xl sm:text-5xl font-extrabold leading-tight text-[#5A8DB8]">{profileData.rating?.toFixed(1) || "5.0"}</span>
+                <span className="text-base sm:text-lg font-semibold mt-1 mb-1">Exceptional</span>
                 <div className="flex items-center mb-1">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                    <Star key={star} className="h-4 w-4 sm:h-5 sm:w-5 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <span className="text-base text-muted-foreground">{profileData.reviews?.length || 0} reviews</span>
+                <span className="text-sm sm:text-base text-muted-foreground">{profileData.reviews?.length || 0} reviews</span>
               </div>
               {/* Right: Rating bars */}
-              <div className="flex flex-col flex-1 md:max-w-[240px] space-y-1.5 ml-8">
+              <div className="flex flex-col flex-1 md:max-w-[240px] space-y-1.5 sm:ml-8 w-full">
                 {[
                   { label: "5-star", value: 70 },
                   { label: "4-star", value: 20 },
@@ -460,8 +460,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
                   { label: "2-star", value: 3 },
                   { label: "1-star", value: 2 },
                 ].map((rating, index) => (
-                  <div key={index} className="flex items-center gap-2 ">
-                    <span className="text-sm min-w-[46px]">{rating.label}</span>
+                  <div key={index} className="flex items-center gap-2">
+                    <span className="text-xs sm:text-sm min-w-[46px]">{rating.label}</span>
                     <Progress value={rating.value} className="h-2 flex-1 bg-[#bad3eb]" />
                   </div>
                 ))}
@@ -469,10 +469,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
             </div>
           </div>
         </div>
-      </div>
-
-      <div>
-        
       </div>
 
       <EditProfileDialog

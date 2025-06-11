@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Plus, Loader2, Trash2 } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -38,6 +38,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
   const [localExperiences, setLocalExperiences] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [form, setForm] = useState<Experience>({
     company_name: "",
     position: "",
@@ -304,7 +305,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     return (
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Experience</h2>
+          <h2 className="text-2xl font-bold text-[#5A8DB8]">Experience</h2>
           {isEditMode && (
             <div className="flex gap-2">
               <Button 
@@ -322,7 +323,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                   setIsDialogOpen(true);
                 }}
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5 text-[#5A8DB8] hover:text-[#3C5979]" />
               </Button>
             </div>
           )}
@@ -333,9 +334,9 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Experience</h2>
+    <div className="border-b border-[#5A8DB8] pb-6">
+        <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-[#5A8DB8]">Experience</h2>
         {isEditMode && (
           <div className="flex gap-2">
             <Button 
@@ -353,7 +354,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 setIsDialogOpen(true);
               }}
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5 text-[#5A8DB8] hover:text-[#3C5979]" />
             </Button>
           </div>
         )}
@@ -470,18 +471,22 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
           </form>
         </DialogContent>
       </Dialog>
-
+      
+{/* Experience Section */}
       <div className="space-y-6">
-        {localExperiences.map((experience, index) => (
+        {localExperiences
+          .slice(0, isExpanded ? undefined : 2)
+          .map((experience, index) => (
           <div key={index} className="relative p-4 border rounded-lg bg-white">
             <div className="flex justify-between items-start">
               <div className="space-y-2 flex-grow">
-                <h3 className="font-semibold">{experience.position}</h3>
-                <p className="text-sm text-gray-600">{experience.company_name}</p>
+                <h3 className="font-semibold text-lg text-[#5A8DB8]">Position : <span className="text-gray-600 font-semibold">{experience.position}</span></h3>
+                <p className="text-sm text-[#5A8DB8] font-bold">Company Name : <span className="text-gray-600 font-semibold">{experience.company_name}</span></p>
                 <div className="flex gap-4 text-sm text-gray-500">
-                  <span>{experience.experience_start_date} - {experience.experience_end_date}</span>
+                  <p className="font-bold"> Start Date : <span className="text-gray-600 font-semibold">{experience.experience_start_date}</span></p>
+                  <p className="font-bold">End Date : <span className="text-gray-600 font-semibold">{experience.experience_end_date}</span></p>
                 </div>
-                <p className="text-sm text-gray-600">{experience.key_responsibilities}</p>
+                <p className="text-sm text-gray-600 font-bold">Key Responsibilities : <span className="text-gray-600 font-semibold">{experience.key_responsibilities}</span></p>
               </div>
               {isEditMode && (
                 <div className="flex gap-2">
@@ -510,13 +515,20 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
         ))}
       </div>
       
-      <Button 
-        variant="link" 
-        className="mt-6 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
-      >
-        <span>Show all experiences</span>
-        <ChevronDown className="ml-1 h-4 w-4" />
-      </Button>
+      {localExperiences.length > 2 && (
+        <Button 
+          variant="link" 
+          className="mt-6 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <span>{isExpanded ? 'Show less' : 'Show all experiences'}</span>
+          {isExpanded ? (
+            <ChevronUp className="ml-1 h-4 w-4" />
+          ) : (
+            <ChevronDown className="ml-1 h-4 w-4" />
+          )}
+        </Button>
+      )}
 
       <DeleteConfirmationDialog
         isOpen={deleteDialogOpen}

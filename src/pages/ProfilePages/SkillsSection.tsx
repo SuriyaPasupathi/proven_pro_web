@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Loader2, Trash2 } from 'lucide-react';
+import { ChevronDown, Pencil, Loader2, Trash2, ChevronUp } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -38,6 +38,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   const { profileData: reduxProfileData } = useAppSelector((state) => state.createProfile);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [form, setForm] = useState<SkillsForm>({
     technical_skills: [],
     soft_skills: [],
@@ -185,9 +186,9 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   };
 
   return (
-    <div>
+    <div className="border-b border-[#5A8DB8] pb-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Skills</h2>
+        <h2 className="text-2xl font-bold text-[#5A8DB8]">Skills</h2>
         {isEditMode && (
           <div className="flex gap-2">
             <Button 
@@ -320,21 +321,23 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       </Dialog>
 
       {form.skills_description && (
-        <p className="text-gray-600 mb-6">{form.skills_description}</p>
+        <p className="text-[#5A8DB8] mb-6 font-bold">Skills Description : <span className="text-gray-600 font-semibold">{form.skills_description}</span></p>
       )}
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-3">Technical Skills</h3>
         <div className="flex flex-wrap gap-2">
           {form.technical_skills.length > 0 ? (
-            form.technical_skills.map((skill, index) => (
-              <span 
-                key={index}
-                className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
-              >
-                {skill}
-              </span>
-            ))
+            form.technical_skills
+              .slice(0, isExpanded ? undefined : 2)
+              .map((skill, index) => (
+                <span 
+                  key={index}
+                  className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
+                >
+                  {skill}
+                </span>
+              ))
           ) : (
             <p className="text-gray-500">No technical skills added yet</p>
           )}
@@ -345,27 +348,36 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         <h3 className="text-lg font-semibold mb-3">Soft Skills</h3>
         <div className="flex flex-wrap gap-2">
           {form.soft_skills.length > 0 ? (
-            form.soft_skills.map((skill, index) => (
-              <span 
-                key={index}
-                className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full hover:bg-green-200 transition-colors"
-              >
-                {skill}
-              </span>
-            ))
+            form.soft_skills
+                .slice(0, isExpanded ? undefined : 2)
+              .map((skill, index) => (
+                <span 
+                  key={index}
+                  className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full hover:bg-green-200 transition-colors"
+                >
+                  {skill}
+                </span>
+              ))
           ) : (
             <p className="text-gray-500">No soft skills added yet</p>
           )}
         </div>
       </div>
       
-      <Button 
-        variant="link" 
-        className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
-      >
-        <span>Show all skills</span>
-        <ChevronDown className="ml-1 h-4 w-4" />
-      </Button>
+      {(form.technical_skills.length > 1 || form.soft_skills.length > 1) && (
+        <Button 
+          variant="link" 
+          className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <span>{isExpanded ? 'Show less' : 'Show all skills'}</span>
+          {isExpanded ? (
+            <ChevronUp className="ml-1 h-4 w-4" />
+          ) : (
+            <ChevronDown className="ml-1 h-4 w-4" />
+          )}
+        </Button>
+      )}
 
       <DeleteConfirmationDialog
         isOpen={deleteDialogOpen}
