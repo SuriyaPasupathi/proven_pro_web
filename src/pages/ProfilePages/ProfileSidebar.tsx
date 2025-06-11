@@ -20,7 +20,7 @@ import {
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 
 // Get the base URL from environment variable
-const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
 
 interface ProfileSidebarProps {
   profileData: ProfileData;

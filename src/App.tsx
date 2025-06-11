@@ -31,6 +31,7 @@ import { EditModeProvider } from './context/EditModeContext';
 import Contact from './pages/landingpages/LandingPreview/Contact';
 import ProtectedRoute from './context/ProtectedRoute';
 import ShareProfilePage from './pages/ProfilePages/SharePage/ShareProfilePage';
+import ReviewAll from './components/Review/ReviewAll';
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
 const { theme } = useTheme();
@@ -51,6 +52,10 @@ function App() {
           <BrowserRouter>
             <Toaster richColors position="top-center" />
             <Routes>
+
+              {/* Review Routes */}
+              <Route path="/reviews" element={<ReviewAll />} />
+
               {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/plans" element={<Plans />} />

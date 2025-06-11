@@ -29,34 +29,42 @@ export default function Header() {
           </div>
 
           {/* Desktop Search Bar */}
-          <div className="hidden md:block md:ml-6 w-full max-w-xs">
+          <div className="hidden md:block md:ml-6 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-[#5A8DB8]">
             <Input placeholder="Search..." className="bg-gray-100" />
           </div>
         </div>
 
         {/* Middle: Nav Links (Desktop) */}
         <nav className="hidden md:flex gap-6 mx-auto text-sm font-semibold text-black">
-          <a href="#" className="border-b-2 border-blue-900">Write a Review</a>
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
+          <button
+            type="button"
+            className="border-b-2 border-[#5A8DB8] bg-transparent px-0 py-0 focus:outline-none"
+            onClick={() => navigate('/reviews')}
+          >
+            Write a Review
+          </button>
+          <button
+            type="button"
+            className="bg-transparent px-0 py-0 focus:outline-none"
+            onClick={() => {
+              navigate('/plans');
               const el = document.getElementById("plans-section");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
           >
             Pricing
-          </a>
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
+          </button>
+          <button
+            type="button"
+            className="bg-transparent px-0 py-0 focus:outline-none"
+            onClick={() => {
+              navigate('/contact');
               const el = document.getElementById("contact-section");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
           >
             Contact Us
-          </a>
+          </button>
         </nav>
 
         {/* Right: Auth Buttons (Desktop) */}
@@ -86,9 +94,16 @@ export default function Header() {
       {/* Mobile Dropdown Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t p-4 flex flex-col gap-4 text-sm font-semibold text-black">
-          <a href="#" className="border-b-2 border-blue-900">Write a Review</a>
-          <a
-            href="#"
+          <button
+            type="button"
+            className="border-b-2 border-blue-900 bg-transparent px-0 py-0 focus:outline-none"
+            onClick={() => navigate('/reviews')}
+          >
+            Write a Review
+          </button>
+          <button
+            type="button"
+            className="bg-transparent px-0 py-0 focus:outline-none"
             onClick={(e) => {
               e.preventDefault();
               setIsMenuOpen(false);
@@ -97,9 +112,10 @@ export default function Header() {
             }}
           >
             Pricing
-          </a>
-          <a
-            href="#"
+          </button>
+          <button
+            type="button"
+            className="bg-transparent px-0 py-0 focus:outline-none"
             onClick={(e) => {
               e.preventDefault();
               setIsMenuOpen(false);
@@ -108,7 +124,7 @@ export default function Header() {
             }}
           >
             Contact Us
-          </a>
+          </button>
 
           {/* Auth Buttons Mobile */}
           <Button
