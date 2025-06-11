@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const faqs = [
   {
@@ -32,7 +33,7 @@ const faqs = [
 
 export default function Questions() {
   const [openIndex, setOpenIndex] = useState<number>(0);
-
+  const navigate = useNavigate();
   return (
     <section className="max-w-4xl mx-auto px-3 sm:px-6 md:px-8 py-8 sm:py-12">
       <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 text-center">
@@ -64,7 +65,9 @@ export default function Questions() {
       </div>
 
       <div className="flex justify-center mt-8 sm:mt-12">
-          <Button className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-6 sm:px-8 py-2 rounded-md text-sm sm:text-base">
+          <Button className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-6 sm:px-8 py-2 rounded-md text-sm sm:text-base"
+          onClick={() => navigate('/signup')}
+          >
           Sign up now
         </Button>
       </div>

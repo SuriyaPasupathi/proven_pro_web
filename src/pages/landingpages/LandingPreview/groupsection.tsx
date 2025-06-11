@@ -5,8 +5,10 @@ import {
   BadgeCheckIcon,
   BriefcaseIcon,
   UsersIcon,
-  IdCardIcon
+  IdCardIcon,
+  RocketIcon
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Feature {
   icon: JSX.Element;
@@ -40,9 +42,16 @@ const features: Feature[] = [
     title: "Build a Strong Reputation",
     description: "Consistently positive reviews and a polished profile help you establish yourself as a trusted expert in your field.",
   },
+  {
+    icon: <RocketIcon className="h-8 w-8 mx-auto mb-2 text-white" />,
+    title: "Accelerate Your Career",
+    description: "Access high-quality projects, grow your network, and take your career to the next level with continuous opportunities.",
+  }
+  
 ];
 
 export default function GroupSection() {
+  const navigate = useNavigate();
   return (
     <section className="py-10 sm:py-14 md:py-16 text-center px-2 sm:px-4">
       <h2 className="text-2xl sm:text-3xl font-bold mb-2">Why Choose Us?</h2>
@@ -62,7 +71,9 @@ export default function GroupSection() {
         ))}
       </div>
 
-      <Button variant="outline" className="mt-8 sm:mt-12 border-black text-black hover:bg-gray-100 px-6 py-2 text-sm sm:text-base">
+      <Button variant="outline" className="mt-8 sm:mt-12 bg-[#5A8DB8] hover:bg-[#3C5979] text-white hover:text-white px-6 py-2 text-sm sm:text-base"
+      onClick={() => navigate('/signup')}
+      >
         Sign Up Now
       </Button>
     </section>
