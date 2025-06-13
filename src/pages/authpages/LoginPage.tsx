@@ -135,43 +135,42 @@ export function LoginForm() {
     }
   };
 
-  // Apple Sign In
-  const handleAppleLogin = () => {
-    console.log("Apple Sign In");
-  };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Left: Form */}
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 bg-white px-8 py-12">
+      <div className="flex flex-col justify-center items-center w-full lg:w-1/2 px-4 sm:px-8 lg:px-12 py-8 lg:py-12">
         {/* Logo and Brand */}
         <div className="flex items-center gap-3 mb-8 self-start">
-          <img src={logo} alt="ProvenPro Logo" className="w-12 h-12" />
-          <span className="text-3xl font-bold text-[#5A8DB8]">Proven<span className="font-light">Pro</span></span>
+          <img src={logo} alt="ProvenPro Logo" className="w-10 h-10 lg:w-12 lg:h-12" />
+          <span className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[#3C5979] to-[#2C3E50] bg-clip-text text-transparent">Proven<span className="font-light">Pro</span></span>
         </div>
+
         <div className="w-full max-w-md">
-          <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
-          <p className="mb-8 text-gray-500">Welcome back! Please enter your details.</p>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-[#3C5979] to-[#2C3E50] bg-clip-text text-transparent">Welcome back</h1>
+          <p className="mb-6 sm:mb-8 text-gray-500">Sign in to your account</p>
+
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
             <div>
-              <label className="block mb-1 font-medium">Email</label>
+              <label className="block mb-1.5 text-sm sm:text-base font-medium text-gray-700">Email</label>
               <Input
                 type="email"
                 placeholder="Enter your email"
                 {...form.register('email')}
                 disabled={isLoading}
-                className="w-full"
+                className="w-full h-10 sm:h-11 text-sm sm:text-base"
               />
             </div>
+
             <div>
-              <label className="block mb-1 font-medium">Password</label>
+              <label className="block mb-1.5 text-sm sm:text-base font-medium text-gray-700">Password</label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Password"
+                  placeholder="Enter your password"
                   {...form.register('password')}
                   disabled={isLoading}
-                  className="w-full pr-10"
+                  className="w-full h-10 sm:h-11 text-sm sm:text-base pr-10"
                 />
                 <button
                   type="button"
@@ -182,92 +181,83 @@ export function LoginForm() {
                 </button>
               </div>
             </div>
+
             <div className="flex items-center justify-between">
-              <div className="flex items-center ">
+              <div className="flex items-center space-x-2">
                 <Checkbox
+                  id="remember"
                   checked={!!form.watch('rememberMe')}
                   onCheckedChange={(checked) => form.setValue('rememberMe', !!checked)}
+                  className="h-4 w-4 text-[#3C5979] border-gray-300 rounded focus:ring-[#3C5979]"
                 />
-                <span className="ml-2 text-sm">Remember for 30 days</span>
+                <label htmlFor="remember" className="text-sm text-gray-600">Remember for 30 days</label>
               </div>
               <button
                 type="button"
-                className="text-[#5A8DB8] text-sm hover:underline"
+                className="text-sm text-[#3C5979] hover:underline font-medium"
                 onClick={() => navigate('/forget-password')}
               >
                 Forgot password?
               </button>
             </div>
+
             <Button
               type="submit"
-              className="w-full bg-[#2C3E50] hover:bg-[#34495E] text-white font-semibold"
+              className="w-full h-11 bg-gradient-to-r from-[#3C5979] to-[#2C3E50] hover:from-[#2C3E50] hover:to-[#3C5979] text-white font-semibold transition-all duration-300"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Log in'}
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
-            
+
             {/* OR CONTINUE WITH Separator */}
             <div className="flex items-center my-4">
-                <div className="flex-grow h-px bg-gray-300" />
-                <span className="mx-3 text-gray-400 text-xs font-semibold">OR CONTINUE WITH</span>
-                <div className="flex-grow h-px bg-gray-300" />
-              </div>
+              <div className="flex-grow h-px bg-gray-200" />
+              <span className="mx-4 text-gray-400 text-xs font-medium">OR CONTINUE WITH</span>
+              <div className="flex-grow h-px bg-gray-200" />
+            </div>
 
-               {/* Google & Apple Sign Up */}
-               <div className="w-full flex flex-col md:flex-row gap-4 items-center justify-center">
-                <div className="w-full md:w-1/2 flex items-center justify-center">
-                  <GoogleLogin
-                    onSuccess={handleGoogleLogin}
-                    onError={() => {
-                      console.log("Signup failed");
-                      toast.error("Google signup failed. Please try again.");
-                    }}
-                  />
-                </div>
-                <div className="w-full md:w-1/2 flex items-center justify-center">
-                  <button
-                    type="button"
-                    className="w-full flex items-center justify-center border border-gray-300 rounded-md py-2 px-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold shadow-sm transition"
-                    onClick={handleAppleLogin}
-                    disabled={isLoading}
-                  >
-                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.41-1.09-.47-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.41C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.54.07 2.7.61 3.44 1.57-3.14 1.88-2.29 5.13.22 6.41-.5 1.39-1.15 2.76-2.25 4.05zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                    </svg>
-                    Apple
-                  </button>
-                </div>
-              </div>
+            {/* Social Sign In Button */}
+            <div className="flex items-center justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={() => {
+                  console.log("Login failed");
+                  toast.error("Google login failed. Please try again.");
+                }}
+              />
+            </div>
+
             {error && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-sm text-red-600">{error.message}</p>
               </div>
             )}
           </form>
-          <p className="mt-8 text-center text-sm text-gray-500">
+
+          <p className="mt-6 text-center text-sm text-gray-500">
             Not a member?{' '}
             <button
-              className="text-[#5A8DB8] font-bold hover:underline"
+              className="text-[#3C5979] font-medium hover:underline"
               onClick={() => navigate('/signup')}
             >
               Register
             </button>
           </p>
-          
+
           {/* Privacy Policy & Terms */}
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
               By continuing, you agree to our{' '}
               <button
-                className="text-[#5A8DB8] hover:underline font-bold"
-                onClick={() => navigate('/login')}
+                className="text-[#3C5979] hover:underline font-medium"
+                onClick={() => navigate('/privacy')}
               >
                 Privacy Policy
               </button>
               {' '}and{' '}
               <button
-                className="text-[#5A8DB8] hover:underline font-bold"
-                onClick={() => navigate('/login')}
+                className="text-[#3C5979] hover:underline font-medium"
+                onClick={() => navigate('/terms')}
               >
                 Terms & Conditions
               </button>
@@ -275,13 +265,21 @@ export function LoginForm() {
           </div>
         </div>
       </div>
+
       {/* Right: Hero Image */}
-      <div className="hidden md:flex w-1/2 items-center justify-center bg-[#3C5979]">
-        <img
-          src={herosectionImg}
-          alt="Hero section"
-          className="max-w-[90%] drop-shadow-2xl"
-        />
+      <div className="hidden lg:flex w-1/2 flex-col bg-gradient-to-br from-[#3C5979] to-[#2C3E50] justify-center items-center p-8 lg:p-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+        <div className="relative z-10">
+          <img
+            src={herosectionImg}
+            alt="Hero section"
+            className="max-w-[90%] drop-shadow-2xl transform hover:scale-105 transition-transform duration-500"
+          />
+          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 p-6 text-center">
+            <h3 className="text-white text-xl font-semibold mb-2">Welcome Back!</h3>
+            <p className="text-white/80 text-sm">Sign in to access your account</p>
+          </div>
+        </div>
       </div>
     </div>
   );

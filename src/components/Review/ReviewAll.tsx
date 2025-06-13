@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import FreelancerCard, { Freelancer } from './FreelancerCard';
+import FreelancerCard from './FreelancerCard';
 import Header from '../layout/header';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { searchUsers } from '../../store/Services/CreateProfileService';
