@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Loader2, Trash2, ChevronUp } from 'lucide-react';
+import { ChevronDown, Pencil, Loader2, Trash2, ChevronUp, Wrench, Plus, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -201,46 +201,50 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   };
 
   return (
-    <div className="border-b border-[#5A8DB8] pb-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-[#5A8DB8]">Skills</h2>
+    <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
+      <div className="flex justify-between items-center mb-4 xs:mb-6">
+        <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
+          <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
+            <Wrench className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
+          </span>
+          Skills
+        </h2>
         {isEditMode && (
           <div className="flex gap-2">
             <Button 
               variant="ghost" 
-              size="icon"
-              className="h-8 w-8 text-gray-500 hover:text-blue-600"
+              className="p-1 xs:p-1.5 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
               onClick={() => setIsDialogOpen(true)}
             >
-              <Pencil className="h-4 w-4" />
+              <Plus className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
         )}
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white to-gray-50/50">
           <DialogHeader>
-            <DialogTitle>Edit Skills</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-[#5A8DB8]">Edit Skills</DialogTitle>
           </DialogHeader>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block font-medium mb-2">Skills Description</label>
+              <label className="block font-medium mb-2 text-gray-700">Skills Description</label>
               <Textarea
                 value={form.skills_description}
                 onChange={(e) => setForm(prev => ({ ...prev, skills_description: e.target.value }))}
                 placeholder="Describe your skills and expertise..."
-                className="bg-gray-50 min-h-[100px]"
+                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 min-h-[100px]"
               />
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block font-medium mb-2">Technical Skills</label>
+                <label className="block font-medium mb-2 text-gray-700">Technical Skills</label>
                 <input
                   type="text"
-                  className="w-full p-2 border rounded-md bg-gray-50"
+                  className="w-full p-2 border border-[#5A8DB8]/20 rounded-md bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-200"
                   placeholder="Add technical skill"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -255,7 +259,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.technical_skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
                       <span>{skill}</span>
                       <Button
                         variant="ghost"
@@ -264,7 +268,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                         onClick={() => handleDeleteClick(skill, 'technical_skills')}
                         disabled={isLoading}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <X className="h-3 w-3" />
                       </Button>
                     </div>
                   ))}
@@ -272,10 +276,10 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
               </div>
 
               <div>
-                <label className="block font-medium mb-2">Soft Skills</label>
+                <label className="block font-medium mb-2 text-gray-700">Soft Skills</label>
                 <input
                   type="text"
-                  className="w-full p-2 border rounded-md bg-gray-50"
+                  className="w-full p-2 border border-[#5A8DB8]/20 rounded-md bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-200"
                   placeholder="Add soft skill"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -290,7 +294,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.soft_skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-green-50 to-green-100 text-green-800 px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
                       <span>{skill}</span>
                       <Button
                         variant="ghost"
@@ -299,7 +303,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                         onClick={() => handleDeleteClick(skill, 'soft_skills')}
                         disabled={isLoading}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <X className="h-3 w-3" />
                       </Button>
                     </div>
                   ))}
@@ -313,12 +317,13 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isLoading}
+                className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -336,60 +341,78 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       </Dialog>
 
       {form.skills_description && (
-        <p className="text-[#5A8DB8] mb-6 font-bold">Skills Description : <span className="text-gray-600 font-semibold">{form.skills_description}</span></p>
+        <div className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-lg p-4 xs:p-6 border border-[#5A8DB8]/10 mb-6">
+          <p className="text-[#5A8DB8] font-bold">Skills Description: <span className="text-gray-600 font-semibold">{form.skills_description}</span></p>
+        </div>
       )}
 
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3">Technical Skills</h3>
-        <div className="flex flex-wrap gap-2">
-          {form.technical_skills.length > 0 ? (
-            form.technical_skills
-              .slice(0, isExpanded ? undefined : 2)
-              .map((skill, index) => (
-                <span 
-                  key={index}
-                  className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
-                >
-                  {skill}
-                </span>
-              ))
-          ) : (
-            <p className="text-gray-500">No technical skills added yet</p>
-          )}
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3">Soft Skills</h3>
-        <div className="flex flex-wrap gap-2">
-          {form.soft_skills.length > 0 ? (
-            form.soft_skills
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-[#5A8DB8]">
+            <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 rounded-lg shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </span>
+            Technical Skills
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {form.technical_skills.length > 0 ? (
+              form.technical_skills
                 .slice(0, isExpanded ? undefined : 2)
-              .map((skill, index) => (
-                <span 
-                  key={index}
-                  className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full hover:bg-green-200 transition-colors"
-                >
-                  {skill}
-                </span>
-              ))
-          ) : (
-            <p className="text-gray-500">No soft skills added yet</p>
-          )}
+                .map((skill, index) => (
+                  <span 
+                    key={index}
+                    className="text-sm bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-all duration-200"
+                  >
+                    {skill}
+                  </span>
+                ))
+            ) : (
+              <p className="text-gray-500">No technical skills added yet</p>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-[#5A8DB8]">
+            <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 rounded-lg shadow-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </span>
+            Soft Skills
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {form.soft_skills.length > 0 ? (
+              form.soft_skills
+                .slice(0, isExpanded ? undefined : 2)
+                .map((skill, index) => (
+                  <span 
+                    key={index}
+                    className="text-sm bg-gradient-to-r from-green-50 to-green-100 text-green-800 px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-all duration-200"
+                  >
+                    {skill}
+                  </span>
+                ))
+            ) : (
+              <p className="text-gray-500">No soft skills added yet</p>
+            )}
+          </div>
         </div>
       </div>
       
       {(form.technical_skills.length > 1 || form.soft_skills.length > 1) && (
         <Button 
           variant="link" 
-          className="mt-4 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
+          className="mt-4 xs:mt-6 text-[#5A8DB8] hover:text-[#3C5979] flex items-center p-0 group transition-all duration-200"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <span>{isExpanded ? 'Show less' : 'Show all skills'}</span>
+          <span className="text-sm group-hover:underline">{isExpanded ? 'Show less' : 'Show all skills'}</span>
           {isExpanded ? (
-            <ChevronUp className="ml-1 h-4 w-4" />
+            <ChevronUp className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
           ) : (
-            <ChevronDown className="ml-1 h-4 w-4" />
+            <ChevronDown className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
           )}
         </Button>
       )}

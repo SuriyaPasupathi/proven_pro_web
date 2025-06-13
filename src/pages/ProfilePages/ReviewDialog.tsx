@@ -88,25 +88,28 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-white to-gray-50/50">
         <DialogHeader>
-          <DialogTitle>Write a Review</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-[#5A8DB8]">Write a Review</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Your Name</label>
+            <label className="text-sm font-medium text-gray-700">Your Name</label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
-              className={errors.name ? "border-red-500" : ""}
+              className={cn(
+                "border-[#5A8DB8]/20 bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-300",
+                errors.name ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""
+              )}
               disabled={isSubmitting}
             />
             {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium">Rating</label>
+            <label className="text-sm font-medium text-gray-700">Rating</label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -115,15 +118,15 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                   onClick={() => setRating(star)}
-                  className="focus:outline-none"
+                  className="focus:outline-none transform hover:scale-110 transition-transform duration-200"
                   disabled={isSubmitting}
                 >
                   <Star
                     className={cn(
-                      "h-8 w-8 transition-colors",
+                      "h-8 w-8 transition-all duration-300",
                       (hoverRating >= star || rating >= star)
                         ? "fill-yellow-400 text-yellow-400"
-                        : "text-gray-300"
+                        : "text-gray-300 hover:text-yellow-300"
                     )}
                   />
                 </button>
@@ -133,12 +136,15 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Your Comments</label>
+            <label className="text-sm font-medium text-gray-700">Your Comments</label>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Write your review here..."
-              className={cn("min-h-[100px]", errors.content ? "border-red-500" : "")}
+              className={cn(
+                "min-h-[100px] border-[#5A8DB8]/20 bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-300",
+                errors.content ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""
+              )}
               disabled={isSubmitting}
             />
             {errors.content && <p className="text-sm text-red-500">{errors.content}</p>}
@@ -153,12 +159,13 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
             variant="outline" 
             onClick={onClose}
             disabled={isSubmitting}
+            className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300"
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit}
-            className="bg-[#70a4d8] hover:bg-[#3C5979] text-white"
+            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition-all duration-300"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Submitting...' : 'Submit Review'}

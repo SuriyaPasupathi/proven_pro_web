@@ -99,43 +99,42 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
   };
 
   return (
-    <header className="border-b bg-gray-100 sticky top-0 z-50 w-full">
+    <header className="border-b border-[#5A8DB8]/10 bg-white/95 backdrop-blur-sm sticky top-0 z-50 w-full shadow-sm">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center w-full md:w-auto gap-4">
             {/* Logo Section */}
-            <div className="flex items-center gap-2 shrink-0 cursor-pointer" onClick={() => navigate('/')}>
+            <div className="flex items-center gap-2 shrink-0 cursor-pointer transition-all duration-200 hover:opacity-80" onClick={() => navigate('/')}>
               <img src={logo} alt="ProvenPro Logo" className="w-8 h-8" />
-              <span className="text-lg font-semibold text-blue-900">
+              <span className="text-lg font-semibold bg-gradient-to-r from-[#5A8DB8] via-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent">
                 Proven<span className="font-light">Pro</span>
               </span>
             </div>
 
             {/* Search Bar - only shown on medium and up */}
             <div className="hidden md:block w-full max-w-sm lg:max-w-md xl:max-w-lg ml-6">
-              <Input placeholder="Search..." className="bg-gray-100" />
+              <div className="relative group">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#5A8DB8] group-hover:text-[#3C5979] transition-colors duration-200" />
+                <Input 
+                  placeholder="Search..." 
+                  className="pl-9 bg-white/80 backdrop-blur-sm border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-200 group-hover:bg-white" 
+                />
+              </div>
             </div>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4">
             <Button 
-              variant="link" 
-              className="text-[#70a4d8] hover:text-[#597999]"
-              onClick={() => setIsReviewDialogOpen(true)}
-            >
-              Write a Review
-            </Button>
-            <Button 
-              variant="link" 
-              className="text-[#70a4d8] hover:text-[#597999]"
+              variant="ghost" 
+              className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
               onClick={() => navigate('/plans')}
             >
               Pricing
             </Button>
             <Button 
-              variant="link" 
-              className="text-[#70a4d8] hover:text-[#597999]"
+              variant="ghost" 
+              className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
               onClick={() => navigate('/contact')}
             >
               Contact Us
@@ -146,23 +145,23 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             <div className="relative" ref={dropdownRef}>
               <Button
                 variant="ghost"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-[#5A8DB8]/10 transition-all duration-200"
                 onClick={() => setIsAccountOpen(!isAccountOpen)}
               >
                 {profileData?.profile_pic ? (
                   <img 
                     src={profileData.profile_pic} 
                     alt={`${profileData.first_name} ${profileData.last_name}`}
-                    className="h-8 w-8 rounded-full object-cover"
+                    className="h-8 w-8 rounded-full object-cover ring-2 ring-[#5A8DB8]/20 hover:ring-[#5A8DB8]/40 transition-all duration-200"
                   />
                 ) : (
-                  <div className="h-8 w-8 rounded-full bg-[#88adc8] flex items-center justify-center text-white">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] flex items-center justify-center text-white ring-2 ring-[#5A8DB8]/20 hover:ring-[#5A8DB8]/40 transition-all duration-200">
                     <span className="text-sm font-medium">{getUserInitials()}</span>
                   </div>
                 )}
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-4 w-4 text-[#5A8DB8] transition-transform duration-200" style={{ transform: isAccountOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
               </Button>
-                {isAccountOpen && <AccountDropdown closeDropdown={() => setIsAccountOpen(false)} />}
+              {isAccountOpen && <AccountDropdown closeDropdown={() => setIsAccountOpen(false)} />}
             </div>
           </nav>
 
@@ -171,7 +170,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-gray-600"
+              className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
               onClick={() => setIsSearchVisible(!isSearchVisible)}
               aria-label="Search"
             >
@@ -180,7 +179,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-gray-600"
+              className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -191,13 +190,13 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
 
         {/* Mobile Search - Slides down when active */}
         {isSearchVisible && (
-          <div className="md:hidden px-4 py-3 border-t">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <div className="md:hidden px-4 py-3 border-t border-[#5A8DB8]/10 bg-white/95 backdrop-blur-sm">
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#5A8DB8] group-hover:text-[#3C5979] transition-colors duration-200" />
               <Input
                 type="search"
                 placeholder="Search..."
-                className="pl-9 bg-gray-100 border-gray-200 w-full"
+                className="pl-9 bg-white/80 backdrop-blur-sm border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-200 w-full group-hover:bg-white"
                 autoFocus
               />
             </div>
@@ -207,12 +206,12 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t shadow-sm">
+        <div className="md:hidden bg-white/95 backdrop-blur-sm border-t border-[#5A8DB8]/10 shadow-sm">
           <div className="max-w-screen-xl mx-auto px-4 py-4 space-y-4">
             <nav className="flex flex-col space-y-2">
               <Button 
                 variant="ghost" 
-                className="text-left text-gray-800 hover:text-blue-700 justify-start"
+                className="text-left text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 justify-start transition-all duration-200"
                 onClick={() => {
                   setIsReviewDialogOpen(true);
                   setIsMenuOpen(false);
@@ -222,7 +221,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-left text-gray-800 hover:text-blue-700 justify-start"
+                className="text-left text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 justify-start transition-all duration-200"
                 onClick={() => {
                   navigate('/plans');
                   setIsMenuOpen(false);
@@ -232,7 +231,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-left text-gray-800 hover:text-blue-700 justify-start"
+                className="text-left text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 justify-start transition-all duration-200"
                 onClick={() => {
                   navigate('/contact');
                   setIsMenuOpen(false);
@@ -242,9 +241,9 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
               </Button>
               
               {/* Mobile Account Section */}
-              <div className="pt-2 border-t">
+              <div className="pt-2 border-t border-[#5A8DB8]/10">
                 <div className="px-4 py-2">
-                  <div className="font-medium">
+                  <div className="font-medium text-[#5A8DB8]">
                     {profileData?.first_name && profileData?.last_name 
                       ? `${profileData.first_name} ${profileData.last_name}`
                       : 'User'}
@@ -253,7 +252,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                 </div>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
                   onClick={() => {
                     setIsMenuOpen(false);
                     setIsEditMode(false);
@@ -264,7 +263,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
                   onClick={() => {
                     setIsMenuOpen(false);
                     setIsEditMode(true);
@@ -277,7 +276,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
                   onClick={() => {
                     navigate('/profile/verification');
                     setIsMenuOpen(false);
@@ -287,7 +286,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
                   onClick={() => {
                     navigate('/profile/membership-plans');
                     setIsMenuOpen(false);
@@ -297,7 +296,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-gray-800 hover:text-blue-700"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
                   onClick={() => {
                     navigate('/profile/account-settings');
                     setIsMenuOpen(false);
@@ -307,7 +306,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-red-600 hover:text-red-700"
+                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200"
                   onClick={() => {
                     handleLogout();
                     setIsMenuOpen(false);

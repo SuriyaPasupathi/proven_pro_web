@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp, Building2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -317,14 +317,19 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
 
   if (!experiences.length) {
     return (
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#5A8DB8]">Experience</h2>
+      <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
+        <div className="flex justify-between items-center mb-4 xs:mb-6">
+          <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
+            <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
+              <Building2 className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
+            </span>
+            Experience
+          </h2>
           {isEditMode && (
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
-                className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+                className="p-1 xs:p-1.5 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
                 onClick={() => {
                   setEditingExperience(null);
                   setForm({
@@ -337,25 +342,32 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                   setIsDialogOpen(true);
                 }}
               >
-                <Plus className="w-5 h-5 text-[#5A8DB8] hover:text-[#3C5979]" />
+                <Plus className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
               </Button>
             </div>
           )}
         </div>
-        <p className="text-gray-600">No experience information available.</p>
+        <div className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-lg p-4 xs:p-6 border border-[#5A8DB8]/10">
+          <p className="text-sm xs:text-base text-gray-600">No experience information available.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="border-b border-[#5A8DB8] pb-6">
-        <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-[#5A8DB8]">Experience</h2>
+    <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
+      <div className="flex justify-between items-center mb-4 xs:mb-6">
+        <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
+          <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
+            <Building2 className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
+          </span>
+          Experience
+        </h2>
         {isEditMode && (
           <div className="flex gap-2">
             <Button 
               variant="ghost" 
-              className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+              className="p-1 xs:p-1.5 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
               onClick={() => {
                 setEditingExperience(null);
                 setForm({
@@ -368,22 +380,22 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 setIsDialogOpen(true);
               }}
             >
-              <Plus className="w-5 h-5 text-[#5A8DB8] hover:text-[#3C5979]" />
+              <Plus className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
         )}
       </div>
       
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white to-gray-50/50">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-xl font-bold text-[#5A8DB8]">
               {editingExperience ? 'Edit Experience' : 'Add Experience'}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="company_name" className="block font-medium mb-1 text-sm">
+              <label htmlFor="company_name" className="block font-medium mb-1.5 text-sm text-gray-700">
                 Company Name
               </label>
               <Input
@@ -392,13 +404,13 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 placeholder="Enter company name"
                 value={form.company_name}
                 onChange={handleChange}
-                className="bg-gray-50"
+                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="position" className="block font-medium mb-1 text-sm">
+              <label htmlFor="position" className="block font-medium mb-1.5 text-sm text-gray-700">
                 Position
               </label>
               <Input
@@ -407,14 +419,14 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 placeholder="Enter your job title"
                 value={form.position}
                 onChange={handleChange}
-                className="bg-gray-50"
+                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="experience_start_date" className="block font-medium mb-1 text-sm">
+                <label htmlFor="experience_start_date" className="block font-medium mb-1.5 text-sm text-gray-700">
                   Start Date
                 </label>
                 <Input
@@ -423,12 +435,12 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                   type="date"
                   value={form.experience_start_date}
                   onChange={handleChange}
-                  className="bg-gray-50"
+                  className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="experience_end_date" className="block font-medium mb-1 text-sm">
+                <label htmlFor="experience_end_date" className="block font-medium mb-1.5 text-sm text-gray-700">
                   End Date
                 </label>
                 <Input
@@ -437,14 +449,14 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                   type="date"
                   value={form.experience_end_date}
                   onChange={handleChange}
-                  className="bg-gray-50"
+                  className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="key_responsibilities" className="block font-medium mb-1 text-sm">
+              <label htmlFor="key_responsibilities" className="block font-medium mb-1.5 text-sm text-gray-700">
                 Key Responsibilities
               </label>
               <Textarea
@@ -453,7 +465,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 placeholder="Describe your key responsibilities and achievements..."
                 value={form.key_responsibilities}
                 onChange={handleChange}
-                className="bg-gray-50 min-h-[120px]"
+                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 min-h-[120px]"
                 required
               />
             </div>
@@ -464,12 +476,13 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isLoading}
+                className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -486,60 +499,76 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
         </DialogContent>
       </Dialog>
       
-{/* Experience Section */}
-      <div className="space-y-6">
-        {localExperiences
-          .slice(0, isExpanded ? undefined : 2)
-          .map((experience, index) => (
-          <div key={index} className="relative p-4 border rounded-lg bg-white">
-            <div className="flex justify-between items-start">
-              <div className="space-y-2 flex-grow">
-                <h3 className="font-semibold text-lg text-[#5A8DB8]">Position : <span className="text-gray-600 font-semibold">{experience.position}</span></h3>
-                <p className="text-sm text-[#5A8DB8] font-bold">Company Name : <span className="text-gray-600 font-semibold">{experience.company_name}</span></p>
-                <div className="flex gap-4 text-sm text-gray-500">
-                  <p className="font-bold"> Start Date : <span className="text-gray-600 font-semibold">{experience.experience_start_date}</span></p>
-                  <p className="font-bold">End Date : <span className="text-gray-600 font-semibold">{experience.experience_end_date}</span></p>
-                </div>
-                <p className="text-sm text-gray-600 font-bold">Key Responsibilities : <span className="text-gray-600 font-semibold">{experience.key_responsibilities}</span></p>
-              </div>
-              {isEditMode && (
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-gray-500 hover:text-blue-600"
-                    onClick={() => handleEdit(experience)}
-                    disabled={isLoading}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-gray-500 hover:text-red-600"
-                    onClick={() => handleDeleteClick(experience)}
-                    disabled={isLoading}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
+      {/* Experience Section */}
+      <div className="space-y-4 xs:space-y-6">
+        {localExperiences.length === 0 ? (
+          <div className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-lg p-4 xs:p-6 border border-[#5A8DB8]/10">
+            <p className="text-sm xs:text-base text-gray-600">No experience information available.</p>
           </div>
-        ))}
+        ) : (
+          localExperiences
+            .slice(0, isExpanded ? undefined : 2)
+            .map((experience, index) => (
+              <div key={index} className="relative p-4 xs:p-6 border border-[#5A8DB8]/10 rounded-lg bg-gradient-to-br from-[#5A8DB8]/5 to-white hover:shadow-lg transition-all duration-300">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="space-y-2 flex-grow">
+                    <h3 className="text-base xs:text-lg text-[#5A8DB8] font-bold">
+                      Position: <span className="text-gray-700 font-semibold">{experience.position}</span>
+                    </h3>
+                    <p className="text-sm xs:text-base font-bold text-[#5A8DB8]">
+                      Company: <span className="text-gray-700 font-semibold">{experience.company_name}</span>
+                    </p>
+                    <div className="flex flex-col xs:flex-row xs:gap-4 text-sm text-gray-600">
+                      <p className="font-bold">
+                        Start Date: <span className="text-gray-700 font-semibold">{experience.experience_start_date}</span>
+                      </p>
+                      <p className="font-bold">
+                        End Date: <span className="text-gray-700 font-semibold">{experience.experience_end_date}</span>
+                      </p>
+                    </div>
+                    <p className="text-sm xs:text-base font-bold text-[#5A8DB8]">
+                      Key Responsibilities: <span className="text-gray-700 font-semibold">{experience.key_responsibilities}</span>
+                    </p>
+                  </div>
+                  {isEditMode && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 xs:h-8 xs:w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-200"
+                        onClick={() => handleEdit(experience)}
+                        disabled={isLoading}
+                      >
+                        <Pencil className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 xs:h-8 xs:w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
+                        onClick={() => handleDeleteClick(experience)}
+                        disabled={isLoading}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+        )}
       </div>
       
       {localExperiences.length > 2 && (
         <Button 
           variant="link" 
-          className="mt-6 text-[#70a4d8] hover:text-[#3C5979] flex items-center p-0"
+          className="mt-4 xs:mt-6 text-[#5A8DB8] hover:text-[#3C5979] flex items-center p-0 group transition-all duration-200"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <span>{isExpanded ? 'Show less' : 'Show all experiences'}</span>
+          <span className="text-sm group-hover:underline">{isExpanded ? 'Show less' : 'Show all experiences'}</span>
           {isExpanded ? (
-            <ChevronUp className="ml-1 h-4 w-4" />
+            <ChevronUp className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
           ) : (
-            <ChevronDown className="ml-1 h-4 w-4" />
+            <ChevronDown className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
           )}
         </Button>
       )}

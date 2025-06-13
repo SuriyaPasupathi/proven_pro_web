@@ -71,18 +71,20 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
   const userEmail = localStorage.getItem('user_email') || '';
 
   return (
-    <div className="absolute right-0 mt-2 w-64 bg-white border rounded-md shadow-lg z-50 overflow-hidden transform origin-top-right transition-all duration-200 ease-in-out">
-      <div className="p-4 border-b">
-        <div className="font-medium truncate">
+    <div className="absolute right-0 mt-2 w-64 bg-gradient-to-br from-white to-gray-50/50 border border-[#5A8DB8]/10 rounded-lg shadow-lg hover:shadow-xl z-50 overflow-hidden transform origin-top-right transition-all duration-300 ease-in-out">
+      <div className="p-4 border-b border-[#5A8DB8]/10">
+        <div className="font-medium truncate text-[#5A8DB8]">
           {userData?.first_name && userData?.last_name 
             ? `${userData.first_name} ${userData.last_name}`
             : 'User'}
         </div>
-        <div className="text-sm text-gray-500 truncate">{userEmail}</div>
+        <div className="text-sm text-gray-600 truncate">{userEmail}</div>
       </div>
       
       <div className="py-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-        <Button variant="ghost" className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
           onClick={() => {
             setIsEditMode(false);
             navigate(`/profile/${userData.id}`);
@@ -92,7 +94,9 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
           <User className="mr-2 h-4 w-4 shrink-0" />
           <span className="truncate">My Profile</span>
         </Button>
-        <Button variant="ghost" className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
           onClick={() => {
             handleEditProfile();
             closeDropdown();
@@ -103,7 +107,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
         </Button>
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
+          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
           onClick={() => {
             navigate(`/profile/verification/${userData.id}`);
             closeDropdown();
@@ -114,7 +118,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
         </Button>
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
+          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
           onClick={() => {
             navigate(`/profile/membership-plans/${userData.id}`);
             closeDropdown();
@@ -125,7 +129,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50"
+          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
           onClick={() => {
             navigate(`/profile/account-settings/${userData.id}`);
             closeDropdown();
@@ -136,10 +140,10 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
         </Button>
       </div>
       
-      <div className="border-t py-2">
+      <div className="border-t border-[#5A8DB8]/10 py-2">
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-4 py-2 text-sm hover:bg-gray-50 text-red-600 hover:text-red-700"
+          className="w-full justify-start px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50/50 transition-all duration-300"
           onClick={() => {
             handleLogout();
             closeDropdown();

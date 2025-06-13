@@ -118,73 +118,73 @@ const AccountSettings: React.FC = () => {
       <Navbar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
       <div className="w-full px-4 sm:px-6 lg:px-8 pb-8 sm:pb-16">
         <div className="max-w-4xl mx-auto text-center mt-6 sm:mt-8 md:mt-10 lg:mt-12 mb-4 sm:mb-6 md:mb-8 lg:mb-10">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-[#5A8DB8] font-bold mb-2 sm:mb-3 md:mb-4">Account Settings</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent font-bold mb-2 sm:mb-3 md:mb-4">Account Settings</h1>
           <p className="text-sm sm:text-base md:text-lg text-gray-600 px-2 sm:px-4 md:px-6 font-semibold">Manage your account preferences and security settings</p>
         </div>
 
         <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
           {/* Email Section */}
-            <div className="bg-gray-50 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8 border border-[#5A8DB8]/10">
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 p-4 sm:p-6 md:p-8 border border-[#5A8DB8]/10">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <h2 className="font-semibold text-base sm:text-lg md:text-xl text-[#5A8DB8]">Email address</h2>
               <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
                 <DialogTrigger asChild>
-                  <button className="text-[#5A8DB8] hover:text-[#3C5979] text-sm sm:text-base font-medium transition-colors duration-300" onClick={() => setShowEmailDialog(true)}>
+                  <button className="text-[#5A8DB8] hover:text-[#3C5979] text-sm sm:text-base font-medium transition-all duration-300 hover:bg-[#5A8DB8]/5 px-3 py-1 rounded-md" onClick={() => setShowEmailDialog(true)}>
                     change
                   </button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] p-3 sm:p-4 md:p-6">
+                <DialogContent className="sm:max-w-[425px] p-3 sm:p-4 md:p-6 bg-gradient-to-br from-white to-gray-50/50">
                   <DialogHeader>
                     <DialogTitle className="text-base sm:text-lg md:text-xl text-[#5A8DB8]">Change Email</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleEmailChange} className="space-y-4">
                     <div>
-                      <Label htmlFor="new-email" className="text-sm sm:text-base">New Email</Label>
+                      <Label htmlFor="new-email" className="text-sm sm:text-base text-gray-700">New Email</Label>
                       <Input
                         id="new-email"
                         type="email"
                         value={newEmail}
                         onChange={e => setNewEmail(e.target.value)}
-                        className="mt-1 text-sm sm:text-base"
+                        className="mt-1 text-sm sm:text-base border-[#5A8DB8]/20 bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-300"
                         required
                       />
                     </div>
                     {emailError && <div className="text-red-500 text-xs sm:text-sm">{emailError}</div>}
                     {emailSuccess && <div className="text-green-600 text-xs sm:text-sm">{emailSuccess}</div>}
                     <DialogFooter className="gap-2 sm:gap-4">
-                      <Button type="submit" className='bg-[#5A8DB8] hover:bg-[#3C5979] text-white text-xs sm:text-sm md:text-base' disabled={emailChangeLoading}>
+                      <Button type="submit" className='bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white text-xs sm:text-sm md:text-base transition-all duration-300' disabled={emailChangeLoading}>
                         {emailChangeLoading ? 'Sending OTP...' : 'Send OTP'}
                       </Button>
                       <DialogClose asChild>
-                        <Button type="button" variant="outline" className="text-xs sm:text-sm md:text-base">Cancel</Button>
+                        <Button type="button" variant="outline" className="text-xs sm:text-sm md:text-base border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300">Cancel</Button>
                       </DialogClose>
                     </DialogFooter>
                   </form>
                 </DialogContent>
               </Dialog>
             </div>
-            <div className="text-sm sm:text-base">Your email address is <span className="font-semibold">{email}</span></div>
+            <div className="text-sm sm:text-base text-gray-600">Your email address is <span className="font-semibold text-[#5A8DB8]">{email}</span></div>
           </div>
 
           {/* Password Section */}
-          <div className="bg-gray-50 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 sm:p-6 md:p-8 border border-[#5A8DB8]/10">
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 p-4 sm:p-6 md:p-8 border border-[#5A8DB8]/10">
             <h2 className="font-semibold text-base sm:text-lg md:text-xl text-[#5A8DB8] mb-4 sm:mb-6">Password</h2>
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="current-password" className="text-sm sm:text-base">Current Password</Label>
+                  <Label htmlFor="current-password" className="text-sm sm:text-base text-gray-700">Current Password</Label>
                   <div className="relative mt-1">
                     <Input
                       id="current-password"
                       type={showCurrentPassword ? 'text' : 'password'}
                       value={currentPassword}
                       onChange={e => setCurrentPassword(e.target.value)}
-                      className="text-sm sm:text-base"
+                      className="text-sm sm:text-base border-[#5A8DB8]/20 bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-300"
                       required
                     />
                     <button
                       type="button"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#5A8DB8] transition-colors duration-300"
                       onClick={() => setShowCurrentPassword(v => !v)}
                       tabIndex={-1}
                     >
@@ -193,19 +193,19 @@ const AccountSettings: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="new-password" className="text-sm sm:text-base">New Password</Label>
+                  <Label htmlFor="new-password" className="text-sm sm:text-base text-gray-700">New Password</Label>
                   <div className="relative mt-1">
                     <Input
                       id="new-password"
                       type={showNewPassword ? 'text' : 'password'}
                       value={newPassword}
                       onChange={e => setNewPassword(e.target.value)}
-                      className="text-sm sm:text-base"
+                      className="text-sm sm:text-base border-[#5A8DB8]/20 bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-300"
                       required
                     />
                     <button
                       type="button"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#5A8DB8] transition-colors duration-300"
                       onClick={() => setShowNewPassword(v => !v)}
                       tabIndex={-1}
                     >
@@ -215,7 +215,7 @@ const AccountSettings: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center justify-end">
-                <Button type="submit" className='bg-[#5A8DB8] hover:bg-[#3C5979] text-white text-xs sm:text-sm md:text-base' disabled={passwordChangeLoading}>
+                <Button type="submit" className='bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white text-xs sm:text-sm md:text-base transition-all duration-300' disabled={passwordChangeLoading}>
                   {passwordChangeLoading ? 'Changing...' : 'Change Password'}
                 </Button>
               </div>
@@ -228,13 +228,13 @@ const AccountSettings: React.FC = () => {
 
       {/* OTP Verification Dialog */}
       <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
-        <DialogContent className="sm:max-w-[425px] p-3 sm:p-4 md:p-6">
+        <DialogContent className="sm:max-w-[425px] p-3 sm:p-4 md:p-6 bg-gradient-to-br from-white to-gray-50/50">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg md:text-xl text-[#5A8DB8]">Verify OTP</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleOtpVerification} className="space-y-4">
             <div>
-              <Label htmlFor="otp" className="text-sm sm:text-base">Enter OTP</Label>
+              <Label htmlFor="otp" className="text-sm sm:text-base text-gray-700">Enter OTP</Label>
               <Input
                 id="otp"
                 type="text"
@@ -242,7 +242,7 @@ const AccountSettings: React.FC = () => {
                 onChange={e => setOtp(e.target.value)}
                 placeholder="Enter 6-digit OTP"
                 maxLength={6}
-                className="mt-1 text-sm sm:text-base"
+                className="mt-1 text-sm sm:text-base border-[#5A8DB8]/20 bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-300"
                 required
               />
               {otpSent && (
@@ -256,17 +256,17 @@ const AccountSettings: React.FC = () => {
               <button
                 type="button"
                 onClick={handleResendOtp}
-                className="text-[#5A8DB8] hover:text-[#3C5979] text-xs sm:text-sm transition-colors duration-300"
+                className="text-[#5A8DB8] hover:text-[#3C5979] text-xs sm:text-sm transition-all duration-300 hover:bg-[#5A8DB8]/5 px-3 py-1 rounded-md"
                 disabled={otpVerificationLoading}
               >
                 Resend OTP
               </button>
               <div className="flex gap-2 sm:gap-4">
-                <Button type="submit" className='bg-[#5A8DB8] hover:bg-[#3C5979] text-white text-xs sm:text-sm md:text-base' disabled={otpVerificationLoading}>
+                <Button type="submit" className='bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white text-xs sm:text-sm md:text-base transition-all duration-300' disabled={otpVerificationLoading}>
                   {otpVerificationLoading ? 'Verifying...' : 'Verify'}
                 </Button>
                 <DialogClose asChild>
-                  <Button type="button" variant="outline" className="text-xs sm:text-sm md:text-base">Cancel</Button>
+                  <Button type="button" variant="outline" className="text-xs sm:text-sm md:text-base border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300">Cancel</Button>
                 </DialogClose>
               </div>
             </div>

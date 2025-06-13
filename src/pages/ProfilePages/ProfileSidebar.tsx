@@ -660,7 +660,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   <img 
                     src={getFullImageUrl(profileData.profile_pic_url || profileData.profile_pic)}
                     alt={`${profileData.first_name || ''} ${profileData.last_name || ''}`}
-                    className="w-full aspect-square object-cover"
+                    className="w-full aspect-square object-cover hover:scale-[1.02] transition-transform duration-300"
                     onError={() => setImageError(true)}
                   />
                   {isEditMode && (
@@ -668,7 +668,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        className="h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-blue-600"
+                        className="h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-[#5A8DB8] transition-colors duration-300"
                         onClick={() => setIsImageDialogOpen(true)}
                       >
                         <Pencil className="h-4 w-4" />
@@ -676,7 +676,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        className="h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-red-600"
+                        className="h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-red-600 transition-colors duration-300"
                         onClick={() => handleDeleteClick('image')}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -685,15 +685,15 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   )}
                 </div>
               ) : (
-                <div className="relative w-full aspect-square bg-gray-200 flex items-center justify-center">
-                  <span className="text-2xl font-semibold text-gray-600">
+                <div className="relative w-full aspect-square bg-gradient-to-br from-gray-200 to-blue-900 flex items-center justify-center">
+                  <span className="text-2xl font-semibold text-white">
                     {`${profileData.first_name?.[0] || ''}${profileData.last_name?.[0] || ''}`.toUpperCase() || '?'}
                   </span>
                   {isEditMode && (
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-blue-600"
+                      className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-[#5A8DB8] transition-colors duration-300"
                       onClick={() => setIsImageDialogOpen(true)}
                     >
                       <Pencil className="h-4 w-4" />
@@ -706,22 +706,22 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
             <div className="mt-4 text-center mb-6">
               <div className="flex justify-center items-center gap-2">
-                <h2 className="text-xl font-bold">{profileData.first_name} {profileData.last_name}</h2>
+                <h2 className="text-xl font-bold text-[#5A8DB8]">{profileData.first_name} {profileData.last_name}</h2>
                 {isEditMode && (
                   <Button 
                     variant="ghost" 
-                    className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+                    className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10 transition-colors duration-300"
                     onClick={() => setIsProfileDialogOpen(true)}
                   >
                     <Pencil className="w-4 h-4" />
                   </Button>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground">{profileData.profile_mail}</p>
+              <p className="text-sm text-gray-600">{profileData.profile_mail}</p>
             </div>
 
-            <Card className="p-4 bg-gray-50 border-gray-200">
-              <p className="text-sm italic text-center">
+            <Card className="p-4 bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/10 hover:shadow-md transition-shadow duration-300">
+              <p className="text-sm italic text-gray-700">
                 {profileData.bio || "No bio available"}
               </p>
             </Card>
@@ -745,7 +745,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-8 w-8 text-gray-500 hover:text-blue-600"
+                      className="h-8 w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
                       onClick={() => setIsVideoDialogOpen(true)}
                     >
                       <Pencil className="h-4 w-4" />
@@ -753,7 +753,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-8 w-8 text-gray-500 hover:text-red-600"
+                      className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-300"
                       onClick={() => handleDeleteClick('video')}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -763,7 +763,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               </div>
               
               <div className="space-y-4">
-                <div className="relative bg-gray-200 rounded-lg aspect-video overflow-hidden">
+                <div className="relative bg-gray-200 rounded-lg aspect-video overflow-hidden hover:shadow-md transition-shadow duration-300">
                   <video 
                     src={getFullImageUrl(profileData.video_intro_url || profileData.video_intro)}
                     className="w-full h-full object-cover"
@@ -774,7 +774,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   />
                 </div>
                 {profileData.video_description && (
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-lg border border-[#5A8DB8]/10">
                     <p className="text-sm text-gray-700">{profileData.video_description}</p>
                   </div>
                 )}
@@ -798,10 +798,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 <div className="flex gap-2">
                   <Button 
                     variant="ghost" 
-                    className="p-0 h-auto  text-[#3C5979] hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200"
+                    className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10 transition-colors duration-300"
                     onClick={() => handleOpenCertDialog()}
                   >
-                    <Plus className="w-5  h-5 mr-1 text-[#5A8DB8] hover:text-[#3C5979]" />
+                    <Plus className="w-5 h-5 text-[#5A8DB8] hover:text-[#3C5979]" />
                   </Button>
                 </div>
               )}
@@ -815,13 +815,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                <div className="text-center py-8 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-[#5A8DB8]/10">
                   <p className="text-gray-500 text-sm italic">No certifications added yet</p>
                   {isEditMode && (
                     <Button 
                       variant="outline"
                       size="sm"
-                      className="mt-2 text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10"
+                      className="mt-2 text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#3C5979]/10 transition-colors duration-300"
                       onClick={() => handleOpenCertDialog()}
                     >
                       Add Your First Certification
