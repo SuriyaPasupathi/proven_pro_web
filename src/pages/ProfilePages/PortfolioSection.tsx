@@ -32,7 +32,8 @@ interface ProjectImage {
 }
 
 interface Project {
-  id?: number;
+  id?: string;
+  user?: string;
   project_title: string;
   project_description: string;
   project_url: string;
@@ -43,9 +44,10 @@ interface Project {
 interface PortfolioSectionProps {
   projects?: Project[];
   portfolio?: Project[];
+  contactId?: string;  // Added contactId prop
 }
 
-const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
+const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
@@ -85,14 +87,25 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       console.log('Parsed Projects:', parsedProjects);
       setProjectItems(parsedProjects);
     }
-  }, []); // Empty dependency array since we only want to initialize once
+  }, [profileData?.portfolio]); // Added dependency on profileData.portfolio
 
   // Parse project data
   const parseProjects = (data: Project[] | string | undefined): Project[] => {
-    if (Array.isArray(data)) return data;
+    if (Array.isArray(data)) {
+      return data.map(project => ({
+        ...project,
+        id: project.id || crypto.randomUUID(),
+        user: project.user || profileData?.user_id
+      }));
+    }
     if (typeof data === 'string') {
       try {
-        return JSON.parse(data);
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) ? parsed.map(project => ({
+          ...project,
+          id: project.id || crypto.randomUUID(),
+          user: project.user || profileData?.user_id
+        })) : [];
       } catch {
         return [];
       }
@@ -205,61 +218,28 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       
-      // Create updated portfolio array
-      let updatedPortfolio;
+      let portfolioPayload;
       if (editingItem) {
-        // If editing, update the existing item
-        updatedPortfolio = projectItems.map(item => 
-          item.id === editingItem.id ? { ...form, id: editingItem.id } : item
-        );
-      } else {
-        // If adding new, check for duplicates before adding
-        const isDuplicate = projectItems.some(
-          item => 
-            item.project_title.toLowerCase() === form.project_title.toLowerCase() &&
-            item.project_description.toLowerCase() === form.project_description.toLowerCase() &&
-            item.project_url.toLowerCase() === form.project_url.toLowerCase()
-        );
-
-        if (isDuplicate) {
-          toast.error("This project already exists!");
-          return;
-        }
-
-        // Add new project with trimmed values
-        const newProject = {
+        // If editing, send the updated item with ID
+        portfolioPayload = [{
           project_title: form.project_title.trim(),
           project_description: form.project_description.trim(),
           project_url: form.project_url.trim(),
-          id: Date.now() // Temporary ID for new items
-        };
-        updatedPortfolio = [...projectItems, newProject];
+          id: editingItem.id,
+          user: profileData?.user_id
+        }];
+      } else {
+        // If adding new, don't include ID - let backend generate it
+        portfolioPayload = [{
+          project_title: form.project_title.trim(),
+          project_description: form.project_description.trim(),
+          project_url: form.project_url.trim(),
+          user: profileData?.user_id
+        }];
       }
-      
-      // Remove any duplicate projects before sending to backend
-      const uniqueProjects = updatedPortfolio.reduce((acc: Project[], current) => {
-        const isDuplicate = acc.some(
-          item => 
-            item.project_title.toLowerCase() === current.project_title.toLowerCase() &&
-            item.project_description.toLowerCase() === current.project_description.toLowerCase() &&
-            item.project_url.toLowerCase() === current.project_url.toLowerCase()
-        );
-        if (!isDuplicate) {
-          acc.push(current);
-        }
-        return acc;
-      }, []);
 
-      // Format projects for API
-      const formattedProjects = uniqueProjects.map(project => ({
-        project_title: project.project_title,
-        project_description: project.project_description,
-        project_url: project.project_url,
-        id: project.id
-      }));
-
-      // Add projects to formData
-      formData.append('portfolio', JSON.stringify(formattedProjects));
+      // Add only the changed/new project to formData
+      formData.append('portfolio', JSON.stringify(portfolioPayload));
 
       // Append project images if any
       form.project_images.forEach((image, index) => {
@@ -271,19 +251,38 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
         return;
       }
 
+      // Add contact ID to formData if available
+      if (contactId) {
+        formData.append('contact_id', contactId);
+      }
+
       const result = await dispatch(updateProfile({
         data: formData,
         profileId: profileData.id
       })).unwrap();
       
       if (result) {
-        // Update local state immediately with unique projects
-        setProjectItems(uniqueProjects);
+        // Update local state with the new/updated item
+        if (editingItem) {
+          setProjectItems(prevItems => 
+            prevItems.map(item => 
+              item.id === editingItem.id ? portfolioPayload[0] : item
+            )
+          );
+        } else {
+          // For new items, use the response from the server which includes the generated ID
+          const newItem = result.portfolio?.[0] || portfolioPayload[0];
+          setProjectItems(prevItems => [...prevItems, newItem]);
+        }
         
         // Update Redux store with the complete profile data
         dispatch(updateProfileData({
           ...profileData,
-          portfolio: formattedProjects
+          portfolio: editingItem 
+            ? projectItems.map(item => 
+                item.id === editingItem.id ? portfolioPayload[0] : item
+              )
+            : [...projectItems, result.portfolio?.[0] || portfolioPayload[0]]
         }));
 
         toast.success(editingItem ? "Project updated successfully!" : "Project added successfully!");
@@ -367,15 +366,23 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
 
     try {
       // First delete the project using the API
-      await handleDelete('project', itemToDelete.id.toString());
+      await handleDelete('project', itemToDelete.id);
 
       // If deletion was successful, update the local state and Redux store
       if (deleteSuccess) {
-        const updatedProjects = projectItems.filter(item => item.id !== itemToDelete.id);
-        
         const formData = new FormData();
         formData.append('subscription_type', profileData.subscription_type || 'premium');
-        formData.append('portfolio', JSON.stringify(updatedProjects));
+        
+        // Only send the ID of the deleted item
+        formData.append('portfolio', JSON.stringify([{
+          id: itemToDelete.id,
+          action: 'delete'
+        }]));
+
+        // Add contact ID to formData if available
+        if (contactId) {
+          formData.append('contact_id', contactId);
+        }
 
         const result = await dispatch(updateProfile({
           data: formData,
@@ -383,11 +390,17 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
         })).unwrap();
         
         if (result) {
-          setProjectItems(updatedProjects);
+          // Update local state by removing the deleted item
+          setProjectItems(prevItems => 
+            prevItems.filter(item => item.id !== itemToDelete.id)
+          );
+          
+          // Update Redux store
           dispatch(updateProfileData({
             ...profileData,
-            portfolio: updatedProjects
+            portfolio: projectItems.filter(item => item.id !== itemToDelete.id)
           }));
+          
           toast.success("Project deleted successfully!");
         }
       }

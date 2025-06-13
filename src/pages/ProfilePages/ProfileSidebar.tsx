@@ -136,7 +136,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
   // Update handleDeleteConfirm to use the new hook
   const handleDeleteConfirm = async () => {
-    if (!deleteType || !profileData.id) return;
+    if (!deleteType || !profileData.id) {
+      toast.error("Missing required information for deletion");
+      return;
+    }
 
     try {
       const modelMap: Record<'image' | 'video' | 'certification', 'profile_pic' | 'video_intro' | 'certification'> = {
@@ -151,61 +154,70 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         return;
       }
 
-      const idToDelete = deleteType === 'certification' ? certificationToDelete : profileData.id;
-      if (!idToDelete) {
-        toast.error("Missing ID for deletion");
-        return;
-      }
+      if (deleteType === 'certification' && certificationToDelete) {
+        // For certifications, update the profile with remaining certifications
+        const updatedCerts = (profileData.certifications || []).filter(
+          cert => cert.certifications_id !== certificationToDelete
+        );
 
-      await handleDelete(modelName, idToDelete);
-
-      // If deletion was successful, update the UI
-      if (deleteSuccess) {
         const formData = new FormData();
         formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
+        formData.append('certifications', JSON.stringify(updatedCerts));
 
-        switch (deleteType) {
-          case 'image':
-            formData.append('profile_pic', '');
-            dispatch(updateProfileData({
-              ...reduxProfileData,
-              profile_pic: '',
-              profile_pic_url: ''
-            }));
-            break;
-
-          case 'video':
-            formData.append('video_intro', '');
-            formData.append('video_description', '');
-            dispatch(updateProfileData({
-              ...reduxProfileData,
-              video_intro: '',
-              video_intro_url: '',
-              video_description: ''
-            }));
-            break;
-
-          case 'certification':
-            if (certificationToDelete) {
-              const updatedCerts = (profileData.certifications || []).filter(
-                cert => cert.certifications_id !== certificationToDelete
-              );
-              formData.append('certifications', JSON.stringify(updatedCerts));
-              dispatch(updateProfileData({
-                ...reduxProfileData,
-                certifications: updatedCerts
-              }));
-            }
-            break;
-        }
-
-        // Update the profile with the changes
+        // Update the profile with remaining certifications
         await dispatch(updateProfile({
           data: formData,
           profileId: profileData.id
         }));
 
-        toast.success(`${deleteType.charAt(0).toUpperCase() + deleteType.slice(1)} deleted successfully!`);
+        // Update the UI
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          certifications: updatedCerts
+        }));
+
+        toast.success("Certification deleted successfully!");
+      } else {
+        // For other types (image, video), use the delete endpoint
+        const result = await handleDelete(modelName, profileData.id);
+
+        // If deletion was successful, update the UI
+        if (result?.success) {
+          const formData = new FormData();
+          formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
+
+          switch (deleteType) {
+            case 'image':
+              formData.append('profile_pic', '');
+              dispatch(updateProfileData({
+                ...reduxProfileData,
+                profile_pic: '',
+                profile_pic_url: ''
+              }));
+              break;
+
+            case 'video':
+              formData.append('video_intro', '');
+              formData.append('video_description', '');
+              dispatch(updateProfileData({
+                ...reduxProfileData,
+                video_intro: '',
+                video_intro_url: '',
+                video_description: ''
+              }));
+              break;
+          }
+
+          // Update the profile with the changes
+          await dispatch(updateProfile({
+            data: formData,
+            profileId: profileData.id
+          }));
+
+          toast.success(result.message || `${deleteType.charAt(0).toUpperCase() + deleteType.slice(1)} deleted successfully!`);
+        } else {
+          toast.error(result?.message || `Failed to delete ${deleteType}`);
+        }
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
@@ -371,6 +383,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     setVideoForm({ ...videoForm, video_description: e.target.value });
   };
 
+  // Add this new function to handle opening the video dialog
+  const handleOpenVideoDialog = () => {
+    setVideoForm({
+      video_description: profileData.video_description || '',
+    });
+    setIsVideoDialogOpen(true);
+  };
+
   const handleVideoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -459,36 +479,42 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       const formData = new FormData();
       formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
 
-      // Handle certification image upload
-      if (selectedCertImage) {
-        formData.append('certifications_image', selectedCertImage);
-      }
-
-      // Add individual certification fields
-      formData.append('certifications_name', certForm.certifications_name);
-      formData.append('certifications_issuer', certForm.certifications_issuer);
-      formData.append('certifications_issued_date', certForm.certifications_issued_date);
-      formData.append('certifications_id', certForm.certifications_id);
-      
-      if (certForm.certifications_expiration_date) {
-        formData.append('certifications_expiration_date', certForm.certifications_expiration_date);
-      }
-
-      // Create updated certification object for optimistic update
-      const updatedCert = {
-        ...certForm,
-        certifications_id: isAddingNewCert ? `cert_${Date.now()}` : certForm.certifications_id,
-        certifications_image: selectedCertImage ? selectedCertImage.name : certForm.certifications_image
+      // Create the certification object
+      const certificationData = {
+        certifications_name: certForm.certifications_name,
+        certifications_issuer: certForm.certifications_issuer,
+        certifications_issued_date: certForm.certifications_issued_date,
+        certifications_id: certForm.certifications_id,
+        certifications_expiration_date: certForm.certifications_expiration_date || '',
+        certifications_image: selectedCertImage ? selectedCertImage.name : certForm.certifications_image,
+        certifications_image_url: certForm.certifications_image_url || ''
       };
 
-      // Update certifications array for optimistic update
-      let updatedCerts: Certification[]; 
+      // Get existing certifications
+      const existingCerts = profileData.certifications || [];
+      
+      // Create updated certifications array
+      let updatedCerts: Certification[];
       if (isAddingNewCert) {
-        updatedCerts = [...(profileData.certifications || []), updatedCert];
+        // Check if certification with same ID already exists
+        const existingCert = existingCerts.find(cert => cert.certifications_id === certForm.certifications_id);
+        if (existingCert) {
+          toast.error("A certification with this ID already exists");
+          return;
+        }
+        updatedCerts = [...existingCerts, certificationData];
       } else {
-        updatedCerts = (profileData.certifications || []).map((cert: Certification) => 
-          cert.certifications_id === certForm.certifications_id ? updatedCert : cert
+        updatedCerts = existingCerts.map((cert: Certification) => 
+          cert.certifications_id === certForm.certifications_id ? certificationData : cert
         );
+      }
+
+      // Append the certifications array as JSON string
+      formData.append('certifications', JSON.stringify(updatedCerts));
+
+      // Handle certification image upload if selected
+      if (selectedCertImage) {
+        formData.append('certifications_image', selectedCertImage);
       }
 
       // Optimistically update the UI
@@ -520,6 +546,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           certifications_image: '',
           certifications_image_url: ''
         });
+        setIsAddingNewCert(false);
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
@@ -746,7 +773,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                       variant="ghost" 
                       size="icon"
                       className="h-8 w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
-                      onClick={() => setIsVideoDialogOpen(true)}
+                      onClick={handleOpenVideoDialog}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -972,7 +999,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       </Dialog>
 
       {/* Video Edit Dialog */}
-      <Dialog open={isVideoDialogOpen} onOpenChange={setIsVideoDialogOpen}>
+      <Dialog open={isVideoDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setSelectedVideo(null);
+          setVideoForm({ video_description: '' });
+        }
+        setIsVideoDialogOpen(open);
+      }}>
         <DialogContent className="sm:max-w-[425px] md:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl md:text-2xl">Update Video Introduction</DialogTitle>
@@ -991,9 +1024,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 <div className="text-sm text-gray-600 mb-4">
                   Selected: {selectedVideo.name}
                 </div>
+              ) : profileData.video_intro_url ? (
+                <div className="text-sm text-gray-600 mb-4">
+                  Current video will be replaced
+                </div>
               ) : (
                 <div className="text-sm text-gray-600 mb-4">
-                  {profileData.video_intro_url ? 'Current video will be replaced' : 'No video selected'}
+                  No video selected
                 </div>
               )}
               <Button

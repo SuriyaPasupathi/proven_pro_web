@@ -1,5 +1,6 @@
 export interface ProfileData {
   id?: string;
+  user_id?: string;
   subscription_type: 'free' | 'standard' | 'premium';
   // Profile Fields
   first_name?: string;

@@ -9,7 +9,7 @@ interface UseDeleteItemReturn {
   isDeleteDialogOpen: boolean;
   openDeleteDialog: () => void;
   closeDeleteDialog: () => void;
-  handleDelete: (modelName: ModelName, id: string) => Promise<void>;
+  handleDelete: (modelName: ModelName, id: string) => Promise<{ success: boolean; message: string }>;
   isLoading: boolean;
   error: string | null;
   success: boolean;
@@ -27,10 +27,13 @@ export const useDeleteItem = (): UseDeleteItemReturn => {
 
   const handleDelete = async (modelName: ModelName, id: string) => {
     try {
-      await dispatch(deleteItem({ modelName, id })).unwrap();
-      closeDeleteDialog();
+      console.log('Deleting item:', { modelName, id }); // Debug log
+      const result = await dispatch(deleteItem({ modelName, id })).unwrap();
+      console.log('Delete result:', result); // Debug log
+      return result;
     } catch (error) {
       console.error('Delete failed:', error);
+      throw error;
     }
   };
 

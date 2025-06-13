@@ -693,6 +693,8 @@ export const deleteItem = createAsyncThunk(
   async (payload: { modelName: string; id: string }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
+      console.log('Delete request payload:', payload); // Debug log
+      
       const response = await axios.delete(
         `${baseUrl}delete/${payload.modelName}/${payload.id}/`,
         {
@@ -707,6 +709,8 @@ export const deleteItem = createAsyncThunk(
           }
         }
       );
+
+      console.log('Delete response:', response); // Debug log
 
       // Check if the response is successful
       if (response.status === 204 || response.status === 200) {
