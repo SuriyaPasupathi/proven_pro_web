@@ -5,11 +5,11 @@ import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-import { createUserProfile, updateProfile } from "../../../store/Services/CreateProfileService";
+import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import { updateProfileData } from "../../../store/Slice/CreateProfileSlice";
 import { fetchJobPositions } from "../../../store/Services/DropDownService";
 import toast from "react-hot-toast";
-import { Trash2, Edit2, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const TOTAL_STEPS = 8;

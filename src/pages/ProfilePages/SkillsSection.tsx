@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Loader2, Trash2, ChevronUp, Wrench, Plus, X } from 'lucide-react';
+import { ChevronDown, Loader2, ChevronUp, Wrench, Plus, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';

@@ -148,7 +148,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         const result = await handleDelete('certification', certificationToDelete);
 
         // If deletion was successful, update the local state and Redux store
-        if (result?.success) {
+        if (result?.success && deleteSuccess) {
           const updatedCerts = (profileData.certifications || []).filter(
             cert => cert.certifications_id !== certificationToDelete
           );
@@ -219,7 +219,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
-      toast.error(error.message || `Failed to delete ${deleteType}`);
+      toast.error(deleteError || error.message || `Failed to delete ${deleteType}`);
     } finally {
       closeDeleteDialog();
       setDeleteType(null);
