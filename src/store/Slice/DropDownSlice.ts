@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface DropDownState {
   services: any[];
   jobPositions: any[];
+  skills: any[];
   loading: boolean;
   error: string | null;
 }
@@ -10,6 +11,7 @@ interface DropDownState {
 const initialState: DropDownState = {
   services: [],
   jobPositions: [],
+  skills: [],
   loading: false,
   error: null,
 };
@@ -24,6 +26,9 @@ const dropDownSlice = createSlice({
     setJobPositions: (state, action: PayloadAction<any[]>) => {
       state.jobPositions = action.payload;
     },
+    setSkills: (state, action: PayloadAction<any[]>) => {
+      state.skills = action.payload;
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
@@ -36,6 +41,7 @@ const dropDownSlice = createSlice({
 export const {
   setServices,
   setJobPositions,
+  setSkills,
   setLoading,
   setError,
 } = dropDownSlice.actions;

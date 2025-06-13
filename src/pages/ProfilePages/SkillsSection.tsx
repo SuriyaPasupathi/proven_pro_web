@@ -62,21 +62,25 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
   // Initialize form when component mounts or props change
   useEffect(() => {
-    if (isDialogOpen) {
-      setForm({
-        technical_skills: Array.isArray(technical_skills) ? technical_skills : [],
-        soft_skills: Array.isArray(soft_skills) ? soft_skills : [],
-        skills_description: skills_description || ''
-      });
-    }
-  }, [isDialogOpen, technical_skills, soft_skills, skills_description]);
+    const techSkills = Array.isArray(technical_skills) ? technical_skills : [];
+    const softSkills = Array.isArray(soft_skills) ? soft_skills : [];
+    
+    setForm({
+      technical_skills: techSkills,
+      soft_skills: softSkills,
+      skills_description: skills_description || ''
+    });
+  }, [technical_skills, soft_skills, skills_description]);
 
   // Initialize form data from Redux store
   useEffect(() => {
     if (reduxProfileData) {
+      const techSkills = Array.isArray(reduxProfileData.technical_skills) ? reduxProfileData.technical_skills : [];
+      const softSkills = Array.isArray(reduxProfileData.soft_skills) ? reduxProfileData.soft_skills : [];
+      
       setForm({
-        technical_skills: Array.isArray(reduxProfileData.technical_skills) ? reduxProfileData.technical_skills : [],
-        soft_skills: Array.isArray(reduxProfileData.soft_skills) ? reduxProfileData.soft_skills : [],
+        technical_skills: techSkills,
+        soft_skills: softSkills,
         skills_description: reduxProfileData.skills_description || ''
       });
     }
