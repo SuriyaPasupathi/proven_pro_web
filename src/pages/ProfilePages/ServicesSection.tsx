@@ -18,6 +18,8 @@ import {
 import toast from 'react-hot-toast';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { fetchServices } from '../../store/Services/DropDownService';
 
 interface ServiceForm {
   services_categories: string;
@@ -63,6 +65,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     availability: '',
   });
   const { profileData: reduxProfileData } = useSelector((state: RootState) => state.createProfile);
+  const { services, loading: servicesLoading } = useSelector((state: RootState) => state.dropdown);
 
   // Add useDeleteItem hook
   const {
@@ -77,6 +80,11 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   // State for tracking service to delete
   const [serviceToDelete, setServiceToDelete] = useState<ServiceCategory | null>(null);
+
+  // Fetch services when component mounts
+  useEffect(() => {
+    dispatch(fetchServices());
+  }, [dispatch]);
 
   // Initialize services when component mounts or categories prop changes
   useEffect(() => {
@@ -143,6 +151,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
             ? { ...form, id: editingService.id }
             : service
         );
+        formData.append('categories', JSON.stringify(updatedServices));
       } else {
         // If adding new service, check for duplicates before adding
         const isDuplicate = localServices.some(
@@ -159,34 +168,16 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
           return;
         }
 
-        // Add new service with a temporary ID
+        // Add new service without ID and only send the new service data
         const newService = {
-          ...form,
-          id: Date.now(),
           services_categories: form.services_categories.trim(),
           services_description: form.services_description.trim(),
           rate_range: form.rate_range.trim(),
           availability: form.availability.trim()
         };
+        formData.append('categories', JSON.stringify([newService]));
         updatedServices = [...localServices, newService];
       }
-      
-      // Remove any duplicate services before sending to backend
-      const uniqueServices = updatedServices.reduce((acc: ServiceCategory[], current) => {
-        const isDuplicate = acc.some(
-          service => 
-            service.services_categories.toLowerCase() === current.services_categories.toLowerCase() &&
-            service.services_description.toLowerCase() === current.services_description.toLowerCase() &&
-            service.rate_range.toLowerCase() === current.rate_range.toLowerCase() &&
-            service.availability.toLowerCase() === current.availability.toLowerCase()
-        );
-        if (!isDuplicate) {
-          acc.push(current);
-        }
-        return acc;
-      }, []);
-
-      formData.append('categories', JSON.stringify(uniqueServices));
 
       if (!reduxProfileData?.id) {
         toast.error("Profile ID is missing");
@@ -199,13 +190,26 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       })).unwrap();
       
       if (result) {
-        // Update local state immediately with unique services
-        setLocalServices(uniqueServices);
+        // Update local state with the new service data
+        if (editingService) {
+          // If editing, update the existing service in local state
+          setLocalServices(updatedServices);
+        } else {
+          // If adding new service, append the new service to local state
+          const newServiceWithId = {
+            services_categories: form.services_categories.trim(),
+            services_description: form.services_description.trim(),
+            rate_range: form.rate_range.trim(),
+            availability: form.availability.trim(),
+            id: result.categories[result.categories.length - 1].id // Get the ID from the response
+          };
+          setLocalServices(prev => [...prev, newServiceWithId]);
+        }
         
         // Update Redux store with the complete profile data
         dispatch(updateProfileData({
           ...reduxProfileData,
-          categories: uniqueServices
+          categories: result.categories
         }));
 
         toast.success(editingService ? "Service updated successfully!" : "Service added successfully!");
@@ -314,6 +318,10 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     }
   };
 
+  const handleServiceSelect = (value: string) => {
+    setForm(prev => ({ ...prev, services_categories: value }));
+  };
+
   if (!categories.length && !services_description && !services_categories && !rate_range && !availability) {
   
   }
@@ -361,15 +369,21 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
               <label htmlFor="services_categories" className="block font-medium mb-1.5 text-sm text-gray-700">
                 Service Categories
               </label>
-              <Input
-                id="services_categories"
-                name="services_categories"
-                placeholder="Enter service categories (comma-separated)..."
+              <Select
                 value={form.services_categories}
-                onChange={handleChange}
-                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
-                required
-              />
+                onValueChange={handleServiceSelect}
+              >
+                <SelectTrigger className="w-full bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20">
+                  <SelectValue placeholder="Select a service category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {services.map((service: any) => (
+                    <SelectItem key={service.id} value={service.name}>
+                      {service.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -423,7 +437,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                disabled={isLoading}
+                disabled={isLoading || servicesLoading}
                 className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
               >
                 Cancel
@@ -431,7 +445,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
               <Button
                 type="submit"
                 className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
-                disabled={isLoading}
+                disabled={isLoading || servicesLoading}
               >
                 {isLoading ? (
                   <>

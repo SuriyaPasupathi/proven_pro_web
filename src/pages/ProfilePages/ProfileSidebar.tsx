@@ -28,6 +28,7 @@ interface ProfileSidebarProps {
 }
 
 interface Certification {
+  id?: string;
   certifications_name: string;
   certifications_issuer: string;
   certifications_issued_date: string;
@@ -142,49 +143,46 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     }
 
     try {
-      const modelMap: Record<'image' | 'video' | 'certification', 'profile_pic' | 'video_intro' | 'certification'> = {
-        'image': 'profile_pic',
-        'video': 'video_intro',
-        'certification': 'certification'
-      };
-
-      const modelName = modelMap[deleteType];
-      if (!modelName) {
-        toast.error("Invalid delete type");
-        return;
-      }
-
       if (deleteType === 'certification' && certificationToDelete) {
-        // For certifications, update the profile with remaining certifications
-        const updatedCerts = (profileData.certifications || []).filter(
-          cert => cert.certifications_id !== certificationToDelete
-        );
+        // First delete the certification using the API
+        const result = await handleDelete('certification', certificationToDelete);
 
-        const formData = new FormData();
-        formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
-        formData.append('certifications', JSON.stringify(updatedCerts));
+        // If deletion was successful, update the local state and Redux store
+        if (result?.success) {
+          const updatedCerts = (profileData.certifications || []).filter(
+            cert => cert.certifications_id !== certificationToDelete
+          );
+          
+          const formData = new FormData();
+          formData.append('certifications', JSON.stringify(updatedCerts));
 
-        // Update the profile with remaining certifications
-        await dispatch(updateProfile({
-          data: formData,
-          profileId: profileData.id
-        }));
-
-        // Update the UI
-        dispatch(updateProfileData({
-          ...reduxProfileData,
-          certifications: updatedCerts
-        }));
-
-        toast.success("Certification deleted successfully!");
+          const updateResult = await dispatch(updateProfile({
+            data: formData,
+            profileId: profileData.id
+          })).unwrap();
+          
+          if (updateResult) {
+            // Update local state
+            dispatch(updateProfileData({
+              ...reduxProfileData,
+              certifications: updatedCerts
+            }));
+            
+            toast.success("Certification deleted successfully!");
+          }
+        } else {
+          toast.error(result?.message || "Failed to delete certification");
+        }
       } else {
         // For other types (image, video), use the delete endpoint
-        const result = await handleDelete(modelName, profileData.id);
+        const result = await handleDelete(
+          deleteType === 'image' ? 'profile_pic' : 'video_intro', 
+          profileData.id
+        );
 
         // If deletion was successful, update the UI
         if (result?.success) {
           const formData = new FormData();
-          formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
 
           switch (deleteType) {
             case 'image':
@@ -476,8 +474,6 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         return;
       }
       setIsCertUpdating(true);
-      const formData = new FormData();
-      formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
 
       // Create the certification object
       const certificationData = {
@@ -493,7 +489,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       // Get existing certifications
       const existingCerts = profileData.certifications || [];
       
-      // Create updated certifications array
+      // Create a new FormData instance
+      const formData = new FormData();
+      
+      // Handle certification image upload if selected
+      if (selectedCertImage) {
+        formData.append('certifications_image', selectedCertImage);
+      }
+
       let updatedCerts: Certification[];
       if (isAddingNewCert) {
         // Check if certification with same ID already exists
@@ -502,19 +505,37 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           toast.error("A certification with this ID already exists");
           return;
         }
-        updatedCerts = [...existingCerts, certificationData];
+        // Add new certification without ID
+        const newCertification = {
+          certifications_name: certForm.certifications_name.trim(),
+          certifications_issuer: certForm.certifications_issuer.trim(),
+          certifications_issued_date: certForm.certifications_issued_date.trim(),
+          certifications_expiration_date: certForm.certifications_expiration_date.trim() || '',
+          certifications_id: certForm.certifications_id.trim(),
+          certifications_image: selectedCertImage ? selectedCertImage.name : '',
+          certifications_image_url: certForm.certifications_image_url || ''
+        };
+        formData.append('certifications', JSON.stringify([newCertification]));
+        updatedCerts = [...existingCerts, newCertification];
       } else {
-        updatedCerts = existingCerts.map((cert: Certification) => 
-          cert.certifications_id === certForm.certifications_id ? certificationData : cert
+        // If editing, find the existing certification to get its ID
+        const existingCert = existingCerts.find(cert => cert.certifications_id === certForm.certifications_id) as Certification;
+        if (!existingCert) {
+          toast.error("Certification not found");
+          return;
+        }
+
+        // Create edited certification with the original ID
+        const editedCertification = {
+          id: existingCert.id, // Use the original ID
+          ...certificationData
+        };
+        formData.append('certifications', JSON.stringify([editedCertification]));
+        
+        // Update local state with the edited certification
+        updatedCerts = existingCerts.map(cert => 
+          cert.certifications_id === certForm.certifications_id ? editedCertification : cert
         );
-      }
-
-      // Append the certifications array as JSON string
-      formData.append('certifications', JSON.stringify(updatedCerts));
-
-      // Handle certification image upload if selected
-      if (selectedCertImage) {
-        formData.append('certifications_image', selectedCertImage);
       }
 
       // Optimistically update the UI

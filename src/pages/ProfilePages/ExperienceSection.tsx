@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { fetchJobPositions } from '../../store/Services/DropDownService';
 // import { ProfileData } from '../../types/profile';
 
 interface Experience {
@@ -36,6 +38,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
   const { profileData } = useAppSelector((state) => state.createProfile);
+  const { jobPositions, loading: jobPositionsLoading } = useAppSelector((state) => state.dropdown);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
   const [localExperiences, setLocalExperiences] = useState<Experience[]>([]);
@@ -62,6 +65,11 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
 
   // State for tracking experience to delete
   const [experienceToDelete, setExperienceToDelete] = useState<Experience | null>(null);
+
+  // Fetch job positions when component mounts
+  useEffect(() => {
+    dispatch(fetchJobPositions());
+  }, [dispatch]);
 
   // Initialize experiences only when the component mounts or experiences prop changes
   useEffect(() => {
@@ -94,6 +102,10 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handlePositionSelect = (value: string) => {
+    setForm(prev => ({ ...prev, position: value }));
+  };
+
   const handleEdit = (experience: Experience) => {
     setEditingExperience(experience);
     setIsDialogOpen(true);
@@ -116,13 +128,16 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
       const formData = new FormData();
       formData.append('subscription_type', profileData?.subscription_type || 'premium');
       
-      // Create updated experiences array
+      // Create updated experiences array using ID for comparison
       let updatedExperiences;
       if (editingExperience) {
         // If editing, update the existing experience
         updatedExperiences = localExperiences.map(exp => 
-          exp === editingExperience ? form : exp
+          exp.id === editingExperience.id 
+            ? { ...form, id: editingExperience.id }
+            : exp
         );
+        formData.append('work_experiences', JSON.stringify(updatedExperiences));
       } else {
         // If adding new experience, check for duplicates before adding
         const isDuplicate = localExperiences.some(
@@ -140,7 +155,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
           return;
         }
 
-        // Add new experience with trimmed values
+        // Add new experience without ID and only send the new experience data
         const newExperience = {
           company_name: form.company_name.trim(),
           position: form.position.trim(),
@@ -148,36 +163,9 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
           experience_end_date: form.experience_end_date.trim(),
           key_responsibilities: form.key_responsibilities.trim()
         };
+        formData.append('work_experiences', JSON.stringify([newExperience]));
         updatedExperiences = [...localExperiences, newExperience];
       }
-      
-      // Remove any duplicate experiences before sending to backend
-      const uniqueExperiences = updatedExperiences.reduce((acc: Experience[], current) => {
-        const isDuplicate = acc.some(
-          exp => 
-            exp.company_name.toLowerCase() === current.company_name.toLowerCase() &&
-            exp.position.toLowerCase() === current.position.toLowerCase() &&
-            exp.experience_start_date === current.experience_start_date &&
-            exp.experience_end_date === current.experience_end_date &&
-            exp.key_responsibilities.toLowerCase() === current.key_responsibilities.toLowerCase()
-        );
-        if (!isDuplicate) {
-          acc.push(current);
-        }
-        return acc;
-      }, []);
-
-      // Format experiences for API
-      const formattedExperiences = uniqueExperiences.map(exp => ({
-        company_name: exp.company_name,
-        position: exp.position,
-        experience_start_date: exp.experience_start_date,
-        experience_end_date: exp.experience_end_date,
-        key_responsibilities: exp.key_responsibilities
-      }));
-
-      // Add experiences to formData
-      formData.append('experiences', JSON.stringify(formattedExperiences));
 
       if (!profileData?.id) {
         toast.error("Profile ID is missing");
@@ -190,13 +178,27 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
       })).unwrap();
       
       if (result) {
-        // Update local state immediately with unique experiences
-        setLocalExperiences(uniqueExperiences);
+        // Update local state with the new experience data
+        if (editingExperience) {
+          // If editing, update the existing experience in local state
+          setLocalExperiences(updatedExperiences);
+        } else {
+          // If adding new experience, append the new experience to local state
+          const newExperienceWithId = {
+            company_name: form.company_name.trim(),
+            position: form.position.trim(),
+            experience_start_date: form.experience_start_date.trim(),
+            experience_end_date: form.experience_end_date.trim(),
+            key_responsibilities: form.key_responsibilities.trim(),
+            id: result.work_experiences[result.work_experiences.length - 1].id // Get the ID from the response
+          };
+          setLocalExperiences(prev => [...prev, newExperienceWithId]);
+        }
         
         // Update Redux store with the complete profile data
         dispatch(updateProfileData({
           ...profileData,
-          experiences: formattedExperiences
+          work_experiences: result.work_experiences
         }));
 
         toast.success(editingExperience ? "Experience updated successfully!" : "Experience added successfully!");
@@ -253,7 +255,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
         // Update Redux store with unique experiences
         dispatch(updateProfileData({
           ...profileData,
-          experiences: uniqueExperiences
+          work_experiences: uniqueExperiences
         }));
       }
     }
@@ -291,7 +293,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
         
         const formData = new FormData();
         formData.append('subscription_type', profileData.subscription_type || 'premium');
-        formData.append('experiences', JSON.stringify(updatedExperiences));
+        formData.append('work_experiences', JSON.stringify(updatedExperiences));
 
         const result = await dispatch(updateProfile({
           data: formData,
@@ -299,11 +301,15 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
         })).unwrap();
         
         if (result) {
+          // Update local state
           setLocalExperiences(updatedExperiences);
+          
+          // Update Redux store
           dispatch(updateProfileData({
             ...profileData,
-            experiences: updatedExperiences
+            work_experiences: result.work_experiences
           }));
+          
           toast.success("Experience deleted successfully!");
         }
       }
@@ -413,15 +419,21 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
               <label htmlFor="position" className="block font-medium mb-1.5 text-sm text-gray-700">
                 Position
               </label>
-              <Input
-                id="position"
-                name="position"
-                placeholder="Enter your job title"
+              <Select
                 value={form.position}
-                onChange={handleChange}
-                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
-                required
-              />
+                onValueChange={handlePositionSelect}
+              >
+                <SelectTrigger className="w-full bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20">
+                  <SelectValue placeholder="Select a position" />
+                </SelectTrigger>
+                <SelectContent>
+                  {jobPositions.map((position: any) => (
+                    <SelectItem key={position.id} value={position.title}>
+                      {position.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -475,7 +487,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                disabled={isLoading}
+                disabled={isLoading || jobPositionsLoading}
                 className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
               >
                 Cancel
@@ -483,7 +495,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
               <Button
                 type="submit"
                 className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
-                disabled={isLoading}
+                disabled={isLoading || jobPositionsLoading}
               >
                 {isLoading ? (
                   <>

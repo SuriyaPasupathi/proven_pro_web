@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Trash2, ChevronUp } from 'lucide-react';
+import { ChevronDown, Pencil, Trash2, ChevronUp, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
 import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
 import { toast } from 'sonner';
+import { fetchSkills } from '../../store/Services/DropDownService';
 import {
   Dialog,
   DialogContent,
@@ -20,10 +21,17 @@ interface ToolsSectionProps {
   primary_tools?: string[] | string;
 }
 
+interface Skill {
+  id: number;
+  name: string;
+  category: string;
+}
+
 const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
   const { profileData } = useAppSelector((state) => state.createProfile);
+  const { skills: dropdownSkills, loading: dropdownLoading } = useAppSelector((state) => state.dropdown);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -56,7 +64,13 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   };
 
   const [tools, setTools] = useState<string[]>(() => getToolsArray(primary_tools));
-  const [newTool, setNewTool] = useState('');
+
+  // Fetch skills when dialog opens
+  useEffect(() => {
+    if (isDialogOpen) {
+      dispatch(fetchSkills('primary'));
+    }
+  }, [isDialogOpen, dispatch]);
 
   // Update tools when dialog opens or primary_tools changes
   useEffect(() => {
@@ -74,10 +88,10 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     }
   }, [profileData?.primary_tools]);
 
-  const handleToolAdd = () => {
-    if (newTool.trim() && !tools.includes(newTool.trim())) {
-      setTools(prevTools => [...prevTools, newTool.trim()]);
-      setNewTool('');
+  const handleToolAdd = (tool: Skill) => {
+    const toolName = tool.name.trim();
+    if (toolName && !tools.includes(toolName)) {
+      setTools(prevTools => [...prevTools, toolName]);
     }
   };
 
@@ -159,6 +173,23 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     setIsDialogOpen(false);
   };
 
+  const getSkillsArray = (skills: any): Skill[] => {
+    if (!skills) return [];
+    if (Array.isArray(skills)) {
+      return skills.map((skill: { id: number; name: string; category: string }) => ({
+        ...skill,
+        name: skill.name.trim()
+      }));
+    }
+    if (skills.skills && Array.isArray(skills.skills)) {
+      return skills.skills.map((skill: { id: number; name: string; category: string }) => ({
+        ...skill,
+        name: skill.name.trim()
+      }));
+    }
+    return [];
+  };
+
   if (!tools || tools.length === 0) {
     return (
       <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
@@ -225,29 +256,26 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
             <div className="space-y-4">
               <div>
                 <label className="block font-medium mb-1.5 text-sm text-gray-700">
-                  Add Tool
+                  Select Tools
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newTool}
-                    onChange={(e) => setNewTool(e.target.value)}
-                    className="flex-1 p-2 xs:p-2.5 border border-[#5A8DB8]/20 rounded-md bg-gradient-to-br from-gray-50 to-white focus:outline-none focus:ring-2 focus:ring-[#5A8DB8]/20 transition-all duration-300 text-sm"
-                    placeholder="Enter tool name"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleToolAdd();
-                      }
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleToolAdd}
-                    className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
-                  >
-                    Add
-                  </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  {dropdownLoading ? (
+                    <div className="col-span-2 flex justify-center">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                  ) : (
+                    getSkillsArray(dropdownSkills).map((tool: Skill) => (
+                      <Button
+                        key={tool.id}
+                        type="button"
+                        variant={tools.includes(tool.name.trim()) ? "default" : "outline"}
+                        className="w-full justify-start"
+                        onClick={() => handleToolAdd(tool)}
+                      >
+                        {tool.name}
+                      </Button>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
