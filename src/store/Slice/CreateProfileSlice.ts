@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, deleteItem } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, deleteItem, searchUsers } from '../Services/CreateProfileService';
 import { ProfileData } from '../../types/profile';
 
 interface ProfileError {
@@ -52,6 +52,18 @@ interface CreateProfileState {
   verificationDetails: VerificationDetails | null;
   deleteLoading: boolean;
   deleteSuccess: boolean;
+  searchResults: Array<{
+    id: string;
+    username: string;
+    bio: string;
+    primary_tools: string[];
+    technical_skills: string[];
+    max_individual_rating: number;
+    total_reviews: number;
+    avg_rating: number;
+  }>;
+  searchLoading: boolean;
+  searchError: ProfileError | null;
 }
 
 const initialState: CreateProfileState = {
@@ -74,6 +86,9 @@ const initialState: CreateProfileState = {
   verificationDetails: null,
   deleteLoading: false,
   deleteSuccess: false,
+  searchResults: [],
+  searchLoading: false,
+  searchError: null,
 };
 
 const createProfileSlice = createSlice({
@@ -104,6 +119,10 @@ const createProfileSlice = createSlice({
       state.reviewsLoading = false;
       state.reviews = [];
       state.error = null;
+    },
+    clearSearchResults: (state) => {
+      state.searchResults = [];
+      state.searchError = null;
     },
   },
   extraReducers: (builder) => {
@@ -348,9 +367,22 @@ const createProfileSlice = createSlice({
         state.deleteLoading = false;
         state.deleteSuccess = false;
         state.error = action.payload as ProfileError;
+      })
+      .addCase(searchUsers.pending, (state) => {
+        state.searchLoading = true;
+        state.searchError = null;
+      })
+      .addCase(searchUsers.fulfilled, (state, action) => {
+        state.searchLoading = false;
+        state.searchResults = action.payload.data;
+        state.searchError = null;
+      })
+      .addCase(searchUsers.rejected, (state, action) => {
+        state.searchLoading = false;
+        state.searchError = action.payload as ProfileError;
       });
   },
 });
 
-export const { clearError, resetState, updateProfileData, resetReviewState, resetReviewsState } = createProfileSlice.actions;
+export const { clearError, resetState, updateProfileData, resetReviewState, resetReviewsState, clearSearchResults } = createProfileSlice.actions;
 export default createProfileSlice.reducer;

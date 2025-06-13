@@ -53,6 +53,21 @@ interface ErrorResponse {
   code?: string;
 }
 
+interface SearchUsersResponse {
+  success: boolean;
+  data: Array<{
+    id: string;
+    username: string;
+    bio: string;
+    primary_tools: string[];
+    technical_skills: string[];
+    max_individual_rating: number;
+    total_reviews: number;
+    avg_rating: number;
+    profile_pic?: string;
+  }>;
+}
+
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
 
 // Get auth token from localStorage
@@ -764,6 +779,50 @@ export const deleteItem = createAsyncThunk(
         message: 'An unexpected error occurred',
         code: 'UNKNOWN_ERROR'
       });
+    }
+  }
+);
+
+export const searchUsers = createAsyncThunk(
+  'profile/searchUsers',
+  async (params: { 
+    search?: string; 
+    offset?: number; 
+    limit?: number; 
+    min_rating?: number;
+  }, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const queryParams = new URLSearchParams();
+      
+      if (params.search) queryParams.append('search', params.search);
+      if (params.offset) queryParams.append('offset', params.offset.toString());
+      if (params.limit) queryParams.append('limit', params.limit.toString());
+      if (params.min_rating) queryParams.append('min_rating', params.min_rating.toString());
+
+      const response = await axios.get<SearchUsersResponse>(
+        `${baseUrl}users-search/?${queryParams.toString()}`,
+        {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : undefined,
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        }
+      );
+
+      if (!response.data.success) {
+        return rejectWithValue({
+          message: 'Failed to fetch search results',
+          code: 'SEARCH_ERROR'
+        });
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('User search error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
     }
   }
 );

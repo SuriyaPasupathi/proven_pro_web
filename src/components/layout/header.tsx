@@ -1,16 +1,73 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "@/store/store";
+import { searchUsers } from "@/store/Services/CreateProfileService";
+import { clearSearchResults } from "@/store/Slice/CreateProfileSlice";
+import { useDebounce } from "../../hooks/useDebounce";
+import { RootState } from "@/store/store";
+
+interface SearchUser {
+  id: string;
+  username: string;
+  bio: string;
+  primary_tools: string[];
+  technical_skills: string[];
+  max_individual_rating: number;
+  total_reviews: number;
+  avg_rating: number;
+}
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { searchResults, searchError } = useAppSelector((state: RootState) => state.createProfile);
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  useEffect(() => {
+    const performSearch = async () => {
+      if (debouncedSearch) {
+        setIsSearching(true);
+        try {
+          await dispatch(searchUsers({ 
+            search: debouncedSearch,
+            limit: 10 // Limit results for better performance
+          })).unwrap();
+        } catch (error) {
+          console.error('Search failed:', error);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        dispatch(clearSearchResults());
+      }
+    };
+
+    performSearch();
+  }, [debouncedSearch, dispatch]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (!value) {
+      dispatch(clearSearchResults());
+    }
+  };
+
+  const handleUserClick = (userId: string) => {
+    navigate(`/profile/${userId}`);
+    setSearchQuery("");
+    dispatch(clearSearchResults());
   };
 
   return (
@@ -29,8 +86,45 @@ export default function Header() {
           </div>
 
           {/* Desktop Search Bar */}
-          <div className="hidden md:block md:ml-6 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-[#5A8DB8]">
-            <Input placeholder="Search..." className="bg-gray-100" />
+          <div className="hidden md:block md:ml-6 w-full max-w-xs relative">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input 
+                placeholder="Search users..." 
+                className="pl-9 bg-gray-100"
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+            </div>
+            
+            {/* Search Results Dropdown */}
+            {searchQuery && (searchResults.length > 0 || isSearching) && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50">
+                {isSearching ? (
+                  <div className="p-4 text-center text-gray-500">Searching...</div>
+                ) : searchError ? (
+                  <div className="p-4 text-center text-red-500">{searchError.message}</div>
+                ) : (
+                  searchResults.map((user: SearchUser) => (
+                    <div
+                      key={user.id}
+                      className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                      onClick={() => handleUserClick(user.id)}
+                    >
+                      <div className="font-medium text-gray-900">{user.username}</div>
+                      {user.bio && (
+                        <div className="text-sm text-gray-500 truncate">{user.bio}</div>
+                      )}
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-sm text-gray-500">
+                          Rating: {(user.avg_rating || 0).toFixed(1)} ({user.total_reviews || 0} reviews)
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
 
