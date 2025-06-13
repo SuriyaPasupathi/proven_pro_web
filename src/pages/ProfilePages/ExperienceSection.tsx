@@ -16,9 +16,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { useDeleteItem } from '@/hooks/useDeleteItem';
 // import { ProfileData } from '../../types/profile';
 
 interface Experience {
+  id?: string;
   company_name: string;
   position: string;
   key_responsibilities: string; 
@@ -46,7 +48,19 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     experience_end_date: "",
     key_responsibilities: "",
   });
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Add useDeleteItem hook
+  const {
+    isDeleteDialogOpen,
+    openDeleteDialog,
+    closeDeleteDialog,
+    handleDelete,
+    isLoading: isDeleteLoading,
+    error: deleteError,
+    success: deleteSuccess
+  } = useDeleteItem();
+
+  // State for tracking experience to delete
   const [experienceToDelete, setExperienceToDelete] = useState<Experience | null>(null);
 
   // Initialize experiences only when the component mounts or experiences prop changes
@@ -253,51 +267,51 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
   }, [profileData?.work_experiences]);
 
   const handleDeleteClick = (experience: Experience) => {
+    if (!experience.id) {
+      toast.error("Experience ID is missing");
+      return;
+    }
     setExperienceToDelete(experience);
-    setDeleteDialogOpen(true);
+    openDeleteDialog();
   };
 
   const handleDeleteConfirm = async () => {
-    if (!experienceToDelete) return;
+    if (!experienceToDelete?.id || !profileData?.id) {
+      toast.error("Missing required IDs for deletion");
+      return;
+    }
 
-    setIsLoading(true);
     try {
-      const updatedExperiences = localExperiences.filter(exp => 
-        exp.company_name !== experienceToDelete.company_name ||
-        exp.position !== experienceToDelete.position ||
-        exp.experience_start_date !== experienceToDelete.experience_start_date ||
-        exp.experience_end_date !== experienceToDelete.experience_end_date ||
-        exp.key_responsibilities !== experienceToDelete.key_responsibilities
-      );
+      // First delete the experience using the API
+      await handleDelete('experience', experienceToDelete.id);
 
-      const formData = new FormData();
-      formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('experiences', JSON.stringify(updatedExperiences));
+      // If deletion was successful, update the local state and Redux store
+      if (deleteSuccess) {
+        const updatedExperiences = localExperiences.filter(exp => exp.id !== experienceToDelete.id);
+        
+        const formData = new FormData();
+        formData.append('subscription_type', profileData.subscription_type || 'premium');
+        formData.append('experiences', JSON.stringify(updatedExperiences));
 
-      if (!profileData?.id) {
-        toast.error("Profile ID is missing");
-        return;
-      }
-
-      const result = await dispatch(updateProfile({
-        data: formData,
-        profileId: profileData.id
-      })).unwrap();
-      
-      if (result) {
-        setLocalExperiences(updatedExperiences);
-        dispatch(updateProfileData({
-          ...profileData,
-          experiences: updatedExperiences
-        }));
-        toast.success("Experience deleted successfully!");
-        setDeleteDialogOpen(false);
-        setExperienceToDelete(null);
+        const result = await dispatch(updateProfile({
+          data: formData,
+          profileId: profileData.id
+        })).unwrap();
+        
+        if (result) {
+          setLocalExperiences(updatedExperiences);
+          dispatch(updateProfileData({
+            ...profileData,
+            experiences: updatedExperiences
+          }));
+          toast.success("Experience deleted successfully!");
+        }
       }
     } catch (error) {
-      toast.error("Failed to delete experience");
+      toast.error(deleteError || "Failed to delete experience");
     } finally {
-      setIsLoading(false);
+      closeDeleteDialog();
+      setExperienceToDelete(null);
     }
   };
 
@@ -531,15 +545,15 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
       )}
 
       <DeleteConfirmationDialog
-        isOpen={deleteDialogOpen}
+        isOpen={isDeleteDialogOpen}
         onClose={() => {
-          setDeleteDialogOpen(false);
+          closeDeleteDialog();
           setExperienceToDelete(null);
         }}
         onConfirm={handleDeleteConfirm}
         title="Delete Experience"
         description={`Are you sure you want to delete your experience at "${experienceToDelete?.company_name}"? This action cannot be undone.`}
-        isLoading={isLoading}
+        isLoading={isDeleteLoading}
       />
     </div>
   );

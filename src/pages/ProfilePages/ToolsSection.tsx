@@ -14,6 +14,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { useDeleteItem } from '@/hooks/useDeleteItem';
 
 interface ToolsSectionProps {
   primary_tools?: string[] | string;
@@ -24,9 +25,21 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const dispatch = useAppDispatch();
   const { profileData } = useAppSelector((state) => state.createProfile);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [toolToDelete, setToolToDelete] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Add useDeleteItem hook
+  const {
+    isDeleteDialogOpen,
+    openDeleteDialog,
+    closeDeleteDialog,
+    handleDelete,
+    isLoading: isDeleteLoading,
+    error: deleteError,
+    success: deleteSuccess
+  } = useDeleteItem();
+
+  // State for tracking tool to delete
+  const [toolToDelete, setToolToDelete] = useState<string | null>(null);
 
   // Convert tools input to array
   const getToolsArray = (input: string[] | string): string[] => {
@@ -70,41 +83,46 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
 
   const handleDeleteClick = (tool: string) => {
     setToolToDelete(tool);
-    setDeleteDialogOpen(true);
+    openDeleteDialog();
   };
 
   const handleDeleteConfirm = async () => {
-    if (!toolToDelete) return;
+    if (!toolToDelete || !profileData?.id) {
+      toast.error("Missing required data for deletion");
+      return;
+    }
 
     try {
-      const updatedTools = tools.filter(tool => tool !== toolToDelete);
-      
-      const formData = new FormData();
-      formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('primary_tools', JSON.stringify(updatedTools));
+      // First delete the tool using the API
+      await handleDelete('tool', toolToDelete);
 
-      if (!profileData?.id) {
-        toast.error("Profile ID is missing");
-        return;
-      }
+      // If deletion was successful, update the local state and Redux store
+      if (deleteSuccess) {
+        const updatedTools = tools.filter(tool => tool !== toolToDelete);
+        
+        const formData = new FormData();
+        formData.append('subscription_type', profileData.subscription_type || 'premium');
+        formData.append('primary_tools', JSON.stringify(updatedTools));
 
-      const result = await dispatch(updateProfile({
-        data: formData,
-        profileId: profileData.id
-      })).unwrap();
-      
-      if (result) {
-        setTools(updatedTools);
-        dispatch(updateProfileData({
-          ...profileData,
-          primary_tools: updatedTools
-        }));
-        toast.success("Tool removed successfully!");
-        setDeleteDialogOpen(false);
-        setToolToDelete(null);
+        const result = await dispatch(updateProfile({
+          data: formData,
+          profileId: profileData.id
+        })).unwrap();
+        
+        if (result) {
+          setTools(updatedTools);
+          dispatch(updateProfileData({
+            ...profileData,
+            primary_tools: updatedTools
+          }));
+          toast.success("Tool removed successfully!");
+        }
       }
     } catch (error) {
-      toast.error("Failed to remove tool");
+      toast.error(deleteError || "Failed to remove tool");
+    } finally {
+      closeDeleteDialog();
+      setToolToDelete(null);
     }
   };
 
@@ -291,14 +309,15 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       )}
 
       <DeleteConfirmationDialog
-        isOpen={deleteDialogOpen}
+        isOpen={isDeleteDialogOpen}
         onClose={() => {
-          setDeleteDialogOpen(false);
+          closeDeleteDialog();
           setToolToDelete(null);
         }}
         onConfirm={handleDeleteConfirm}
         title="Delete Tool"
         description={`Are you sure you want to remove "${toolToDelete}" from your tools?`}
+        isLoading={isDeleteLoading}
       />
     </div>
   );

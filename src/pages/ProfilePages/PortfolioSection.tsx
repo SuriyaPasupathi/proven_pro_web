@@ -18,6 +18,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { useDeleteItem } from '@/hooks/useDeleteItem';
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -60,9 +61,21 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
     project_image: "",
     project_images: [],
   });
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<Project | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Add useDeleteItem hook
+  const {
+    isDeleteDialogOpen,
+    openDeleteDialog,
+    closeDeleteDialog,
+    handleDelete,
+    isLoading: isDeleteLoading,
+    error: deleteError,
+    success: deleteSuccess
+  } = useDeleteItem();
+
+  // State for tracking item to delete
+  const [itemToDelete, setItemToDelete] = useState<Project | null>(null);
 
   // Initialize projectItems from profileData
   useEffect(() => {
@@ -343,41 +356,46 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
 
   const handleDeleteClick = (item: Project) => {
     setItemToDelete(item);
-    setDeleteDialogOpen(true);
+    openDeleteDialog();
   };
 
   const handleDeleteConfirm = async () => {
-    if (!itemToDelete?.id) return;
+    if (!itemToDelete?.id || !profileData?.id) {
+      toast.error("Missing required data for deletion");
+      return;
+    }
 
     try {
-      const updatedProjects = projectItems.filter(item => item.id !== itemToDelete.id);
-      
-      const formData = new FormData();
-      formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('portfolio', JSON.stringify(updatedProjects));
+      // First delete the project using the API
+      await handleDelete('project', itemToDelete.id.toString());
 
-      if (!profileData?.id) {
-        toast.error("Profile ID is missing");
-        return;
-      }
+      // If deletion was successful, update the local state and Redux store
+      if (deleteSuccess) {
+        const updatedProjects = projectItems.filter(item => item.id !== itemToDelete.id);
+        
+        const formData = new FormData();
+        formData.append('subscription_type', profileData.subscription_type || 'premium');
+        formData.append('portfolio', JSON.stringify(updatedProjects));
 
-      const result = await dispatch(updateProfile({
-        data: formData,
-        profileId: profileData.id
-      })).unwrap();
-      
-      if (result) {
-        setProjectItems(updatedProjects);
-        dispatch(updateProfileData({
-          ...profileData,
-          portfolio: updatedProjects
-        }));
-        toast.success("Project deleted successfully!");
-        setDeleteDialogOpen(false);
-        setItemToDelete(null);
+        const result = await dispatch(updateProfile({
+          data: formData,
+          profileId: profileData.id
+        })).unwrap();
+        
+        if (result) {
+          setProjectItems(updatedProjects);
+          dispatch(updateProfileData({
+            ...profileData,
+            portfolio: updatedProjects
+          }));
+          toast.success("Project deleted successfully!");
+        }
       }
     } catch (error) {
-      toast.error("Failed to delete project");
+      toast.error(deleteError || "Failed to delete project");
+    } finally {
+      closeDeleteDialog();
+      setItemToDelete(null);
     }
   };
 
@@ -773,14 +791,15 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = () => {
 
       {/* Add DeleteConfirmationDialog */}
       <DeleteConfirmationDialog
-        isOpen={deleteDialogOpen}
+        isOpen={isDeleteDialogOpen}
         onClose={() => {
-          setDeleteDialogOpen(false);
+          closeDeleteDialog();
           setItemToDelete(null);
         }}
         onConfirm={handleDeleteConfirm}
         title="Delete Project"
         description={`Are you sure you want to delete "${itemToDelete?.project_title}"? This action cannot be undone.`}
+        isLoading={isDeleteLoading}
       />
     </div>
   );

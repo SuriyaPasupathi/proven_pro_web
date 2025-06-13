@@ -47,6 +47,12 @@ interface ProfileStatusResponse {
   subscription_type: 'free' | 'standard' | 'premium';
 }
 
+interface ErrorResponse {
+  message?: string;
+  status?: number;
+  code?: string;
+}
+
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
 
 // Get auth token from localStorage
@@ -663,6 +669,101 @@ export const getProfileReviews = createAsyncThunk(
       console.error('Get reviews error:', error);
       const profileError = handleProfileError(error);
       return rejectWithValue(profileError);
+    }
+  }
+);
+
+export const deleteItem = createAsyncThunk(
+  'profile/deleteItem',
+  async (payload: { modelName: string; id: string }, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.delete(
+        `${baseUrl}delete/${payload.modelName}/${payload.id}/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          validateStatus: (status) => {
+            // Accept 200, 204, and 404 as valid responses
+            return status === 200 || status === 204 || status === 404;
+          }
+        }
+      );
+
+      // Check if the response is successful
+      if (response.status === 204 || response.status === 200) {
+        return { success: true, message: 'Item deleted successfully' };
+      }
+
+      // If we get here, something unexpected happened
+      return rejectWithValue({
+        message: 'Unexpected response from server',
+        status: response.status,
+        code: 'UNEXPECTED_RESPONSE'
+      });
+    } catch (error) {
+      console.error('Delete item error:', error);
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<ErrorResponse>;
+        
+        // Handle 500 Internal Server Error
+        if (axiosError.response?.status === 500) {
+          return rejectWithValue({
+            message: 'Server error occurred. Please try again later.',
+            status: 500,
+            code: 'SERVER_ERROR'
+          });
+        }
+
+        // Handle specific error cases
+        if (axiosError.response?.status === 404) {
+          return rejectWithValue({
+            message: 'Item not found',
+            status: 404,
+            code: 'NOT_FOUND'
+          });
+        }
+
+        if (axiosError.response?.status === 401) {
+          return rejectWithValue({
+            message: 'Unauthorized. Please log in again.',
+            status: 401,
+            code: 'UNAUTHORIZED'
+          });
+        }
+
+        if (axiosError.response?.status === 403) {
+          return rejectWithValue({
+            message: 'You do not have permission to delete this item',
+            status: 403,
+            code: 'FORBIDDEN'
+          });
+        }
+
+        // Handle network errors
+        if (!axiosError.response) {
+          return rejectWithValue({
+            message: 'Network error. Please check your connection.',
+            code: 'NETWORK_ERROR'
+          });
+        }
+
+        // Handle other error responses
+        return rejectWithValue({
+          message: axiosError.response.data?.message || 'Failed to delete item',
+          status: axiosError.response.status,
+          code: 'DELETE_ERROR'
+        });
+      }
+
+      // Handle non-Axios errors
+      return rejectWithValue({
+        message: 'An unexpected error occurred',
+        code: 'UNKNOWN_ERROR'
+      });
     }
   }
 );

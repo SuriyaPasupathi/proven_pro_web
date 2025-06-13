@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import toast from 'react-hot-toast';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { useDeleteItem } from '@/hooks/useDeleteItem';
 
 interface ServiceForm {
   services_categories: string;
@@ -54,8 +55,6 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   const [editingService, setEditingService] = useState<ServiceCategory | null>(null);
   const [localServices, setLocalServices] = useState<ServiceCategory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [serviceToDelete, setServiceToDelete] = useState<ServiceCategory | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [form, setForm] = useState<ServiceForm>({
     services_categories: '',
@@ -64,6 +63,20 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
     availability: '',
   });
   const { profileData: reduxProfileData } = useSelector((state: RootState) => state.createProfile);
+
+  // Add useDeleteItem hook
+  const {
+    isDeleteDialogOpen,
+    openDeleteDialog,
+    closeDeleteDialog,
+    handleDelete,
+    isLoading: isDeleteLoading,
+    error: deleteError,
+    success: deleteSuccess
+  } = useDeleteItem();
+
+  // State for tracking service to delete
+  const [serviceToDelete, setServiceToDelete] = useState<ServiceCategory | null>(null);
 
   // Initialize services when component mounts or categories prop changes
   useEffect(() => {
@@ -253,45 +266,51 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   };
 
   const handleDeleteClick = (service: ServiceCategory) => {
+    if (!service.id) {
+      toast.error("Service ID is missing");
+      return;
+    }
     setServiceToDelete(service);
-    setDeleteDialogOpen(true);
+    openDeleteDialog();
   };
 
   const handleDeleteConfirm = async () => {
-    if (!serviceToDelete?.id) return;
+    if (!serviceToDelete?.id || !reduxProfileData?.id) {
+      toast.error("Missing required IDs for deletion");
+      return;
+    }
 
-    setIsLoading(true);
     try {
-      const updatedServices = localServices.filter(service => service.id !== serviceToDelete.id);
-      
-      const formData = new FormData();
-      formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
-      formData.append('categories', JSON.stringify(updatedServices));
+      // First delete the service using the API
+      await handleDelete('category', serviceToDelete.id.toString());
 
-      if (!reduxProfileData?.id) {
-        toast.error("Profile ID is missing");
-        return;
-      }
+      // If deletion was successful, update the local state and Redux store
+      if (deleteSuccess) {
+        const updatedServices = localServices.filter(service => service.id !== serviceToDelete.id);
+        
+        const formData = new FormData();
+        formData.append('subscription_type', reduxProfileData.subscription_type || 'premium');
+        formData.append('categories', JSON.stringify(updatedServices));
 
-      const result = await dispatch(updateProfile({
-        data: formData,
-        profileId: reduxProfileData.id as string
-      })).unwrap();
-      
-      if (result) {
-        setLocalServices(updatedServices);
-        dispatch(updateProfileData({
-          ...reduxProfileData,
-          categories: updatedServices
-        }));
-        toast.success("Service deleted successfully!");
-        setDeleteDialogOpen(false);
-        setServiceToDelete(null);
+        const result = await dispatch(updateProfile({
+          data: formData,
+          profileId: reduxProfileData.id
+        })).unwrap();
+        
+        if (result) {
+          setLocalServices(updatedServices);
+          dispatch(updateProfileData({
+            ...reduxProfileData,
+            categories: updatedServices
+          }));
+          toast.success("Service deleted successfully!");
+        }
       }
     } catch (error) {
-      toast.error("Failed to delete service");
+      toast.error(deleteError || "Failed to delete service");
     } finally {
-      setIsLoading(false);
+      closeDeleteDialog();
+      setServiceToDelete(null);
     }
   };
 
@@ -491,15 +510,15 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       )}
 
       <DeleteConfirmationDialog
-        isOpen={deleteDialogOpen}
+        isOpen={isDeleteDialogOpen}
         onClose={() => {
-          setDeleteDialogOpen(false);
+          closeDeleteDialog();
           setServiceToDelete(null);
         }}
         onConfirm={handleDeleteConfirm}
         title="Delete Service"
         description={`Are you sure you want to delete the service "${serviceToDelete?.services_categories}"? This action cannot be undone.`}
-        isLoading={isLoading}
+        isLoading={isDeleteLoading}
       />
     </div>
   );

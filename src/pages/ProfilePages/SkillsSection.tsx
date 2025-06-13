@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { useDeleteItem } from '@/hooks/useDeleteItem';
 
 interface SkillsForm {
   technical_skills: string[];
@@ -44,7 +45,19 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
     soft_skills: [],
     skills_description: ''
   });
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Add useDeleteItem hook
+  const {
+    isDeleteDialogOpen,
+    openDeleteDialog,
+    closeDeleteDialog,
+    handleDelete,
+    isLoading: isDeleteLoading,
+    error: deleteError,
+    success: deleteSuccess
+  } = useDeleteItem();
+
+  // State for tracking skill to delete
   const [skillToDelete, setSkillToDelete] = useState<{ skill: string; type: 'technical_skills' | 'soft_skills' } | null>(null);
 
   // Initialize form when component mounts or props change
@@ -137,51 +150,53 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
   const handleDeleteClick = (skill: string, type: 'technical_skills' | 'soft_skills') => {
     setSkillToDelete({ skill, type });
-    setDeleteDialogOpen(true);
+    openDeleteDialog();
   };
 
   const handleDeleteConfirm = async () => {
-    if (!skillToDelete) return;
+    if (!skillToDelete || !reduxProfileData?.id) {
+      toast.error("Missing required data for deletion");
+      return;
+    }
 
-    setIsLoading(true);
     try {
-      const updatedSkills = {
-        ...form,
-        [skillToDelete.type]: form[skillToDelete.type].filter(s => s !== skillToDelete.skill)
-      };
+      // First delete the skill using the API
+      await handleDelete('skill', skillToDelete.skill);
 
-      const formData = new FormData();
-      formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
-      formData.append('technical_skills', JSON.stringify(updatedSkills.technical_skills));
-      formData.append('soft_skills', JSON.stringify(updatedSkills.soft_skills));
-      formData.append('skills_description', updatedSkills.skills_description);
+      // If deletion was successful, update the local state and Redux store
+      if (deleteSuccess) {
+        const updatedSkills = {
+          ...form,
+          [skillToDelete.type]: form[skillToDelete.type].filter(s => s !== skillToDelete.skill)
+        };
 
-      if (!reduxProfileData?.id) {
-        toast.error("Profile ID is missing");
-        return;
-      }
+        const formData = new FormData();
+        formData.append('subscription_type', reduxProfileData.subscription_type || 'premium');
+        formData.append('technical_skills', JSON.stringify(updatedSkills.technical_skills));
+        formData.append('soft_skills', JSON.stringify(updatedSkills.soft_skills));
+        formData.append('skills_description', updatedSkills.skills_description);
 
-      const result = await dispatch(updateProfile({
-        data: formData,
-        profileId: reduxProfileData.id
-      })).unwrap();
-      
-      if (result) {
-        setForm(updatedSkills);
-        dispatch(updateProfileData({
-          ...reduxProfileData,
-          technical_skills: updatedSkills.technical_skills,
-          soft_skills: updatedSkills.soft_skills,
-          skills_description: updatedSkills.skills_description
-        }));
-        toast.success("Skill removed successfully!");
-        setDeleteDialogOpen(false);
-        setSkillToDelete(null);
+        const result = await dispatch(updateProfile({
+          data: formData,
+          profileId: reduxProfileData.id
+        })).unwrap();
+        
+        if (result) {
+          setForm(updatedSkills);
+          dispatch(updateProfileData({
+            ...reduxProfileData,
+            technical_skills: updatedSkills.technical_skills,
+            soft_skills: updatedSkills.soft_skills,
+            skills_description: updatedSkills.skills_description
+          }));
+          toast.success("Skill removed successfully!");
+        }
       }
     } catch (error) {
-      toast.error("Failed to remove skill");
+      toast.error(deleteError || "Failed to remove skill");
     } finally {
-      setIsLoading(false);
+      closeDeleteDialog();
+      setSkillToDelete(null);
     }
   };
 
@@ -380,15 +395,15 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       )}
 
       <DeleteConfirmationDialog
-        isOpen={deleteDialogOpen}
+        isOpen={isDeleteDialogOpen}
         onClose={() => {
-          setDeleteDialogOpen(false);
+          closeDeleteDialog();
           setSkillToDelete(null);
         }}
         onConfirm={handleDeleteConfirm}
         title="Delete Skill"
         description={`Are you sure you want to remove "${skillToDelete?.skill}" from your ${skillToDelete?.type === 'technical_skills' ? 'technical' : 'soft'} skills?`}
-        isLoading={isLoading}
+        isLoading={isDeleteLoading}
       />
     </div>
   );

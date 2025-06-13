@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, deleteItem } from '../Services/CreateProfileService';
 import { ProfileData } from '../../types/profile';
 
 interface ProfileError {
@@ -50,6 +50,8 @@ interface CreateProfileState {
   reviewsLoading: boolean;
   reviews: Review[];
   verificationDetails: VerificationDetails | null;
+  deleteLoading: boolean;
+  deleteSuccess: boolean;
 }
 
 const initialState: CreateProfileState = {
@@ -70,6 +72,8 @@ const initialState: CreateProfileState = {
   reviewsLoading: false,
   reviews: [],
   verificationDetails: null,
+  deleteLoading: false,
+  deleteSuccess: false,
 };
 
 const createProfileSlice = createSlice({
@@ -328,6 +332,21 @@ const createProfileSlice = createSlice({
       })
       .addCase(getProfileReviews.rejected, (state, action) => {
         state.reviewsLoading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(deleteItem.pending, (state) => {
+        state.deleteLoading = true;
+        state.error = null;
+        state.deleteSuccess = false;
+      })
+      .addCase(deleteItem.fulfilled, (state) => {
+        state.deleteLoading = false;
+        state.deleteSuccess = true;
+        state.error = null;
+      })
+      .addCase(deleteItem.rejected, (state, action) => {
+        state.deleteLoading = false;
+        state.deleteSuccess = false;
         state.error = action.payload as ProfileError;
       });
   },
