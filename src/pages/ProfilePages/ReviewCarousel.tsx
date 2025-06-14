@@ -11,6 +11,7 @@ interface Review {
   name: string;
   rating: number;
   content: string;
+  timestamp?: string; // Add timestamp to help with uniqueness
 }
 
 interface ReviewCarouselProps {
@@ -34,12 +35,14 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
   // Update reviews whenever initialReviews changes and clean up duplicates
   useEffect(() => {
     if (initialReviews && initialReviews.length > 0) {
-      // Remove duplicate reviews based on content and name
+      // Remove duplicate reviews based on id, content, name, and rating
       const uniqueReviews = initialReviews.reduce((acc: Review[], current) => {
         const isDuplicate = acc.some(
           review => 
-            review.content.toLowerCase().trim() === current.content.toLowerCase().trim() &&
-            review.name.toLowerCase().trim() === current.name.toLowerCase().trim()
+            review.id === current.id || // Check ID first
+            (review.content.toLowerCase().trim() === current.content.toLowerCase().trim() &&
+            review.name.toLowerCase().trim() === current.name.toLowerCase().trim() &&
+            review.rating === current.rating)
         );
         if (!isDuplicate) {
           acc.push(current);
@@ -47,11 +50,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
         return acc;
       }, []);
       
-      if (uniqueReviews.length !== initialReviews.length) {
-        setReviews(uniqueReviews);
-      } else {
-        setReviews(initialReviews);
-      }
+      setReviews(uniqueReviews);
     } else {
       setReviews([]);
     }
@@ -88,7 +87,8 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
     const isDuplicate = reviews.some(
       existingReview => 
         existingReview.content.toLowerCase().trim() === review.content.toLowerCase().trim() &&
-        existingReview.name.toLowerCase().trim() === review.name.toLowerCase().trim()
+        existingReview.name.toLowerCase().trim() === review.name.toLowerCase().trim() &&
+        existingReview.rating === review.rating
     );
 
     if (isDuplicate) {
