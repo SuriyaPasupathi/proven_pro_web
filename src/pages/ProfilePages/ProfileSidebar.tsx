@@ -127,7 +127,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     // Store the delete info in state for the confirmation dialog
     setDeleteType(type);
     if (type === 'certification' && certId) {
-      setCertificationToDelete(certId);
+      // Find the certification by certifications_id to get its UUID
+      const cert = profileData.certifications?.find(c => c.certifications_id === certId);
+      if (!cert?.id) {
+        toast.error("Certification ID not found");
+        return;
+      }
+      setCertificationToDelete(cert.id);
     }
 
     // Open the delete dialog
@@ -143,15 +149,22 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
     try {
       if (deleteType === 'certification' && certificationToDelete) {
-        // First delete the certification using the API
+        // Optimistically update the UI first
+        const updatedCerts = (profileData.certifications || []).filter(
+          cert => cert.id !== certificationToDelete
+        );
+        
+        // Update local state immediately
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          certifications: updatedCerts
+        }));
+
+        // Then make the API call
         const result = await handleDelete('certification', certificationToDelete);
 
-        // If deletion was successful, update the local state and Redux store
+        // If deletion was successful, update the backend state
         if (result?.success && deleteSuccess) {
-          const updatedCerts = (profileData.certifications || []).filter(
-            cert => cert.certifications_id !== certificationToDelete
-          );
-          
           const formData = new FormData();
           formData.append('certifications', JSON.stringify(updatedCerts));
 
@@ -161,15 +174,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           })).unwrap();
           
           if (updateResult) {
-            // Update local state
-            dispatch(updateProfileData({
-              ...reduxProfileData,
-              certifications: updatedCerts
-            }));
-            
             toast.success("Certification deleted successfully!");
           }
         } else {
+          // If deletion failed, revert the optimistic update
+          dispatch(updateProfileData({
+            ...reduxProfileData,
+            certifications: profileData.certifications
+          }));
           toast.error(result?.message || "Failed to delete certification");
         }
       } else {
@@ -218,6 +230,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
+      // Revert optimistic update on error
+      if (deleteType === 'certification') {
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          certifications: profileData.certifications
+        }));
+      }
       toast.error(deleteError || error.message || `Failed to delete ${deleteType}`);
     } finally {
       closeDeleteDialog();

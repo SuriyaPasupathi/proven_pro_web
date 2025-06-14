@@ -55,6 +55,7 @@ export interface ProfileData {
 
   // Certifications
   certifications?: {
+    id?: string;
     certifications_name: string;
     certifications_issuer: string;
     certifications_issued_date: string;
