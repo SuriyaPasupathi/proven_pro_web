@@ -1,4 +1,4 @@
-import { Copy, Star, Pencil, Share2 } from 'lucide-react';
+import { Copy, Star,Share2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ProfileData } from '../../types/profile';
 import { useEditMode } from '../../context/EditModeContext';
@@ -356,7 +356,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
                     className="p-1 xs:p-1.5 sm:p-2 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
                     onClick={() => setIsEditDialogOpen(true)}
                   >
-                    <Pencil className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
+                    {/* <Pencil className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" /> */}
                   </Button>
                 )}
               </div>

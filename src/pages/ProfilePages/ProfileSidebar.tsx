@@ -58,7 +58,6 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const [profileForm, setProfileForm] = useState({
     first_name: profileData.first_name || '',
     last_name: profileData.last_name || '',
-    profile_mail: profileData.profile_mail || '',
     bio: profileData.bio || '',
   });
   
@@ -233,6 +232,16 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     if (url.startsWith('http')) return url;
     const cleanPath = url.replace(/^\/+/, '');
     return `${baseUrl}/${cleanPath}`;
+  };
+
+  // Add new function to handle opening the profile dialog
+  const handleOpenProfileDialog = () => {
+    setProfileForm({
+      first_name: profileData.first_name || '',
+      last_name: profileData.last_name || '',
+      bio: profileData.bio || '',
+    });
+    setIsProfileDialogOpen(true);
   };
 
   // Profile form handlers
@@ -759,7 +768,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   <Button 
                     variant="ghost" 
                     className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10 transition-colors duration-300"
-                    onClick={() => setIsProfileDialogOpen(true)}
+                    onClick={handleOpenProfileDialog}
                   >
                     <Pencil className="w-4 h-4" />
                   </Button>
@@ -912,18 +921,6 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   disabled={isProfileUpdating}
                 />
               </div>
-            </div>
-            <div>
-              <label className="block font-medium mb-1 text-sm">Email</label>
-              <Input
-                name="profile_mail"
-                type="email"
-                value={profileForm.profile_mail}
-                onChange={handleProfileChange}
-                className="bg-gray-50"
-                required
-                disabled={isProfileUpdating}
-              />
             </div>
             <div>
               <label className="block font-medium mb-1 text-sm">Bio</label>

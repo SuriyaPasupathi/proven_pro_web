@@ -16,7 +16,6 @@ const CURRENT_STEP = 1;
 interface PersonalInfoForm {
   first_name: string;
   last_name: string;
-  profile_mail: string;
   mobile: string;
   countryCode: string;
   bio: string;
@@ -28,7 +27,6 @@ const PersonalInfo: React.FC = () => {
   const [form, setForm] = useState<PersonalInfoForm>({
     first_name: "",
     last_name: "",
-    profile_mail: "",
     mobile: "",
     countryCode: "",
     bio: "",
@@ -80,10 +78,6 @@ const PersonalInfo: React.FC = () => {
       toast.error('Last name is required');
       return false;
     }
-    if (!form.profile_mail.trim()) {
-      toast.error('Email is required');
-      return false;
-    }
     if (!form.mobile.trim()) {
       toast.error('Phone number is required');
       return false;
@@ -114,7 +108,6 @@ const PersonalInfo: React.FC = () => {
         subscription_type: "premium" as const,
         first_name: form.first_name ? form.first_name.trim() : '',
         last_name: form.last_name ? form.last_name.trim() : '',
-        profile_mail: form.profile_mail ? form.profile_mail.trim().toLowerCase() : '',
         mobile: formattedPhone,
         countryCode: form.countryCode,
         bio: form.bio ? form.bio.trim() : undefined,
@@ -202,22 +195,6 @@ const PersonalInfo: React.FC = () => {
               required
             />
           </div>
-        </div>
-
-        <div>
-          <label htmlFor="profile_mail" className="block font-medium mb-1 text-sm">
-            Email
-          </label>
-          <Input
-            id="profile_mail"
-            name="profile_mail"
-            type="email"
-            placeholder="Enter your email"
-            value={form.profile_mail}
-            onChange={handleChange}
-            className="bg-gray-50"
-            required
-          />
         </div>
 
         <div>
