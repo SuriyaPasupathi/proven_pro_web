@@ -91,7 +91,7 @@ const PremiumPlan: React.FC = () => {
           </Card>
 
           {/* Payment Form */}
-          <Card>
+          <Card className="border-2 border-[#5A8DB8]">
             <CardHeader>
               <CardTitle className="text-xl text-[#5A8DB8]">Payment Information</CardTitle>
             </CardHeader>
