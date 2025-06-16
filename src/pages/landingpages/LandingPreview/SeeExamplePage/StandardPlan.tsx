@@ -64,10 +64,13 @@ const StandardPlan: React.FC = () => {
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-10 text-[#5A8DB8] drop-shadow">
           {PLAN_NAME} Checkout
         </h1>
+        <p className="text-center text-gray-600 mb-10">
+          Get started with our standard plan and create your professional profile
+        </p>
         <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Plan Details */}
-          <Card className="border-2 border-[#5A8DB8] transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl">
-            <CardHeader className="bg-gradient-to-br from-blue-50 to-white">
+          <Card className="border-2 border-[#5A8DB8] transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-blue-50 to-white border-b border-gray-100">
               <CardTitle className="text-2xl font-bold text-[#5A8DB8]">{PLAN_NAME}</CardTitle>
               <div className="text-4xl font-extrabold text-[#222]">
                 <span className="text-2xl align-top">USD</span> {PLAN_PRICE}
@@ -88,8 +91,8 @@ const StandardPlan: React.FC = () => {
           </Card>
 
           {/* Payment Form */}
-          <Card className="transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl">
-            <CardHeader className="bg-gradient-to-br from-blue-50 to-white">
+          <Card className="transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-blue-50 to-white border-b border-gray-100">
               <CardTitle className="text-xl text-[#5A8DB8]">Payment Information</CardTitle>
             </CardHeader>
             <CardContent>
