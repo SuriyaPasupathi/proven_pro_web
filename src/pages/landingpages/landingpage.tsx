@@ -7,6 +7,7 @@ import Questions from "./LandingPreview/Questions";
 import Contact from "./LandingPreview/Contact";
 import Footer from "./LandingPreview/Footer";
 import Header from "../../components/layout/header";
+
 const LandingPage = () => {
   return (
     <div>
@@ -15,9 +16,9 @@ const LandingPage = () => {
       <GroupSection />
       <LevelUpSection />
       <HowItWorks />
-      <Plans />
+      <Plans isInLandingPage={true} />
       <Questions />
-      <Contact />
+      <Contact isInLandingPage={true} />
       <Footer />
     </div>
   )
