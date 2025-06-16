@@ -64,29 +64,39 @@ const PremiumPlan: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       <Header />
       <main className="flex-grow flex flex-col items-center justify-center py-8 px-2 sm:px-4 md:px-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-10 text-[#5A8DB8] drop-shadow">
-          {PLAN_NAME} Checkout
-        </h1>
-        <p className="text-center text-gray-600 mb-10">
-          Get started with our premium plan and create your professional profile
-        </p>
+        <div className="text-center mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-500 drop-shadow">
+            {PLAN_NAME} Checkout
+          </h1>
+          <p className="text-center text-gray-600 max-w-2xl mx-auto">
+            Get started with our premium plan and create your professional profile
+          </p>
+        </div>
         <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Plan Details */}
-          <Card className="border-2 border-yellow-400 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
+          <Card className="border-2 border-transparent transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden"
+            style={{
+              background: 'linear-gradient(white, white) padding-box, linear-gradient(45deg, #FFD700, #FFA500) border-box',
+            }}>
             <CardHeader className="bg-gradient-to-br from-yellow-50 to-white border-b border-gray-100">
-              <CardTitle className="text-2xl font-bold text-yellow-600">{PLAN_NAME}</CardTitle>
-              <div className="text-4xl font-extrabold text-[#222]">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl font-bold text-yellow-600">{PLAN_NAME}</CardTitle>
+                <span className="px-3 py-1 bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-700 rounded-full text-sm font-semibold">
+                  Most Popular
+                </span>
+              </div>
+              <div className="text-4xl font-extrabold text-[#222] mt-2">
                 <span className="text-2xl align-top">USD</span> {PLAN_PRICE}
                 <span className="text-base font-semibold text-gray-600">{PLAN_PERIOD}</span>
               </div>
             </CardHeader>
             <CardContent>
-              <h3 className="mb-4 font-semibold text-lg">Includes:</h3>
+              <h3 className="mb-4 font-semibold text-lg text-yellow-600">Premium Features:</h3>
               <ul className="space-y-3 text-gray-700 text-base">
                 {planFeatures.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 hover:translate-x-1 transition-transform">
-                    <FaCheckCircle className="text-green-500 flex-shrink-0" />
-                    <span>{feature}</span>
+                  <li key={feature} className="flex items-center gap-2 hover:translate-x-1 transition-transform group">
+                    <FaCheckCircle className="text-green-500 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                    <span className="group-hover:text-yellow-600 transition-colors">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -101,11 +111,12 @@ const PremiumPlan: React.FC = () => {
             <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name on Card</Label>
+                  <Label htmlFor="name" className="text-gray-700">Name on Card</Label>
                   <Input
                     id="name"
                     {...register("name")}
                     placeholder="John Smith"
+                    className="border-gray-200 focus:border-yellow-400 focus:ring-yellow-400/20 transition-colors"
                   />
                   {errors.name && (
                     <p className="text-sm text-red-500">{errors.name.message}</p>
@@ -113,12 +124,13 @@ const PremiumPlan: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="card">Card Number</Label>
+                  <Label htmlFor="card" className="text-gray-700">Card Number</Label>
                   <Input
                     id="card"
                     {...register("card")}
                     placeholder="1234 5678 9012 3456"
                     maxLength={19}
+                    className="border-gray-200 focus:border-yellow-400 focus:ring-yellow-400/20 transition-colors"
                   />
                   {errors.card && (
                     <p className="text-sm text-red-500">{errors.card.message}</p>
@@ -127,12 +139,13 @@ const PremiumPlan: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="expiry">Expiry Date</Label>
+                    <Label htmlFor="expiry" className="text-gray-700">Expiry Date</Label>
                     <Input
                       id="expiry"
                       {...register("expiry")}
                       placeholder="MM/YY"
                       maxLength={5}
+                      className="border-gray-200 focus:border-yellow-400 focus:ring-yellow-400/20 transition-colors"
                     />
                     {errors.expiry && (
                       <p className="text-sm text-red-500">{errors.expiry.message}</p>
@@ -140,12 +153,13 @@ const PremiumPlan: React.FC = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cvc">CVC</Label>
+                    <Label htmlFor="cvc" className="text-gray-700">CVC</Label>
                     <Input
                       id="cvc"
                       {...register("cvc")}
                       placeholder="123"
                       maxLength={4}
+                      className="border-gray-200 focus:border-yellow-400 focus:ring-yellow-400/20 transition-colors"
                     />
                     {errors.cvc && (
                       <p className="text-sm text-red-500">{errors.cvc.message}</p>
@@ -155,7 +169,7 @@ const PremiumPlan: React.FC = () => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
+                  className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-orange-500 hover:to-yellow-500 text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Processing..." : `Complete Payment ($${PLAN_PRICE}.00)`}
@@ -167,7 +181,7 @@ const PremiumPlan: React.FC = () => {
 
         <Button
           variant="outline"
-          className="border-[#5A8DB8] text-[#5A8DB8] hover:bg-[#5A8DB8] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+          className="border-yellow-400 text-yellow-600 hover:bg-yellow-50 hover:text-yellow-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
           onClick={() => navigate('/plans')}
         >
           Go Back to Pricing
