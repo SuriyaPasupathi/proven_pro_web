@@ -471,7 +471,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 xs:gap-6">
         {projectItems
-          .slice(0, isExpanded ? undefined : 1)
+          .slice(0, isExpanded ? undefined : 3)
           .map((item: Project, index: number) => {
           const imageUrl = getFullImageUrl(item.project_image_url || item.project_image);
           
@@ -537,7 +537,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
         })}
       </div>
       
-      {projectItems.length > 1 && (
+      {projectItems.length > 3 && (
         <Button 
           variant="link" 
           className="mt-4 xs:mt-6 text-[#5A8DB8] hover:text-[#3C5979] flex items-center p-0 group transition-all duration-200"
