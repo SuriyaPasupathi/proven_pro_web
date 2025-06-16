@@ -21,12 +21,19 @@ export default function Hero() {
           <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-gray-700 max-w-xl mx-auto md:mx-0">
             Showcase your expertise, gain trust, and land your next opportunity faster with a platform built to highlight your skills and past successes.
           </p>
-          <div className="mt-6 sm:mt-8">
+          <div className="mt-6 sm:mt-8 flex gap-4 justify-center md:justify-start">
             <Button
               className="bg-[#5A8DB8] hover:bg-[#3C5979] px-6 py-3 text-sm sm:text-base"
               onClick={() => navigate("/signup")}
             >
               Create Your Profile
+            </Button>
+            <Button
+              variant="outline"
+              className="border-[#5A8DB8] text-[#5A8DB8] hover:bg-[#5A8DB8] hover:text-white px-6 py-3 text-sm sm:text-base"
+              onClick={() => navigate("/example")}
+            >
+              See Example
             </Button>
           </div>
         </div>

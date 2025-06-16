@@ -17,7 +17,7 @@ const plans = [
   },
   {
     name: "Premium",
-    price: "USD 20/annually",
+    price: "USD 20/semiannually",
     features: [
       "Profile Name and Image",
       "Review Ratings",
@@ -26,8 +26,8 @@ const plans = [
       "Copy URL Link",
       "Displays Services, Experiences, Skills and Tools",
       "Displays Education and Certifications",
-      "Languages",
-      "Categories",
+      "Multiple Languages Support",
+      "Custom Categories",
       "Video Introduction",
       "Exhibit Portfolio / Previous Works",
     ],
@@ -37,7 +37,7 @@ const plans = [
   },
   {
     name: "Standard",
-    price: "USD 10/annually",
+      price: "USD 10/semiannually",
     features: [
       "Profile Name and Image",
       "Review Ratings",
@@ -45,8 +45,8 @@ const plans = [
       "Client's Previews Reviews",
       "Copy URL Link",
       "Displays Services, Experiences, Skills and Tools",
-      "Languages",
-      "Categories",
+      "Multiple Languages Support",
+      "Custom Categories",
     ],
     button: "Sign Up Now",
     highlight: false,
@@ -97,7 +97,7 @@ export default function Plans() {
                     <span className="text-2xl sm:text-3xl font-bold">
                       {plan.price.match(/\d+/)}
                     </span>
-                    <span className="text-xs sm:text-sm font-normal">
+                    <span className="text-xs sm:text-sm font-bold">
                       {plan.price.replace(/USD|\d+/, "")}
                     </span>
                   </>
@@ -135,11 +135,17 @@ export default function Plans() {
               onClick={() => {
                 if (plan.name === "Basic") {
                   navigate("/create-profile/personal-info");
+                } else if (plan.name === "Premium") {
+                  navigate("/premium-plan");
+                } else if (plan.name === "Standard") {
+                  navigate("/standard-plan");
                 }
               }}
             >
               {plan.button}
             </Button>
+
+            
           </div>
         ))}
       </div>

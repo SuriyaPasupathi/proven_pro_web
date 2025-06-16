@@ -32,6 +32,10 @@ import Contact from './pages/landingpages/LandingPreview/Contact';
 import ProtectedRoute from './context/ProtectedRoute';
 import ShareProfilePage from './pages/ProfilePages/SharePage/ShareProfilePage';
 import ReviewAll from './components/Review/ReviewAll';
+import SeeExample from './pages/landingpages/LandingPreview/SeeExample';
+import BasicExample from './pages/landingpages/LandingPreview/SeeExamplePage/FreePlan';
+import StandardExample from './pages/landingpages/LandingPreview/SeeExamplePage/StandardPlan';
+import PremiumExample from './pages/landingpages/LandingPreview/SeeExamplePage/PremiumPlan';
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
 const { theme } = useTheme();
@@ -55,6 +59,12 @@ function App() {
 
               {/* Review Routes */}
               <Route path="/reviews" element={<ReviewAll />} />
+
+              {/* Example Routes */}
+              <Route path="/example" element={<SeeExample />} />
+              <Route path="/free-plan" element={<BasicExample />} />
+              <Route path="/standard-plan" element={<StandardExample />} />
+              <Route path="/premium-plan" element={<PremiumExample />} />
 
               {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
