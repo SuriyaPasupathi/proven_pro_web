@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Header from '../../../components/layout/header';
 import Footer from './Footer';
 import { FaStar, FaGem, FaRocket } from 'react-icons/fa';
-import profileImg from '../../../assets/profilepage.jpg';
 import { useNavigate } from 'react-router-dom';
 import FreePlanDailog from './SeeExamplePage/FreePlanDailog';
 
@@ -86,7 +85,7 @@ const SeeExample: React.FC = () => {
 
   const profiles = [
     {
-      image: profileImg,
+      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
       title: 'Basic Example',
       subtitle: 'UI/UX Designer',
       description: 'A basic profile showcasing essential information and reviews.',
@@ -101,7 +100,7 @@ const SeeExample: React.FC = () => {
       onSelect: () => setShowFreeDialog(true),
     },
     {
-      image: profileImg,
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
       title: 'Standard Example',
       subtitle: 'Front End Developer',
       description:
@@ -117,7 +116,7 @@ const SeeExample: React.FC = () => {
       onSelect: () => navigate('/standard-plan'),
     },
     {
-      image: profileImg,
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop',
       title: 'Premium Example',
       subtitle: 'Senior Designer',
       description:
@@ -138,11 +137,25 @@ const SeeExample: React.FC = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
-        <div className="py-8 px-2 sm:py-12 sm:px-4 md:px-8 bg-gradient-to-br from-blue-50 via-white to-blue-100">
-          <div className="container mx-auto">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-10 md:mb-12 text-[#5A8DB8] drop-shadow">
-              Example Profiles
-            </h2>
+        <div className="relative py-8 px-2 sm:py-12 sm:px-4 md:px-8 bg-gradient-to-br from-blue-50 via-white to-blue-100">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235A8DB8' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 60px'
+            }}></div>
+          </div>
+          
+          {/* Content Container */}
+          <div className="container mx-auto relative z-10">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#5A8DB8] drop-shadow">
+                Example Profiles
+              </h2>
+              <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+                Choose from our professionally designed profile templates to showcase your expertise
+              </p>
+            </div>
             <div className="grid gap-6 sm:gap-8 md:gap-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
               {profiles.map((profile, idx) => (
                 <ProfileCard key={idx} {...profile} />

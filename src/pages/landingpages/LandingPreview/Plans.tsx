@@ -69,10 +69,10 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
         {/* Header */}
         <div className="max-w-7xl mx-auto text-center mb-8 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-gray-900">Ready to START?</h2>
-          <p className="text-red-500 flex items-center justify-center gap-2 text-sm sm:text-base">
+          {/* <p className="text-red-500 flex items-center justify-center gap-2 text-sm sm:text-base">
             <span>📌</span>
             Sed eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </p>
+          </p> */}
         </div>
 
         {/* Pricing Cards */}
