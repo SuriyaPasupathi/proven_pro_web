@@ -37,37 +37,37 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
   return (
     <div
-      className={`relative flex flex-col items-center bg-white rounded-xl shadow-md border transition-all duration-200 ${borderClass} hover:shadow-lg hover:-translate-y-1 w-full max-w-sm mx-auto`}
+      className={`relative flex flex-col items-center bg-white rounded-xl shadow-md border transition-all duration-300 ${borderClass} hover:shadow-xl hover:-translate-y-2 w-full max-w-sm mx-auto`}
     >
       {/* Badge */}
-      <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">{badge}</div>
+      <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 transform hover:scale-105 transition-transform duration-200">{badge}</div>
       <div className="w-full flex flex-col items-center pt-8 pb-4 px-4">
-        <div className="relative w-28 h-28 sm:w-32 sm:h-32 mb-3">
+        <div className="relative w-28 h-28 sm:w-32 sm:h-32 mb-3 group">
           <img
             src={image}
             alt={title}
-            className="w-full h-full object-cover rounded-full border-4 border-white shadow"
+            className="w-full h-full object-cover rounded-full border-4 border-white shadow-md group-hover:shadow-lg transition-all duration-300"
           />
           <div
-            className="absolute bottom-0 left-0 w-full h-8 bg-[#5A8DB8] rounded-b-full"
+            className="absolute bottom-0 left-0 w-full h-8 bg-[#5A8DB8] rounded-b-full transition-opacity duration-300 group-hover:opacity-90"
             style={{
               clipPath: 'polygon(0 60%, 100% 0, 100% 100%, 0% 100%)',
               opacity: 0.7,
             }}
           ></div>
         </div>
-        <h3 className="font-bold text-lg text-gray-900 mb-1">{title}</h3>
+        <h3 className="font-bold text-lg text-gray-900 mb-1 hover:text-[#5A8DB8] transition-colors duration-200">{title}</h3>
         <p className="text-[#5A8DB8] text-sm font-medium mb-1">{subtitle}</p>
         <p className="text-gray-500 text-sm mb-4 text-center">{description}</p>
         <div className="flex w-full gap-2 mt-auto">
           <button
-            className="flex-1 bg-[#E6F0FA] text-[#5A8DB8] px-3 py-2 rounded font-medium cursor-default shadow-sm border border-[#5A8DB8] whitespace-nowrap text-xs sm:text-sm"
+            className="flex-1 bg-[#E6F0FA] text-[#5A8DB8] px-3 py-2 rounded-lg font-medium cursor-default shadow-sm border border-[#5A8DB8] whitespace-nowrap text-xs sm:text-sm transition-all duration-200"
             disabled
           >
             {planLabel}
           </button>
           <button
-            className="flex-1 bg-[#5A8DB8] text-white px-3 py-2 rounded font-semibold shadow hover:bg-[#3C5979] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#5A8DB8] whitespace-nowrap text-xs sm:text-sm"
+            className="flex-1 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 rounded-lg font-semibold whitespace-nowrap text-xs sm:text-sm"
             style={{ border: '1px solid #5A8DB8' }}
             onClick={onSelect}
           >
@@ -92,7 +92,7 @@ const SeeExample: React.FC = () => {
       planLabel: 'Basic Plan',
       selectLabel: 'Select Basic',
       badge: (
-        <span className="flex items-center gap-1 bg-blue-100 text-[#5A8DB8] px-3 py-1 rounded-full text-xs font-semibold shadow">
+        <span className="flex items-center gap-1 bg-blue-100 text-[#5A8DB8] px-3 py-1 rounded-full text-xs font-semibold shadow-md hover:shadow-lg transition-all duration-200">
           <FaStar className="text-yellow-400" /> Basic
         </span>
       ),
@@ -108,7 +108,7 @@ const SeeExample: React.FC = () => {
       planLabel: 'Standard Plan',
       selectLabel: 'Select Standard',
       badge: (
-        <span className="flex items-center gap-1 bg-blue-100 text-[#5A8DB8] px-3 py-1 rounded-full text-xs font-semibold shadow">
+        <span className="flex items-center gap-1 bg-blue-100 text-[#5A8DB8] px-3 py-1 rounded-full text-xs font-semibold shadow-md hover:shadow-lg transition-all duration-200">
           <FaGem className="text-blue-500" /> Standard
         </span>
       ),
@@ -124,7 +124,7 @@ const SeeExample: React.FC = () => {
       planLabel: 'Premium Plan',
       selectLabel: 'Select Premium',
       badge: (
-        <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold shadow">
+        <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold shadow-md hover:shadow-lg transition-all duration-200">
           <FaRocket className="text-yellow-500" /> Premium
         </span>
       ),

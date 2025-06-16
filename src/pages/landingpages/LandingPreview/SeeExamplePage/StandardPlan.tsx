@@ -64,10 +64,10 @@ const StandardPlan: React.FC = () => {
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-10 text-[#5A8DB8] drop-shadow">
           {PLAN_NAME} Checkout
         </h1>
-        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 overflow-x-auto">
+        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Plan Details */}
-          <Card className="border-2 border-[#5A8DB8]">
-            <CardHeader>
+          <Card className="border-2 border-[#5A8DB8] transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl">
+            <CardHeader className="bg-gradient-to-br from-blue-50 to-white">
               <CardTitle className="text-2xl font-bold text-[#5A8DB8]">{PLAN_NAME}</CardTitle>
               <div className="text-4xl font-extrabold text-[#222]">
                 <span className="text-2xl align-top">USD</span> {PLAN_PRICE}
@@ -78,8 +78,8 @@ const StandardPlan: React.FC = () => {
               <h3 className="mb-4 font-semibold text-lg">Includes:</h3>
               <ul className="space-y-3 text-gray-700 text-base">
                 {planFeatures.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2">
-                    <FaCheckCircle className="text-green-500" />
+                  <li key={feature} className="flex items-center gap-2 hover:translate-x-1 transition-transform">
+                    <FaCheckCircle className="text-green-500 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -88,8 +88,8 @@ const StandardPlan: React.FC = () => {
           </Card>
 
           {/* Payment Form */}
-          <Card>
-            <CardHeader>
+          <Card className="transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl">
+            <CardHeader className="bg-gradient-to-br from-blue-50 to-white">
               <CardTitle className="text-xl text-[#5A8DB8]">Payment Information</CardTitle>
             </CardHeader>
             <CardContent>
@@ -149,7 +149,7 @@ const StandardPlan: React.FC = () => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-[#5A8DB8] hover:bg-[#3C5979]"
+                  className="w-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Processing..." : `Complete Payment ($${PLAN_PRICE}.00)`}
@@ -161,7 +161,7 @@ const StandardPlan: React.FC = () => {
 
         <Button
           variant="outline"
-          className="border-[#5A8DB8] text-[#5A8DB8] hover:bg-[#5A8DB8] hover:text-white"
+          className="border-[#5A8DB8] text-[#5A8DB8] hover:bg-[#5A8DB8] hover:text-white transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
           onClick={() => navigate('/plans')}
         >
           Go Back to Pricing
