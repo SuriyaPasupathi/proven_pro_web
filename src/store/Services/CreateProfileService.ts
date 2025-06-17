@@ -531,7 +531,7 @@ export const shareProfile = createAsyncThunk(
   'profile/shareProfile',
   async (payload: { email: string; user_id: string }, { rejectWithValue }) => {
     try {
-      const token = getAuthToken();
+      // const token = getAuthToken();
       const response = await axios.post(
         `${baseUrl}request-profile-share/`,
         { 
@@ -539,11 +539,11 @@ export const shareProfile = createAsyncThunk(
           email: payload.email,
           user_id: payload.user_id
         },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
+        // {
+        //   headers: {
+        //     'Authorization': `Bearer ${token}`
+        //   }
+        // }
       );
       return response.data;
     } catch (error) {
