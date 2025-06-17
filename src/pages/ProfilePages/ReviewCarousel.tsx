@@ -201,41 +201,45 @@ interface ReviewCardProps {
 
 const ReviewCard = ({ review }: ReviewCardProps) => {
   return (
-    <Card className="border border-[#5A8DB8]/10 bg-gradient-to-br from-white to-gray-50 h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] relative overflow-hidden group">
+    <Card className="border border-[#5A8DB8]/10 bg-gradient-to-br from-white to-gray-50 h-[180px] sm:h-[200px] transition-all duration-300 hover:shadow-lg hover:scale-[1.02] relative overflow-hidden group">
       <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <CardContent className="p-6 relative">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-gradient-to-br from-[#5A8DB8]/10 to-[#3C5979]/10 rounded-full">
-            <User className="h-5 w-5 text-[#5A8DB8]" />
+      <CardContent className="p-3 sm:p-4 relative h-full flex flex-col">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="p-1.5 bg-gradient-to-br from-[#5A8DB8]/10 to-[#3C5979]/10 rounded-full">
+            <User className="h-3.5 w-3.5 text-[#5A8DB8]" />
           </div>
-          <h3 className="font-semibold text-[#5A8DB8] text-base">{review.name}</h3>
+          <h3 className="font-semibold text-[#5A8DB8] text-xs sm:text-sm truncate">{review.name}</h3>
         </div>
         
-        <div className="flex items-center gap-2 mb-4">
-          <div className="flex">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={cn(
-                  "h-4 w-4 transition-all duration-300",
-                  i < review.rating 
-                    ? "fill-yellow-400 text-yellow-400" 
-                    : "text-gray-200"
-                )}
-              />
-            ))}
+        <div className="flex items-center gap-1.5 mb-2">
+          <span className="text-xs font-medium text-[#5A8DB8]">Rating:</span>
+          <div className="flex items-center gap-1">
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={cn(
+                    "h-3 w-3 transition-all duration-300",
+                    i < review.rating 
+                      ? "fill-yellow-400 text-yellow-400" 
+                      : "text-gray-200"
+                  )}
+                />
+              ))}
+            </div>
+            <span className="text-xs font-medium text-[#5A8DB8]">({review.rating}/5)</span>
           </div>
           {review.timestamp && (
-            <div className="flex items-center gap-1 text-gray-500 text-sm">
-              <Calendar className="h-3 w-3" />
-              <span>{review.timestamp}</span>
+            <div className="flex items-center gap-1 text-gray-500 text-xs">
+              <Calendar className="h-2.5 w-2.5" />
+              <span className="truncate">{review.timestamp}</span>
             </div>
           )}
         </div>
         
-        <div className="flex items-start gap-3">
-          <MessageSquare className="h-4 w-4 text-[#5A8DB8] mt-1 flex-shrink-0" />
-          <p className="text-sm text-gray-600 leading-relaxed">{review.content}</p>
+        <div className="flex items-start gap-2 flex-grow">
+          <MessageSquare className="h-3 w-3 text-[#5A8DB8] mt-1 flex-shrink-0" />
+          <p className="text-xs text-gray-600 line-clamp-4 sm:line-clamp-5">{review.content}</p>
         </div>
       </CardContent>
     </Card>
