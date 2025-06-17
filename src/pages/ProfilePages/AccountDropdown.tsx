@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { User, ShieldCheck, Users, Settings, LogOut, Edit } from 'lucide-react';
+import { User, ShieldCheck, Users, Settings, LogOut, Edit, ChevronRight } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
@@ -22,17 +22,14 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
     try {
       const refreshToken = localStorage.getItem('refresh_token');
       
-      // First attempt API call if we have a refresh token
       if (refreshToken) {
         try {
           await dispatch(logout());
         } catch (apiError) {
           console.error('API logout failed:', apiError);
-          // Continue with local logout even if API call fails
         }
       }
       
-      // Then clear local storage
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
@@ -43,11 +40,9 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
         duration: 3000,
       });
       
-      // Redirect to login
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
-      // Ensure we still clear everything and redirect even if there's an error
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
@@ -71,86 +66,130 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
   const userEmail = localStorage.getItem('user_email') || '';
 
   return (
-    <div className="absolute right-0 mt-2 w-64 bg-gradient-to-br from-white to-gray-50/50 border border-[#5A8DB8]/10 rounded-lg shadow-lg hover:shadow-xl z-50 overflow-hidden transform origin-top-right transition-all duration-300 ease-in-out">
-      <div className="p-4 border-b border-[#5A8DB8]/10">
-        <div className="font-medium truncate text-[#5A8DB8]">
-          {userData?.first_name && userData?.last_name 
-            ? `${userData.first_name} ${userData.last_name}`
-            : 'User'}
+    <div className="absolute right-0 mt-2 w-72 bg-white/80 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl shadow-2xl z-50 overflow-hidden transform origin-top-right transition-all duration-300 ease-in-out">
+      {/* User Info Section */}
+      <div className="p-4 border-b border-[#5A8DB8]/10 bg-gradient-to-br from-[#5A8DB8]/5 to-transparent">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#5A8DB8] to-[#70a4d8] flex items-center justify-center text-white font-semibold">
+            {userData?.first_name?.[0] || 'U'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-[#3C5979] truncate">
+              {userData?.first_name && userData?.last_name 
+                ? `${userData.first_name} ${userData.last_name}`
+                : 'User'}
+            </div>
+            <div className="text-sm text-[#5A8DB8]/70 truncate">{userEmail}</div>
+          </div>
         </div>
-        <div className="text-sm text-gray-600 truncate">{userEmail}</div>
       </div>
       
+      {/* Menu Items */}
       <div className="py-2 max-h-[calc(100vh-200px)] overflow-y-auto">
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
+          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             setIsEditMode(false);
             navigate(`/profile/${userData.id}`);
             closeDropdown();
           }}
         >
-          <User className="mr-2 h-4 w-4 shrink-0" />
-          <span className="truncate">My Profile</span>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-[#5A8DB8]/10 flex items-center justify-center group-hover:bg-[#5A8DB8]/20 transition-colors">
+              <User className="h-4 w-4 text-[#5A8DB8]" />
+            </div>
+            <span className="truncate">My Profile</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-[#5A8DB8]/50 group-hover:text-[#5A8DB8] transition-colors" />
         </Button>
+
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
+          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             handleEditProfile();
             closeDropdown();
           }}
         >
-          <Edit className="mr-2 h-4 w-4 shrink-0" />
-          <span className="truncate">Edit Profile</span>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-[#5A8DB8]/10 flex items-center justify-center group-hover:bg-[#5A8DB8]/20 transition-colors">
+              <Edit className="h-4 w-4 text-[#5A8DB8]" />
+            </div>
+            <span className="truncate">Edit Profile</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-[#5A8DB8]/50 group-hover:text-[#5A8DB8] transition-colors" />
         </Button>
+
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
+          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             navigate(`/profile/verification/${userData.id}`);
             closeDropdown();
           }}
         >
-          <ShieldCheck className="mr-2 h-4 w-4 shrink-0" />
-          <span className="truncate">Verification</span>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-[#5A8DB8]/10 flex items-center justify-center group-hover:bg-[#5A8DB8]/20 transition-colors">
+              <ShieldCheck className="h-4 w-4 text-[#5A8DB8]" />
+            </div>
+            <span className="truncate">Verification</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-[#5A8DB8]/50 group-hover:text-[#5A8DB8] transition-colors" />
         </Button>
+
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
+          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             navigate(`/profile/membership-plans/${userData.id}`);
             closeDropdown();
           }}
         >
-          <Users className="mr-2 h-4 w-4 shrink-0" />
-          <span className="truncate">Membership Plan</span>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-[#5A8DB8]/10 flex items-center justify-center group-hover:bg-[#5A8DB8]/20 transition-colors">
+              <Users className="h-4 w-4 text-[#5A8DB8]" />
+            </div>
+            <span className="truncate">Membership Plan</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-[#5A8DB8]/50 group-hover:text-[#5A8DB8] transition-colors" />
         </Button>
+
         <Button
           variant="ghost"
-          className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300"
+          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             navigate(`/profile/account-settings/${userData.id}`);
             closeDropdown();
           }}
         >
-          <Settings className="mr-2 h-4 w-4 shrink-0" />
-          <span className="truncate">Account Settings</span>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-[#5A8DB8]/10 flex items-center justify-center group-hover:bg-[#5A8DB8]/20 transition-colors">
+              <Settings className="h-4 w-4 text-[#5A8DB8]" />
+            </div>
+            <span className="truncate">Account Settings</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-[#5A8DB8]/50 group-hover:text-[#5A8DB8] transition-colors" />
         </Button>
       </div>
       
-      <div className="border-t border-[#5A8DB8]/10 py-2">
+      {/* Logout Section */}
+      <div className="border-t border-[#5A8DB8]/10 py-2 bg-gradient-to-br from-transparent to-[#5A8DB8]/5">
         <Button 
           variant="ghost" 
-          className="w-full justify-start px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50/50 transition-all duration-300"
+          className="w-full justify-between px-4 py-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50/50 transition-all duration-300 group"
           onClick={() => {
             handleLogout();
             closeDropdown();
           }}
         >
-          <LogOut className="mr-2 h-4 w-4 shrink-0" />
-          <span className="truncate">Log out</span>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-red-100/50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+              <LogOut className="h-4 w-4 text-red-600" />
+            </div>
+            <span className="truncate">Log out</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-red-400/50 group-hover:text-red-500 transition-colors" />
         </Button>
       </div>
     </div>

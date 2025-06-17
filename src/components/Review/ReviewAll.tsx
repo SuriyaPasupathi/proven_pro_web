@@ -54,13 +54,15 @@ const ReviewAll: React.FC = () => {
     });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-[#f0f0f3]">
       <Header />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 gap-4 sm:gap-6">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">Find Users</h1>
-            <p className="mt-2 text-base sm:text-lg text-gray-600">Discover and connect with talented professionals</p>
+          <div className="relative">
+            <div className="bg-[#f0f0f3] p-4 rounded-2xl shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff]">
+              <h1 className="text-3xl sm:text-4xl font-bold text-[#5A8DB8]">Find Users</h1>
+              <p className="mt-2 text-base sm:text-lg text-gray-600 font-medium">Discover and connect with talented professionals</p>
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
             <div className="relative flex-1 sm:flex-none">
@@ -70,7 +72,7 @@ const ReviewAll: React.FC = () => {
                   placeholder="Search users..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#5A8DB8] focus:border-transparent shadow-sm transition-all duration-200 text-sm sm:text-base"
+                  className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-[#f0f0f3] border-none rounded-xl shadow-[inset_4px_4px_8px_#d1d1d1,inset_-4px_-4px_8px_#ffffff] focus:outline-none focus:ring-2 focus:ring-[#5A8DB8] transition-all duration-300 text-sm sm:text-base"
                 />
                 <svg
                   className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400"
@@ -90,11 +92,11 @@ const ReviewAll: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setShowSort(!showSort)}
-                className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between gap-2 sm:gap-3 hover:bg-gray-50 transition-all duration-200 shadow-sm text-sm sm:text-base"
+                className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-[#f0f0f3] border-none rounded-xl shadow-[4px_4px_8px_#d1d1d1,-4px_-4px_8px_#ffffff] hover:shadow-[inset_4px_4px_8px_#d1d1d1,inset_-4px_-4px_8px_#ffffff] transition-all duration-300 flex items-center justify-between gap-2 sm:gap-3 text-sm sm:text-base"
               >
                 <span className="text-gray-700">Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
                 <svg
-                  className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-500 transition-transform duration-200 ${showSort ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-500 transition-transform duration-300 ${showSort ? 'rotate-180' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -103,7 +105,7 @@ const ReviewAll: React.FC = () => {
                 </svg>
               </button>
               {showSort && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-10 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-48 bg-[#f0f0f3] rounded-xl shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff] border border-[#e0e0e0] z-10 overflow-hidden">
                   {sortOptions.map((option) => (
                     <button
                       key={option.value}
@@ -111,7 +113,7 @@ const ReviewAll: React.FC = () => {
                         setSortBy(option.value);
                         setShowSort(false);
                       }}
-                      className={`flex items-center w-full px-4 py-2.5 sm:py-3 text-sm hover:bg-[#5A8DB8]/10 transition-colors duration-200 ${
+                      className={`flex items-center w-full px-4 py-2.5 sm:py-3 text-sm hover:bg-[#e8e8e8] transition-colors duration-200 ${
                         sortBy === option.value ? 'text-[#5A8DB8] font-medium' : 'text-gray-700'
                       }`}
                     >
@@ -133,7 +135,7 @@ const ReviewAll: React.FC = () => {
             <p className="mt-4 sm:mt-6 text-base sm:text-lg text-gray-600 font-medium">Loading freelancers...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 sm:py-16 bg-white rounded-2xl shadow-sm border border-gray-200">
+          <div className="text-center py-12 sm:py-16 bg-[#f0f0f3] rounded-2xl shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff]">
             <svg
               className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4"
               fill="none"
@@ -155,18 +157,14 @@ const ReviewAll: React.FC = () => {
             {filtered.map((freelancer, index) => (
               <div
                 key={freelancer.id}
-                className={`relative transform transition-all duration-300 hover:scale-[1.02] ${
+                className={`relative transform transition-all duration-500 hover:scale-[1.02] ${
                   index % 2 === 0 
                     ? 'ml-0' 
                     : 'ml-0 sm:ml-12'
                 }`}
               >
-                <div className={`relative ${
-                  index % 2 === 0 
-                    ? 'bg-white rounded-2xl shadow-lg border border-gray-200' 
-                    : 'bg-gradient-to-br from-[#5A8DB8]/10 to-white rounded-2xl shadow-md'
-                }`}>
-                  <div className="absolute -top-3 -left-3 sm:-top-4 sm:-left-4 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-[#5A8DB8] flex items-center justify-center text-white text-sm sm:text-base font-bold">
+                <div className="relative">
+                  <div className="absolute -top-3 -left-3 sm:-top-4 sm:-left-4 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-[#f0f0f3] flex items-center justify-center text-[#5A8DB8] text-sm sm:text-base font-bold shadow-[4px_4px_8px_#d1d1d1,-4px_-4px_8px_#ffffff]">
                     {index + 1}
                   </div>
                   <div className="p-4 sm:p-8">
