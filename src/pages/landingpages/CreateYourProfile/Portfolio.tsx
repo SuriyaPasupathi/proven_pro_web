@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
-import { X } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, Sparkles, Briefcase, FileText, Link2, Image as ImageIcon, Upload } from "lucide-react";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 6;
@@ -145,20 +145,21 @@ const Portfolio: React.FC = () => {
   const progressPercent = Math.round((CURRENT_STEP / TOTAL_STEPS) * 100);
 
   return (
-    <div className="min-h-screen bg-white px-4 sm:px-6 md:px-8 py-6 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#F8FBFF] px-4 sm:px-6 md:px-8 py-8 flex flex-col">
       {/* Step Progress */}
-      <div className="mb-8 w-full max-w-5xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+      <div className="mb-10 w-full max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-gray-500 text-sm md:text-base">
+          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
             {progressPercent}% Complete
           </span>
         </div>
-        <div className="w-full h-2 bg-gray-200 rounded">
+        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
           <div
-            className="h-2 bg-[#3C5979] rounded transition-all duration-300"
+            className="h-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -167,131 +168,172 @@ const Portfolio: React.FC = () => {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-5xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col gap-6"
+        className="w-full max-w-5xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex flex-col gap-8"
       >
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">
-          Portfolio
-        </h1>
-
-        {/* Project Title */}
-        <div>
-          <label htmlFor="project_title" className="block font-medium mb-1 text-sm">
-            Project Title
-          </label>
-          <Input
-            id="project_title"
-            name="project_title"
-            placeholder="Enter project name"
-            value={form.project_title}
-            onChange={handleChange}
-            className="bg-gray-50"
-            required
-          />
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
+            <Briefcase className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+              Portfolio
+            </h1>
+            <p className="text-sm text-[#5A8DB8]/70 mt-1">Showcase your best work</p>
+          </div>
         </div>
 
-        {/* Project Description */}
-        <div>
-          <label htmlFor="project_description" className="block font-medium mb-1 text-sm">
-            Project Description
-          </label>
-          <Textarea
-            id="project_description"
-            name="project_description"
-            placeholder="Describe your project..."
-            value={form.project_description}
-            onChange={handleChange}
-            className="bg-gray-50 min-h-[120px]"
-            required
-          />
-        </div>
-
-        {/* Project URL */}
-        <div>
-          <label htmlFor="project_url" className="block font-medium mb-1 text-sm">
-            Project URL
-          </label>
-          <Input
-            id="project_url"
-            name="project_url"
-            placeholder="https://..."
-            value={form.project_url}
-            onChange={handleChange}
-            className="bg-gray-50"
-            required
-          />
-        </div>
-
-        {/* Image Upload */}
-        <div className="space-y-4">
-          <div className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-6 md:px-8 text-center">
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleImageChange}
-              multiple
+        <div className="space-y-6">
+          {/* Project Title */}
+          <div>
+            <label htmlFor="project_title" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+              <Briefcase className="w-4 h-4" />
+              Project Title
+            </label>
+            <Input
+              id="project_title"
+              name="project_title"
+              placeholder="Enter project name"
+              value={form.project_title}
+              onChange={handleChange}
+              className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300"
+              required
             />
-            <Button
-              type="button"
-              variant="outline"
-              className="mb-2"
-              onClick={handleUploadClick}
-            >
-              Upload Project Images
-            </Button>
-            <p className="text-gray-500 text-sm">
-              Upload project images (max 5MB each)
-            </p>
           </div>
 
-          {/* Image Previews */}
-          {form.project_images.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {form.project_images.map((image, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={image.previewUrl}
-                    alt={`Project preview ${index + 1}`}
-                    className="w-full h-32 object-cover rounded-lg"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              ))}
+          {/* Project Description */}
+          <div>
+            <label htmlFor="project_description" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+              <FileText className="w-4 h-4" />
+              Project Description
+            </label>
+            <Textarea
+              id="project_description"
+              name="project_description"
+              placeholder="Describe your project..."
+              value={form.project_description}
+              onChange={handleChange}
+              className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[120px]"
+              required
+            />
+          </div>
+
+          {/* Project URL */}
+          <div>
+            <label htmlFor="project_url" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+              <Link2 className="w-4 h-4" />
+              Project URL
+            </label>
+            <Input
+              id="project_url"
+              name="project_url"
+              placeholder="https://..."
+              value={form.project_url}
+              onChange={handleChange}
+              className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300"
+              required
+            />
+          </div>
+
+          {/* Image Upload */}
+          <div className="space-y-4">
+            <div 
+              className="border-2 border-dashed border-[#5A8DB8]/30 rounded-xl flex flex-col items-center justify-center py-12 px-4 sm:px-6 md:px-8 text-center bg-white/50 hover:bg-white/80 transition-colors duration-300"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer.files) {
+                  handleImageChange({ target: { files: e.dataTransfer.files } } as any);
+                }
+              }}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleImageChange}
+                multiple
+              />
+              <div className="h-16 w-16 rounded-full bg-[#5A8DB8]/10 flex items-center justify-center mb-4">
+                <Upload className="h-8 w-8 text-[#5A8DB8]" />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="mb-3 bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979] transition-all duration-300 rounded-xl"
+                onClick={handleUploadClick}
+              >
+                Upload Project Images
+              </Button>
+              <p className="text-[#5A8DB8]/70 text-sm">
+                Drag and drop images here or click to upload (max 5MB each)
+              </p>
             </div>
-          )}
+
+            {/* Image Previews */}
+            {form.project_images.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {form.project_images.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <div className="aspect-square rounded-xl overflow-hidden shadow-md">
+                      <img
+                        src={image.previewUrl}
+                        alt={`Project preview ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm text-red-500 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-50 hover:text-red-600 shadow-lg"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="text-red-500 text-sm mt-2">
-            {error.message}
+          <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
+            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" />
+              {error.message}
+            </p>
           </div>
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mt-6 gap-3">
+        <div className="flex justify-end gap-4 mt-8">
           <Button
             type="button"
             variant="outline"
-            className="w-full sm:w-auto hover:bg-[#5A8DB8] text-black"
+            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading}
           >
+            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
             type="submit"
-            className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
             disabled={loading}
           >
-            {loading ? "Saving..." : "Save and Continue"}
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                Save and Continue
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </Button>
         </div>
       </form>

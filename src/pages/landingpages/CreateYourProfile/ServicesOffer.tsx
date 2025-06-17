@@ -8,7 +8,7 @@ import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import { fetchServices } from "../../../store/Services/DropDownService";
 import toast from "react-hot-toast";
-import { Plus, X } from "lucide-react";
+import { Plus, X, ArrowLeft, ArrowRight, Sparkles, Briefcase, DollarSign, Clock, ListChecks } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 interface ServiceForm {
@@ -37,6 +37,12 @@ const ServicesOffer: React.FC = () => {
   useEffect(() => {
     dispatch(fetchServices());
   }, [dispatch]);
+
+  // Add debug logging
+  useEffect(() => {
+    console.log('Services state:', services);
+    console.log('Services loading state:', servicesLoading);
+  }, [services, servicesLoading]);
 
   // Initialize form with existing data if available
   useEffect(() => {
@@ -165,18 +171,21 @@ const ServicesOffer: React.FC = () => {
   const progressPercent = Math.round((CURRENT_STEP / TOTAL_STEPS) * 100);
 
   return (
-    <div className="min-h-screen bg-white px-4 sm:px-6 md:px-8 py-6 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#F8FBFF] px-4 sm:px-6 md:px-8 py-8 flex flex-col">
       {/* Progress Section */}
-      <div className="mb-8 w-full max-w-4xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+      <div className="mb-10 w-full max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-sm text-gray-500">{progressPercent}% Complete</span>
+          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+            {progressPercent}% Complete
+          </span>
         </div>
-        <div className="w-full h-2 bg-gray-200 rounded overflow-hidden">
+        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
           <div
-            className="h-2 bg-[#3C5979] transition-all duration-300"
+            className="h-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -185,106 +194,132 @@ const ServicesOffer: React.FC = () => {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-4xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-sm space-y-6"
+        className="w-full max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg space-y-8"
       >
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Services Offered
-          </h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
+              <Briefcase className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+                Services Offered
+              </h1>
+              <p className="text-sm text-[#5A8DB8]/70 mt-1">Add the services you provide</p>
+            </div>
+          </div>
           <Button
             type="button"
             onClick={addNewService}
-            className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white flex items-center gap-2"
+            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 px-4 py-2 rounded-xl"
           >
-            <Plus className="w-5 h-5 text-[#5A8DB8] hover:text-[#3C5979]" />
+            <Plus className="w-5 h-5" />
             Add Service
           </Button>
         </div>
 
         {serviceForms.map((form, index) => (
-          <div key={index} className="border rounded-lg p-6 space-y-6 relative">
+          <div 
+            key={index} 
+            className="border-2 border-[#5A8DB8]/20 rounded-xl p-6 space-y-6 relative bg-white/50 hover:bg-white/80 transition-colors duration-300"
+          >
             {index > 0 && (
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute top-4 right-4 text-gray-500 hover:text-red-500"
+                className="absolute top-4 right-4 text-[#5A8DB8]/40 hover:text-red-500 hover:bg-red-50 transition-colors duration-300"
                 onClick={() => removeService(index)}
               >
                 <X className="w-4 h-4" />
               </Button>
             )}
-            <h3 className="text-lg font-semibold text-gray-800">
-              Service Category {index + 1}
-            </h3>
-
-            <div>
-              <label htmlFor={`services_categories_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                Main Service Category
-              </label>
-              <Select
-                value={form.services_categories}
-                onValueChange={(value) => handleServiceSelect(value, index)}
-              >
-                <SelectTrigger className="w-full bg-gray-50">
-                  <SelectValue placeholder="Select a service category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {services.map((service: any) => (
-                    <SelectItem key={service.id} value={service.name}>
-                      {service.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex items-center gap-2">
+              <ListChecks className="w-5 h-5 text-[#5A8DB8]" />
+              <h3 className="text-lg font-semibold text-[#3C5979]">
+                Service Category {index + 1}
+              </h3>
             </div>
 
-            <div>
-              <label htmlFor={`services_description_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                Service Description
-              </label>
-              <Textarea
-                id={`services_description_${index}`}
-                name="services_description"
-                placeholder="Describe your main services and expertise..."
-                value={form.services_description}
-                onChange={(e) => handleChange(e, index)}
-                className="bg-gray-50 min-h-[120px]"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div>
-                <label htmlFor={`rate_range_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  Rate Range
+                <label htmlFor={`services_categories_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                  <Briefcase className="w-4 h-4" />
+                  Main Service Category
                 </label>
-                <input
-                  type="text"
-                  id={`rate_range_${index}`}
-                  name="rate_range"
-                  value={form.rate_range}
+                <Select
+                  value={form.services_categories}
+                  onValueChange={(value) => handleServiceSelect(value, index)}
+                >
+                  <SelectTrigger className="w-full bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300">
+                    <SelectValue placeholder="Select a service category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {services && services.length > 0 ? (
+                      services.map((service: any) => (
+                        <SelectItem key={service.id} value={service.name}>
+                          {service.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="loading" disabled>
+                        {servicesLoading ? "Loading services..." : "No services available"}
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label htmlFor={`services_description_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                  <ListChecks className="w-4 h-4" />
+                  Service Description
+                </label>
+                <Textarea
+                  id={`services_description_${index}`}
+                  name="services_description"
+                  placeholder="Describe your main services and expertise..."
+                  value={form.services_description}
                   onChange={(e) => handleChange(e, index)}
-                  className="w-full p-2 border rounded-md bg-gray-50"
-                  placeholder="Enter your rate range..."
+                  className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[120px]"
                   required
                 />
               </div>
 
-              <div>
-                <label htmlFor={`availability_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  Availability
-                </label>
-                <input
-                  type="text"
-                  id={`availability_${index}`}
-                  name="availability"
-                  value={form.availability}
-                  onChange={(e) => handleChange(e, index)}
-                  className="w-full p-2 border rounded-md bg-gray-50"
-                  placeholder="Enter your availability..."
-                  required
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor={`rate_range_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                    <DollarSign className="w-4 h-4" />
+                    Rate Range
+                  </label>
+                  <input
+                    type="text"
+                    id={`rate_range_${index}`}
+                    name="rate_range"
+                    value={form.rate_range}
+                    onChange={(e) => handleChange(e, index)}
+                    className="w-full p-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300"
+                    placeholder="Enter your rate range..."
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor={`availability_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                    <Clock className="w-4 h-4" />
+                    Availability
+                  </label>
+                  <input
+                    type="text"
+                    id={`availability_${index}`}
+                    name="availability"
+                    value={form.availability}
+                    onChange={(e) => handleChange(e, index)}
+                    className="w-full p-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300"
+                    placeholder="Enter your availability..."
+                    required
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -292,28 +327,42 @@ const ServicesOffer: React.FC = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="text-red-500 text-sm mt-2">
-            {error.message}
+          <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
+            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
+              <ListChecks className="w-4 h-4" />
+              {error.message}
+            </p>
           </div>
         )}
 
         {/* Button Group */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-6">
+        <div className="flex justify-end gap-4 mt-8">
           <Button
             type="button"
             variant="outline"
-            className="w-full sm:w-auto hover:bg-[#5A8DB8] hover:text-white transition"
+            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading || servicesLoading}
           >
+            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
             type="submit"
-            className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition"
+            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
             disabled={loading || servicesLoading}
           >
-            {loading ? "Saving..." : "Save and Continue"}
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                Save and Continue
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </Button>
         </div>
       </form>

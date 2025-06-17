@@ -9,6 +9,7 @@ import { createUserProfile } from "../../../store/Services/CreateProfileService"
 import toast from "react-hot-toast";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { User, Phone, ArrowLeft, ArrowRight, UserCircle, MessageSquare, Sparkles } from 'lucide-react';
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 1;
@@ -141,18 +142,21 @@ const PersonalInfo: React.FC = () => {
   const progressPercent = Math.round((CURRENT_STEP / TOTAL_STEPS) * 100);
 
   return (
-    <div className="min-h-screen bg-white px-4 sm:px-6 md:px-8 py-6 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#F8FBFF] px-4 sm:px-6 md:px-8 py-8 flex flex-col">
       {/* Step Progress */}
-      <div className="mb-8 w-full max-w-4xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold">
+      <div className="mb-10 w-full max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-gray-500 text-sm">{progressPercent}% Complete</span>
+          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+            {progressPercent}% Complete
+          </span>
         </div>
-        <div className="w-full h-2 bg-gray-200 rounded">
+        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
           <div
-            className="h-2 bg-[#3C5979] rounded transition-all duration-300"
+            className="h-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -161,134 +165,154 @@ const PersonalInfo: React.FC = () => {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-4xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-sm flex flex-col gap-6"
+        className="w-full max-w-4xl mx-auto flex flex-col gap-10 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg"
         noValidate
       >
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Personal Information</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-          <div>
-            <label htmlFor="first_name" className="block font-medium mb-1 text-sm">
-              First Name
-            </label>
-            <Input
-              id="first_name"
-              name="first_name"
-              placeholder="Enter your first name"
-              value={form.first_name}
-              onChange={handleChange}
-              className="bg-gray-50"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="last_name" className="block font-medium mb-1 text-sm">
-              Last Name
-            </label>
-            <Input
-              id="last_name"
-              name="last_name"
-              placeholder="Enter your last name"
-              value={form.last_name}
-              onChange={handleChange}
-              className="bg-gray-50"
-              required
-            />
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
+              <UserCircle className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+                Personal Information
+              </h1>
+              <p className="text-sm text-[#5A8DB8]/70 mt-1">Tell us about yourself</p>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label htmlFor="mobile" className="block font-medium mb-1 text-sm">
-            Phone Number
-          </label>
-          <PhoneInput
-            country={'us'}
-            value={form.mobile}
-            onChange={handlePhoneChange}
-            inputClass="w-full h-9 rounded-md border border-input bg-gray-50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            buttonClass="border-input bg-gray-50"
-            containerClass="w-full"
-            inputProps={{
-              name: 'mobile',
-              required: true,
-              id: 'mobile'
-            }}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <div className="relative group">
+              <label htmlFor="first_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                <User className="w-4 h-4" />
+                First Name
+              </label>
+              <div className="relative">
+                <Input
+                  id="first_name"
+                  name="first_name"
+                  placeholder="Enter your first name"
+                  value={form.first_name}
+                  onChange={handleChange}
+                  className="pl-10 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40"
+                  required
+                />
+                <User className="w-5 h-5 text-[#5A8DB8]/40 absolute left-3 top-1/2 -translate-y-1/2 group-hover:text-[#5A8DB8]/60 transition-colors" />
+              </div>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="relative group">
+              <label htmlFor="last_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                <User className="w-4 h-4" />
+                Last Name
+              </label>
+              <div className="relative">
+                <Input
+                  id="last_name"
+                  name="last_name"
+                  placeholder="Enter your last name"
+                  value={form.last_name}
+                  onChange={handleChange}
+                  className="pl-10 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40"
+                  required
+                />
+                <User className="w-5 h-5 text-[#5A8DB8]/40 absolute left-3 top-1/2 -translate-y-1/2 group-hover:text-[#5A8DB8]/60 transition-colors" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="bio" className="block font-medium mb-1 text-sm">
-            Bio
-          </label>
-          <Textarea
-            id="bio"
-            name="bio"
-            placeholder="Tell us about yourself..."
-            value={form.bio}
-            onChange={handleChange}
-            className="bg-gray-50 min-h-[120px]"
-          />
+        <div className="space-y-4">
+          <div className="relative group">
+            <label htmlFor="mobile" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+              <Phone className="w-4 h-4" />
+              Phone Number
+            </label>
+            <div className="relative">
+              <PhoneInput
+                country={'us'}
+                value={form.mobile}
+                onChange={handlePhoneChange}
+                inputClass="pl-10 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40 w-full"
+                buttonClass="border-2 border-[#5A8DB8]/20 bg-white rounded-l-xl group-hover:border-[#5A8DB8]/40"
+                containerClass="w-full"
+                inputProps={{
+                  name: 'mobile',
+                  required: true,
+                  id: 'mobile'
+                }}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* <div>
-          <label htmlFor="rating" className="block font-medium mb-1 text-sm">
-            Rating
-          </label>
-          <Input
-            id="rating"
-            name="rating"
-            placeholder="Enter your rating"
-            value={form.rating}
-            onChange={handleChange}
-            className="bg-gray-50"
-          />
-        </div> */}
+        <div className="space-y-4">
+          <div className="relative group">
+            <label htmlFor="bio" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+              <MessageSquare className="w-4 h-4" />
+              Bio
+            </label>
+            <div className="relative">
+              <Textarea
+                id="bio"
+                name="bio"
+                placeholder="Tell us about yourself..."
+                value={form.bio}
+                onChange={handleChange}
+                className="pl-10 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[120px] group-hover:border-[#5A8DB8]/40"
+              />
+              <MessageSquare className="w-5 h-5 text-[#5A8DB8]/40 absolute left-3 top-3 group-hover:text-[#5A8DB8]/60 transition-colors" />
+            </div>
+          </div>
+        </div>
 
-        {/* <div>
-          <label htmlFor="profile_url" className="block font-medium mb-1 text-sm">
-            Profile URL
-          </label>
-          <Input
-            id="profile_url"
-            name="profile_url"
-            placeholder="Enter your profile URL"
-            value={form.profile_url}
-            onChange={handleChange}
-            className="bg-gray-50"
-          />
-        </div> */}
-
-        {/* Error Message */}
         {error && (
-          <div className="text-red-500 text-sm mt-2">
-            {error.message}
+          <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
+            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              {error.message}
+            </p>
           </div>
         )}
 
         {/* Button Group */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-3">
+        <div className="flex justify-end gap-4 mt-4">
           <Button
             type="button"
             variant="outline"
-            className="w-full sm:w-auto hover:bg-[#5A8DB8] text-black"
+            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => {
               sessionStorage.setItem('fromPreviousStep', 'true');
               navigate(-1);
             }}
             disabled={loading}
           >
+            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
             type="submit"
-            className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
             disabled={loading}
             onClick={(e) => {
               e.preventDefault();
               handleSubmit(e);
             }}
           >
-            {loading ? "Saving..." : "Save and Continue"}
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                Save and Continue
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </Button>
         </div>
       </form>

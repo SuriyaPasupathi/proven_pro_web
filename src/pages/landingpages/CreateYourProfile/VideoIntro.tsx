@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import { AppDispatch, RootState } from "../../../store/store";
 import toast from "react-hot-toast";
+import { ArrowLeft, ArrowRight, Sparkles, Video, Upload, FileText, Loader2 } from "lucide-react";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 8;
@@ -93,20 +94,21 @@ const VideoIntro: React.FC = () => {
   const progressPercent = Math.round((CURRENT_STEP / TOTAL_STEPS) * 100);
 
   return (
-    <div className="min-h-screen bg-white px-4 sm:px-6 md:px-8 py-6 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#F8FBFF] px-4 sm:px-6 md:px-8 py-8 flex flex-col">
       {/* Step Progress */}
-      <div className="mb-8 w-full max-w-4xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+      <div className="mb-10 w-full max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-gray-500 text-sm md:text-base">
+          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
             {progressPercent}% Complete
           </span>
         </div>
-        <div className="w-full h-2 bg-gray-200 rounded">
+        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
           <div
-            className="h-2 bg-[#3C5979] rounded transition-all duration-300"
+            className="h-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -115,14 +117,31 @@ const VideoIntro: React.FC = () => {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-4xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col gap-6"
+        className="w-full max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex flex-col gap-8"
       >
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">
-          Video Introduction (Optional)
-        </h1>
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
+            <Video className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+              Video Introduction
+            </h1>
+            <p className="text-sm text-[#5A8DB8]/70 mt-1">Add a personal touch to your profile</p>
+          </div>
+        </div>
 
         {/* Video Upload */}
-        <div className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-6 md:px-8 text-center">
+        <div 
+          className="border-2 border-dashed border-[#5A8DB8]/30 rounded-xl flex flex-col items-center justify-center py-12 px-4 sm:px-8 bg-white/50 hover:bg-white/80 transition-colors duration-300"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            if (e.dataTransfer.files) {
+              handleVideoChange({ target: { files: e.dataTransfer.files } } as any);
+            }
+          }}
+        >
           <input
             type="file"
             accept="video/mp4,video/*"
@@ -130,19 +149,22 @@ const VideoIntro: React.FC = () => {
             className="hidden"
             onChange={handleVideoChange}
           />
+          <div className="h-20 w-20 rounded-full bg-[#5A8DB8]/10 flex items-center justify-center mb-6">
+            <Upload className="h-10 w-10 text-[#5A8DB8]" />
+          </div>
           <Button
             type="button"
             variant="outline"
-            className="mb-2"
+            className="mb-4 bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979] transition-all duration-300 rounded-xl px-6 py-2"
             onClick={handleUploadClick}
           >
             Upload Video
           </Button>
-          <p className="text-gray-500 text-sm">
+          <p className="text-[#5A8DB8]/70 text-sm text-center max-w-md">
             Upload a short video introduction (max 100MB, MP4 preferred)
           </p>
           {form.video_intro && (
-            <div className="mt-3 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded max-w-[220px] truncate">
+            <div className="mt-4 text-sm text-[#3C5979] bg-[#5A8DB8]/10 px-4 py-2 rounded-full break-all max-w-full text-center font-medium">
               {form.video_intro.name}
             </div>
           )}
@@ -150,7 +172,8 @@ const VideoIntro: React.FC = () => {
 
         {/* Description */}
         <div>
-          <label htmlFor="video_description" className="block font-medium mb-1 text-sm">
+          <label htmlFor="video_description" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+            <FileText className="w-4 h-4" />
             Video Description
           </label>
           <Textarea
@@ -159,34 +182,48 @@ const VideoIntro: React.FC = () => {
             placeholder="Add a brief description of your video..."
             value={form.video_description}
             onChange={(e) => setForm({ ...form, video_description: e.target.value })}
-            className="bg-gray-50 min-h-[100px]"
+            className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[120px] resize-none"
           />
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="text-red-500 text-sm mt-2">
-            {error.message}
+          <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
+            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
+              <Video className="w-4 h-4" />
+              {error.message}
+            </p>
           </div>
         )}
 
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mt-6">
+        {/* Navigation Buttons */}
+        <div className="flex justify-end gap-4 mt-8">
           <Button
             type="button"
             variant="outline"
-            className="w-full sm:w-auto hover:bg-[#5A8DB8] text-black"
+            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading}
           >
+            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
             type="submit"
-            className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
             disabled={loading}
           >
-            {loading ? "Creating Profile..." : "Complete"}
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Creating Profile...
+              </>
+            ) : (
+              <>
+                Complete
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </Button>
         </div>
       </form>

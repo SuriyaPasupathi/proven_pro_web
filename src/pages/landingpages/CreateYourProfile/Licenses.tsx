@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
-import { X } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, Sparkles, Award, Building2, Calendar, Hash, Upload, Plus } from "lucide-react";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 7;
@@ -162,18 +162,21 @@ const Licenses: React.FC = () => {
   const progressPercent = Math.round((CURRENT_STEP / TOTAL_STEPS) * 100);
 
   return (
-    <div className="min-h-screen bg-white px-4 sm:px-6 md:px-8 py-6 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#F8FBFF] px-4 sm:px-6 md:px-8 py-8 flex flex-col">
       {/* Step Progress */}
-      <div className="mb-8 w-full max-w-4xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+      <div className="mb-10 w-full max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-gray-500 text-sm">{progressPercent}% Complete</span>
+          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+            {progressPercent}% Complete
+          </span>
         </div>
-        <div className="w-full h-2 bg-gray-200 rounded">
+        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
           <div
-            className="h-2 bg-[#3C5979] rounded transition-all duration-300"
+            className="h-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -182,163 +185,207 @@ const Licenses: React.FC = () => {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-4xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-sm flex flex-col gap-6"
+        className="w-full max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex flex-col gap-8"
       >
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Licenses & Certifications
-          </h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
+              <Award className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+                Licenses & Certifications
+              </h1>
+              <p className="text-sm text-[#5A8DB8]/70 mt-1">Add your professional certifications</p>
+            </div>
+          </div>
           <Button
             type="button"
-            variant="outline"
             onClick={addCertification}
-            className="bg-[#5A8DB8] text-white hover:bg-[#3C5979]"
+            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 px-4 py-2 rounded-xl"
           >
-            Add Another Certification
+            <Plus className="w-5 h-5" />
+            Add Certification
           </Button>
         </div>
 
         {certifications.map((certification, index) => (
-          <div key={index} className="border rounded-lg p-6 relative">
+          <div 
+            key={index} 
+            className="border-2 border-[#5A8DB8]/20 rounded-xl p-6 relative bg-white/50 hover:bg-white/80 transition-colors duration-300"
+          >
             {certifications.length > 1 && (
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute top-2 right-2"
+                className="absolute top-4 right-4 text-[#5A8DB8]/40 hover:text-red-500 hover:bg-red-50 transition-colors duration-300"
                 onClick={() => removeCertification(index)}
               >
                 <X className="h-4 w-4" />
               </Button>
             )}
 
-            <div>
-              <label htmlFor={`certifications_name_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                Certification Name
-              </label>
-              <Input
-                id={`certifications_name_${index}`}
-                name="certifications_name"
-                placeholder="Enter certification name"
-                value={certification.certifications_name}
-                onChange={(e) => handleChange(index, e)}
-                className="bg-gray-50"
-                required
-              />
-            </div>
-
-            <div className="mt-4">
-              <label htmlFor={`certifications_issuer_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                Issuing Organization
-              </label>
-              <Input
-                id={`certifications_issuer_${index}`}
-                name="certifications_issuer"
-                placeholder="Enter organization name"
-                value={certification.certifications_issuer}
-                onChange={(e) => handleChange(index, e)}
-                className="bg-gray-50"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="space-y-4">
               <div>
-                <label htmlFor={`certifications_issued_date_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  Issue Date
+                <label htmlFor={`certifications_name_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                  <Award className="w-4 h-4" />
+                  Certification Name
                 </label>
                 <Input
-                  id={`certifications_issued_date_${index}`}
-                  name="certifications_issued_date"
-                  type="date"
-                  value={certification.certifications_issued_date}
+                  id={`certifications_name_${index}`}
+                  name="certifications_name"
+                  placeholder="Enter certification name"
+                  value={certification.certifications_name}
                   onChange={(e) => handleChange(index, e)}
-                  className="bg-gray-50"
+                  className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300"
                   required
                 />
               </div>
+
               <div>
-                <label htmlFor={`certifications_expiration_date_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                  Expiry Date (Optional)
+                <label htmlFor={`certifications_issuer_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                  <Building2 className="w-4 h-4" />
+                  Issuing Organization
                 </label>
                 <Input
-                  id={`certifications_expiration_date_${index}`}
-                  name="certifications_expiration_date"
-                  type="date"
-                  value={certification.certifications_expiration_date}
+                  id={`certifications_issuer_${index}`}
+                  name="certifications_issuer"
+                  placeholder="Enter organization name"
+                  value={certification.certifications_issuer}
                   onChange={(e) => handleChange(index, e)}
-                  className="bg-gray-50"
+                  className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300"
+                  required
                 />
               </div>
-            </div>
 
-            <div className="mt-4">
-              <label htmlFor={`certifications_id_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                Credential ID
-              </label>
-              <Input
-                id={`certifications_id_${index}`}
-                name="certifications_id"
-                placeholder="Enter credential ID"
-                value={certification.certifications_id}
-                onChange={(e) => handleChange(index, e)}
-                className="bg-gray-50"
-              />
-            </div>
-
-            {/* Certificate Upload */}
-            <div className="mt-4 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-8">
-              <input
-                type="file"
-                accept=".pdf,image/*"
-                ref={(el) => (fileInputRefs.current[index] = el)}
-                className="hidden"
-                onChange={(e) => handleFileChange(index, e)}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                className="mb-2"
-                onClick={() => handleUploadClick(index)}
-              >
-                Upload Certificate
-              </Button>
-              <p className="text-gray-500 text-sm text-center">
-                Upload your certification document (PDF or image)
-              </p>
-              {certification.certifications_image && (
-                <div className="mt-2 text-sm text-blue-700 bg-blue-100 px-2 py-1 rounded break-all max-w-full text-center">
-                  {certification.certifications_image.name}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor={`certifications_issued_date_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                    <Calendar className="w-4 h-4" />
+                    Issue Date
+                  </label>
+                  <Input
+                    id={`certifications_issued_date_${index}`}
+                    name="certifications_issued_date"
+                    type="date"
+                    value={certification.certifications_issued_date}
+                    onChange={(e) => handleChange(index, e)}
+                    className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300"
+                    required
+                  />
                 </div>
-              )}
+                <div>
+                  <label htmlFor={`certifications_expiration_date_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                    <Calendar className="w-4 h-4" />
+                    Expiry Date (Optional)
+                  </label>
+                  <Input
+                    id={`certifications_expiration_date_${index}`}
+                    name="certifications_expiration_date"
+                    type="date"
+                    value={certification.certifications_expiration_date}
+                    onChange={(e) => handleChange(index, e)}
+                    className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor={`certifications_id_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
+                  <Hash className="w-4 h-4" />
+                  Credential ID
+                </label>
+                <Input
+                  id={`certifications_id_${index}`}
+                  name="certifications_id"
+                  placeholder="Enter credential ID"
+                  value={certification.certifications_id}
+                  onChange={(e) => handleChange(index, e)}
+                  className="bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300"
+                />
+              </div>
+
+              {/* Certificate Upload */}
+              <div 
+                className="border-2 border-dashed border-[#5A8DB8]/30 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-8 bg-white/50 hover:bg-white/80 transition-colors duration-300"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (e.dataTransfer.files) {
+                    handleFileChange(index, { target: { files: e.dataTransfer.files } } as any);
+                  }
+                }}
+              >
+                <input
+                  type="file"
+                  accept=".pdf,image/*"
+                  ref={(el) => (fileInputRefs.current[index] = el)}
+                  className="hidden"
+                  onChange={(e) => handleFileChange(index, e)}
+                />
+                <div className="h-16 w-16 rounded-full bg-[#5A8DB8]/10 flex items-center justify-center mb-4">
+                  <Upload className="h-8 w-8 text-[#5A8DB8]" />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mb-3 bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979] transition-all duration-300 rounded-xl"
+                  onClick={() => handleUploadClick(index)}
+                >
+                  Upload Certificate
+                </Button>
+                <p className="text-[#5A8DB8]/70 text-sm text-center">
+                  Drag and drop or click to upload (PDF or image)
+                </p>
+                {certification.certifications_image && (
+                  <div className="mt-3 text-sm text-[#3C5979] bg-[#5A8DB8]/10 px-3 py-1.5 rounded-full break-all max-w-full text-center font-medium">
+                    {certification.certifications_image.name}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}
 
         {/* Error Message */}
         {error && (
-          <div className="text-red-500 text-sm mt-2">
-            {error.message}
+          <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
+            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
+              <Award className="w-4 h-4" />
+              {error.message}
+            </p>
           </div>
         )}
 
-        {/* Button Group */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-3">
+        {/* Navigation Buttons */}
+        <div className="flex justify-end gap-4 mt-8">
           <Button
             type="button"
             variant="outline"
-            className="w-full sm:w-auto hover:bg-[#5A8DB8] hover:text-white transition"
+            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading}
           >
+            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
             type="submit"
-            className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition"
+            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
             disabled={loading}
           >
-            {loading ? "Saving..." : "Save and Continue"}
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                Save and Continue
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </Button>
         </div>
       </form>
