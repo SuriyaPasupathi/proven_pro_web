@@ -1,4 +1,4 @@
-import { Copy, Star,Share2 } from 'lucide-react';
+import { Copy, Star,Share2, Pencil, Save, Mail, MessageSquare, Send } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ProfileData } from '../../types/profile';
 import { useEditMode } from '../../context/EditModeContext';
@@ -139,51 +139,70 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+      <DialogContent className="sm:max-w-md bg-white/80 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-3xl shadow-2xl transition-all duration-300">
+        <DialogHeader className="space-y-3">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+              <Pencil className="w-5 h-5" />
+              Edit Profile
+            </DialogTitle>
+          </div>
+          <div className="h-1 w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="first_name">First Name</Label>
+              <Label htmlFor="first_name" className="text-sm font-medium text-[#3C5979]">First Name</Label>
               <Input
                 id="first_name"
                 value={formData.first_name}
                 onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-md transition-all duration-300"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="last_name">Last Name</Label>
+              <Label htmlFor="last_name" className="text-sm font-medium text-[#3C5979]">Last Name</Label>
               <Input
                 id="last_name"
                 value={formData.last_name}
                 onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-md transition-all duration-300"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="bio" className="text-sm font-medium text-[#3C5979]">Bio</Label>
             <Textarea
               id="bio"
               value={formData.bio}
               onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+              className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-md transition-all duration-300"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="profile_mail">Email</Label>
+            <Label htmlFor="profile_mail" className="text-sm font-medium text-[#3C5979]">Email</Label>
             <Input
               id="profile_mail"
               type="email"
               value={formData.profile_mail}
               onChange={(e) => setFormData(prev => ({ ...prev, profile_mail: e.target.value }))}
+              className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-md transition-all duration-300"
             />
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter className="flex justify-end gap-3">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition"
+            >
               Cancel
             </Button>
-            <Button type="submit" className="bg-[#70a4d8] hover:bg-[#3C5979] text-white">
+            <Button 
+              type="submit" 
+              className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
               Save Changes
             </Button>
           </DialogFooter>
@@ -234,38 +253,75 @@ const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Share Profile</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleShare} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email address"
-              required
-              disabled={isLoading}
-            />
+      <DialogContent className="sm:max-w-md bg-white/80 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-3xl shadow-2xl transition-all duration-300">
+        <DialogHeader className="space-y-3">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+              <Share2 className="w-5 h-5" />
+              Share Profile
+            </DialogTitle>
           </div>
-          <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline" 
+          <div className="h-1 w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
+        </DialogHeader>
+        <form onSubmit={handleShare} className="space-y-6">
+          <div className="space-y-4">
+            <div className="relative">
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-[#3C5979] flex items-center gap-2"
+              >
+                <Mail className="w-4 h-4" />
+                Email Address
+              </Label>
+              <div className="relative mt-2">
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter email address"
+                  required
+                  disabled={isLoading}
+                  className="pl-10 pr-4 py-2 bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-md transition-all duration-300"
+                />
+                <Mail className="w-5 h-5 text-[#5A8DB8]/40 absolute left-3 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+
+            <div className="bg-[#EAF3FA] p-3 rounded-lg border border-[#5A8DB8]/20">
+              <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                The recipient will receive an email with a link to view this profile
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
               onClick={onClose}
               disabled={isLoading}
+              className="border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition"
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              className="bg-[#70a4d8] hover:bg-[#3C5979] text-white"
+            <Button
+              type="submit"
               disabled={isLoading}
+              className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center gap-2"
             >
-              {isLoading ? "Sharing..." : "Share"}
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                  Sharing...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  Share Profile
+                </>
+              )}
             </Button>
           </DialogFooter>
         </form>

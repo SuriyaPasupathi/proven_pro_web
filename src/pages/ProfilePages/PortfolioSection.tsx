@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Pencil, X, Trash2, Plus, ChevronUp, ChevronDown, Briefcase } from 'lucide-react';
+import { Pencil, X, Trash2, Plus, ChevronUp, ChevronDown, Briefcase, FileText, Link, Image } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -594,15 +594,23 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
       )}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white to-gray-50/50">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#5A8DB8]">
-              {editingItem ? 'Edit Project' : 'Add Project'}
-            </DialogTitle>
+        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
+          <DialogHeader className="space-y-4 relative">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
+                  <Briefcase className="w-5 h-5 text-[#5A8DB8]" />
+                </div>
+                {editingItem ? 'Edit Project' : 'Add Project'}
+              </DialogTitle>
+            </div>
+            <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="project_title" className="block font-medium mb-1.5 text-sm text-gray-700">
+          <form onSubmit={handleSubmit} className="space-y-6 relative">
+            <div className="space-y-2 group">
+              <label htmlFor="project_title" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <FileText className="w-4 h-4" />
                 Project Title
               </label>
               <Input
@@ -611,13 +619,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 placeholder="Enter project name"
                 value={form.project_title}
                 onChange={handleChange}
-                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                 required
               />
             </div>
 
-            <div>
-              <label htmlFor="project_description" className="block font-medium mb-1.5 text-sm text-gray-700">
+            <div className="space-y-2 group">
+              <label htmlFor="project_description" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <FileText className="w-4 h-4" />
                 Project Description
               </label>
               <Textarea
@@ -626,13 +635,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 placeholder="Describe your project..."
                 value={form.project_description}
                 onChange={handleChange}
-                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 min-h-[120px]"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 min-h-[120px] rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                 required
               />
             </div>
 
-            <div>
-              <label htmlFor="project_url" className="block font-medium mb-1.5 text-sm text-gray-700">
+            <div className="space-y-2 group">
+              <label htmlFor="project_url" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <Link className="w-4 h-4" />
                 Project URL
               </label>
               <Input
@@ -641,14 +651,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 placeholder="https://..."
                 value={form.project_url}
                 onChange={handleChange}
-                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                 required
               />
             </div>
 
             {/* Image Upload Section */}
             <div className="space-y-4">
-              <div className="border-2 border-dashed border-[#5A8DB8]/20 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-6 md:px-8 text-center bg-gradient-to-br from-[#5A8DB8]/5 to-white">
+              <div className="border-2 border-dashed border-[#5A8DB8]/20 rounded-xl flex flex-col items-center justify-center py-8 px-4 sm:px-6 md:px-8 text-center bg-gradient-to-br from-[#5A8DB8]/5 to-white/80 backdrop-blur-sm">
                 <input
                   type="file"
                   accept="image/*"
@@ -660,9 +670,10 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="mb-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
+                  className="mb-2 border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl flex items-center gap-2"
                   onClick={handleUploadClick}
                 >
+                  <Image className="w-4 h-4" />
                   Upload Project Images
                 </Button>
                 <p className="text-sm text-gray-500">
@@ -678,12 +689,12 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                       <img
                         src={image.previewUrl}
                         alt={`Project preview ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg"
+                        className="w-full h-32 object-cover rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
                       />
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                        className="absolute top-2 right-2 bg-red-500/90 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-600 shadow-lg"
                       >
                         <X size={16} />
                       </button>
@@ -693,18 +704,18 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
               )}
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
               >
                 {editingItem ? 'Save Changes' : 'Add Project'}
               </Button>

@@ -72,15 +72,39 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   useEffect(() => {
     // Parse the skills if they are strings
     const parseSkills = (skills: any) => {
+      if (!skills) return [];
+      
       if (typeof skills === 'string') {
         try {
-          return JSON.parse(skills);
+          // Handle empty string case
+          if (skills.trim() === '') return [];
+          
+          // Try to parse the JSON string
+          const parsed = JSON.parse(skills);
+          return Array.isArray(parsed) ? parsed : [];
         } catch (e) {
           console.error('Error parsing skills:', e);
-          return [];
+          // If parsing fails, try to handle it as a comma-separated string
+          try {
+            return skills.split(',').map(s => s.trim()).filter(Boolean);
+          } catch (e2) {
+            console.error('Error parsing skills as comma-separated string:', e2);
+            return [];
+          }
         }
       }
-      return Array.isArray(skills) ? skills : [];
+      
+      // If it's already an array, return it
+      if (Array.isArray(skills)) {
+        return skills.map(skill => typeof skill === 'string' ? skill.trim() : skill);
+      }
+      
+      // If it's an object with a skills property, try to use that
+      if (skills && typeof skills === 'object' && 'skills' in skills) {
+        return Array.isArray(skills.skills) ? skills.skills : [];
+      }
+      
+      return [];
     };
 
     const techSkills = parseSkills(technical_skills);

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Star } from 'lucide-react';
+import { Star, User, MessageSquare, Star as StarIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 interface ReviewDialogProps {
   isOpen: boolean;
@@ -88,19 +89,31 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-white to-gray-50/50">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-[#5A8DB8]">Write a Review</DialogTitle>
+      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
+        <DialogHeader className="space-y-4 relative">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
+                <StarIcon className="w-5 h-5 text-[#5A8DB8]" />
+              </div>
+              Write a Review
+            </DialogTitle>
+          </div>
+          <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Your Name</label>
+        <div className="grid gap-4 py-4 relative">
+          <div className="space-y-2 group">
+            <label className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Your Name
+            </label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
               className={cn(
-                "border-[#5A8DB8]/20 bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-300",
+                "bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md",
                 errors.name ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""
               )}
               disabled={isSubmitting}
@@ -108,8 +121,11 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
             {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
           </div>
           
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Rating</label>
+          <div className="space-y-2 group">
+            <label className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+              <Star className="w-4 h-4" />
+              Rating
+            </label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -135,14 +151,17 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
             {errors.rating && <p className="text-sm text-red-500">{errors.rating}</p>}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Your Comments</label>
+          <div className="space-y-2 group">
+            <label className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              Your Comments
+            </label>
             <Textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Write your review here..."
               className={cn(
-                "min-h-[100px] border-[#5A8DB8]/20 bg-gradient-to-br from-gray-50 to-white focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-300",
+                "min-h-[120px] bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md",
                 errors.content ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""
               )}
               disabled={isSubmitting}
@@ -154,21 +173,28 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
             <p className="text-sm text-red-500">{errors.submit}</p>
           )}
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
           <Button 
             variant="outline" 
             onClick={onClose}
             disabled={isSubmitting}
-            className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300"
+            className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit}
-            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition-all duration-300"
+            className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Review'}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              'Submit Review'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

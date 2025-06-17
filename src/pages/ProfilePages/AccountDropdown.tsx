@@ -66,7 +66,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
   const userEmail = localStorage.getItem('user_email') || '';
 
   return (
-    <div className="absolute right-0 mt-2 w-72 bg-white/80 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl shadow-2xl z-50 overflow-hidden transform origin-top-right transition-all duration-300 ease-in-out">
+    <div className="absolute right-0 mt-2 w-72 bg-white/100 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl  z-50 overflow-hidden transform origin-top-right transition-all duration-300 ease-in-out">
       {/* User Info Section */}
       <div className="p-4 border-b border-[#5A8DB8]/10 bg-gradient-to-br from-[#5A8DB8]/5 to-transparent">
         <div className="flex items-center gap-3">

@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp, Building2 } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp, Building2, Calendar, Briefcase, FileText } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -393,15 +393,23 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
       </div>
       
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white to-gray-50/50">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#5A8DB8]">
-              {editingExperience ? 'Edit Experience' : 'Add Experience'}
-            </DialogTitle>
+        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
+          <DialogHeader className="space-y-4 relative">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
+                  <Briefcase className="w-5 h-5 text-[#5A8DB8]" />
+                </div>
+                {editingExperience ? 'Edit Experience' : 'Add Experience'}
+              </DialogTitle>
+            </div>
+            <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="company_name" className="block font-medium mb-1.5 text-sm text-gray-700">
+          <form onSubmit={handleSubmit} className="space-y-6 relative">
+            <div className="space-y-2 group">
+              <label htmlFor="company_name" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
                 Company Name
               </label>
               <Input
@@ -410,25 +418,26 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 placeholder="Enter company name"
                 value={form.company_name}
                 onChange={handleChange}
-                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                 required
               />
             </div>
 
-            <div>
-              <label htmlFor="position" className="block font-medium mb-1.5 text-sm text-gray-700">
+            <div className="space-y-2 group">
+              <label htmlFor="position" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <Briefcase className="w-4 h-4" />
                 Position
               </label>
               <Select
                 value={form.position}
                 onValueChange={handlePositionSelect}
               >
-                <SelectTrigger className="w-full bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20">
+                <SelectTrigger className="w-full bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md">
                   <SelectValue placeholder="Select a position" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-xl shadow-lg">
                   {jobPositions.map((position: any) => (
-                    <SelectItem key={position.id} value={position.title}>
+                    <SelectItem key={position.id} value={position.title} className="hover:bg-[#5A8DB8]/5">
                       {position.title}
                     </SelectItem>
                   ))}
@@ -437,8 +446,9 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="experience_start_date" className="block font-medium mb-1.5 text-sm text-gray-700">
+              <div className="space-y-2 group">
+                <label htmlFor="experience_start_date" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
                   Start Date
                 </label>
                 <Input
@@ -447,12 +457,13 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                   type="date"
                   value={form.experience_start_date}
                   onChange={handleChange}
-                  className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                   required
                 />
               </div>
-              <div>
-                <label htmlFor="experience_end_date" className="block font-medium mb-1.5 text-sm text-gray-700">
+              <div className="space-y-2 group">
+                <label htmlFor="experience_end_date" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
                   End Date
                 </label>
                 <Input
@@ -461,14 +472,15 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                   type="date"
                   value={form.experience_end_date}
                   onChange={handleChange}
-                  className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                   required
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="key_responsibilities" className="block font-medium mb-1.5 text-sm text-gray-700">
+            <div className="space-y-2 group">
+              <label htmlFor="key_responsibilities" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <FileText className="w-4 h-4" />
                 Key Responsibilities
               </label>
               <Textarea
@@ -477,33 +489,36 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 placeholder="Describe your key responsibilities and achievements..."
                 value={form.key_responsibilities}
                 onChange={handleChange}
-                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 min-h-[120px]"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 min-h-[120px] rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                 required
               />
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isLoading || jobPositionsLoading}
-                className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
                 disabled={isLoading || jobPositionsLoading}
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     {editingExperience ? 'Saving Changes...' : 'Adding Experience...'}
                   </>
                 ) : (
-                  editingExperience ? 'Save Changes' : 'Add Experience'
+                  <>
+                    
+                    {editingExperience ? 'Save Changes' : 'Add Experience'}
+                  </>
                 )}
               </Button>
             </DialogFooter>

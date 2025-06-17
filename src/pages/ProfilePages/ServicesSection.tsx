@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp, Briefcase } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp, Briefcase, Tag, FileText, DollarSign, Clock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
@@ -358,27 +358,35 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white to-gray-50/50">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#5A8DB8]">
-              {editingService ? 'Edit Service' : 'Add Service'}
-            </DialogTitle>
+        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
+          <DialogHeader className="space-y-4 relative">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
+                  <Briefcase className="w-5 h-5 text-[#5A8DB8]" />
+                </div>
+                {editingService ? 'Edit Service' : 'Add Service'}
+              </DialogTitle>
+            </div>
+            <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="services_categories" className="block font-medium mb-1.5 text-sm text-gray-700">
+          <form onSubmit={handleSubmit} className="space-y-6 relative">
+            <div className="space-y-2 group">
+              <label htmlFor="services_categories" className=" font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <Tag className="w-4 h-4" />
                 Service Categories
               </label>
               <Select
                 value={form.services_categories}
                 onValueChange={handleServiceSelect}
               >
-                <SelectTrigger className="w-full bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20">
+                <SelectTrigger className="w-full bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md">
                   <SelectValue placeholder="Select a service category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-xl shadow-lg">
                   {services.map((service: any) => (
-                    <SelectItem key={service.id} value={service.name}>
+                    <SelectItem key={service.id} value={service.name} className="hover:bg-[#5A8DB8]/5">
                       {service.name}
                     </SelectItem>
                   ))}
@@ -386,8 +394,9 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
               </Select>
             </div>
 
-            <div>
-              <label htmlFor="services_description" className="block font-medium mb-1.5 text-sm text-gray-700">
+            <div className="space-y-2 group">
+              <label htmlFor="services_description" className=" font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <FileText className="w-4 h-4" />
                 Service Description
               </label>
               <Textarea
@@ -396,14 +405,15 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                 placeholder="Describe your services and expertise..."
                 value={form.services_description}
                 onChange={handleChange}
-                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 min-h-[120px]"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 min-h-[120px] rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="rate_range" className="block font-medium mb-1.5 text-sm text-gray-700">
+              <div className="space-y-2 group">
+                <label htmlFor="rate_range" className=" font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
                   Rate Range
                 </label>
                 <Input
@@ -412,12 +422,13 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                   placeholder="Enter your rate range..."
                   value={form.rate_range}
                   onChange={handleChange}
-                  className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                   required
                 />
               </div>
-              <div>
-                <label htmlFor="availability" className="block font-medium mb-1.5 text-sm text-gray-700">
+              <div className="space-y-2 group">
+                <label htmlFor="availability" className=" font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
                   Availability
                 </label>
                 <Input
@@ -426,34 +437,37 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                   placeholder="Enter your availability..."
                   value={form.availability}
                   onChange={handleChange}
-                  className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                   required
                 />
               </div>
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isLoading || servicesLoading}
-                className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
                 disabled={isLoading || servicesLoading}
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     {editingService ? 'Saving Changes...' : 'Adding Service...'}
                   </>
                 ) : (
-                  editingService ? 'Save Changes' : 'Add Service'
+                  <>
+                    <Plus className="w-4 h-4" />
+                    {editingService ? 'Save Changes' : 'Add Service'}
+                  </>
                 )}
               </Button>
             </DialogFooter>

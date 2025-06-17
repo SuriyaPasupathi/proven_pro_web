@@ -1,4 +1,4 @@
-import { Video, Award, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Video, Award, Pencil, Plus, Trash2, Image, FileVideo, Save, Upload, User, FileText, Calendar, Hash, Building2 } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProfileData } from '../../types/profile';
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
+import { Label } from "@/components/ui/label";
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
@@ -912,61 +913,92 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
       {/* Profile Edit Dialog */}
       <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] md:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl md:text-2xl">Edit Profile Information</DialogTitle>
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
+          <DialogHeader className="space-y-4 relative">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
+                  <User className="w-5 h-5 text-[#5A8DB8]" />
+                </div>
+                Edit Profile Information
+              </DialogTitle>
+            </div>
+            <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
           </DialogHeader>
-          <form onSubmit={handleProfileSubmit} className="space-y-4">
+          <form onSubmit={handleProfileSubmit} className="space-y-6 relative">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-medium mb-1 text-sm">First Name</label>
+              <div className="space-y-2 group">
+                <Label htmlFor="first_name" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  First Name
+                </Label>
                 <Input
+                  id="first_name"
                   name="first_name"
                   value={profileForm.first_name}
                   onChange={handleProfileChange}
-                  className="bg-gray-50"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                   required
                   disabled={isProfileUpdating}
                 />
               </div>
-              <div>
-                <label className="block font-medium mb-1 text-sm">Last Name</label>
+              <div className="space-y-2 group">
+                <Label htmlFor="last_name" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Last Name
+                </Label>
                 <Input
+                  id="last_name"
                   name="last_name"
                   value={profileForm.last_name}
                   onChange={handleProfileChange}
-                  className="bg-gray-50"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                   required
                   disabled={isProfileUpdating}
                 />
               </div>
             </div>
-            <div>
-              <label className="block font-medium mb-1 text-sm">Bio</label>
+            <div className="space-y-2 group">
+              <Label htmlFor="bio" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Bio
+              </Label>
               <Textarea
+                id="bio"
                 name="bio"
                 value={profileForm.bio}
                 onChange={handleProfileChange}
-                className="bg-gray-50 min-h-[100px] resize-y"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[100px] resize-y shadow-sm hover:shadow-md"
                 disabled={isProfileUpdating}
               />
             </div>
-            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsProfileDialogOpen(false)}
                 disabled={isProfileUpdating}
-                className="w-full sm:w-auto"
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full sm:w-auto"
                 disabled={isProfileUpdating}
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
               >
-                {isProfileUpdating ? 'Updating...' : 'Save Changes'}
+                {isProfileUpdating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Save Changes
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -975,12 +1007,21 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
       {/* Image Edit Dialog */}
       <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] md:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl md:text-2xl">Update Profile Image</DialogTitle>
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
+          <DialogHeader className="space-y-4 relative">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
+                  <Image className="w-5 h-5 text-[#5A8DB8]" />
+                </div>
+                Update Profile Image
+              </DialogTitle>
+            </div>
+            <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
           </DialogHeader>
-          <form onSubmit={handleImageSubmit} className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+          <form onSubmit={handleImageSubmit} className="space-y-6 relative">
+            <div className="border-2 border-dashed border-[#5A8DB8]/20 rounded-2xl p-8 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/30 transition-all duration-300">
               <input
                 type="file"
                 accept="image/*"
@@ -990,45 +1031,58 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 disabled={isImageUploading}
               />
               {imagePreview ? (
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-32 h-32 mx-auto rounded-full object-cover mb-4"
-                />
+                <div className="relative group">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-40 h-40 mx-auto rounded-2xl object-cover mb-4 shadow-lg transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
               ) : (
-                <div className="w-32 h-32 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-gray-400">No image selected</span>
+                <div className="w-40 h-40 mx-auto bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10 rounded-2xl flex items-center justify-center mb-4">
+                  <span className="text-[#5A8DB8]">No image selected</span>
                 </div>
               )}
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleImageClick}
-                className="mb-2 w-full sm:w-auto"
+                className="mb-2 border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
                 disabled={isImageUploading}
               >
                 {isImageUploading ? 'Uploading...' : 'Choose Image'}
               </Button>
-              <p className="text-gray-500 text-sm">
+              <p className="text-sm text-[#5A8DB8]/70">
                 Recommended: Square image, max 5MB
               </p>
             </div>
-            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsImageDialogOpen(false)}
                 disabled={isImageUploading}
-                className="w-full sm:w-auto"
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full sm:w-auto"
                 disabled={!selectedImage || isImageUploading}
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
               >
-                {isImageUploading ? 'Uploading...' : 'Upload Image'}
+                {isImageUploading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Upload Image
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -1043,12 +1097,21 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         }
         setIsVideoDialogOpen(open);
       }}>
-        <DialogContent className="sm:max-w-[425px] md:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl md:text-2xl">Update Video Introduction</DialogTitle>
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
+          <DialogHeader className="space-y-4 relative">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
+                  <Video className="w-5 h-5 text-[#5A8DB8]" />
+                </div>
+                Update Video Introduction
+              </DialogTitle>
+            </div>
+            <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
           </DialogHeader>
-          <form onSubmit={handleVideoSubmit} className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+          <form onSubmit={handleVideoSubmit} className="space-y-6 relative">
+            <div className="border-2 border-dashed border-[#5A8DB8]/20 rounded-2xl p-8 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/30 transition-all duration-300">
               <input
                 type="file"
                 accept="video/*"
@@ -1058,15 +1121,18 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 disabled={isVideoUpdating}
               />
               {selectedVideo ? (
-                <div className="text-sm text-gray-600 mb-4">
-                  Selected: {selectedVideo.name}
+                <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
+                  <FileVideo className="w-5 h-5" />
+                  {selectedVideo.name}
                 </div>
               ) : profileData.video_intro_url ? (
-                <div className="text-sm text-gray-600 mb-4">
+                <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
+                  <FileVideo className="w-5 h-5" />
                   Current video will be replaced
                 </div>
               ) : (
-                <div className="text-sm text-gray-600 mb-4">
+                <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
+                  <FileVideo className="w-5 h-5" />
                   No video selected
                 </div>
               )}
@@ -1074,41 +1140,52 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 type="button"
                 variant="outline"
                 onClick={handleVideoClick}
-                className="mb-2 w-full sm:w-auto"
+                className="mb-2 border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
                 disabled={isVideoUpdating}
               >
                 {isVideoUpdating ? 'Uploading...' : 'Choose Video'}
               </Button>
-              <p className="text-gray-500 text-sm">
+              <p className="text-sm text-[#5A8DB8]/70">
                 Recommended: MP4 format, max 100MB
               </p>
             </div>
-            <div>
-              <label className="block font-medium mb-1 text-sm">Description</label>
+            <div className="space-y-2 group">
+              <Label htmlFor="video_description" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors">Description</Label>
               <Textarea
+                id="video_description"
                 value={videoForm.video_description}
                 onChange={handleVideoDescriptionChange}
                 placeholder="Add a description for your video..."
-                className="bg-gray-50 min-h-[100px] resize-y"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[100px] resize-y shadow-sm hover:shadow-md"
                 disabled={isVideoUpdating}
               />
             </div>
-            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsVideoDialogOpen(false)}
                 disabled={isVideoUpdating}
-                className="w-full sm:w-auto"
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full sm:w-auto"
                 disabled={isVideoUpdating}
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
               >
-                {isVideoUpdating ? 'Updating...' : 'Save Changes'}
+                {isVideoUpdating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Save Changes
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -1117,75 +1194,104 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
       {/* Certification Edit Dialog */}
       <Dialog open={isCertDialogOpen} onOpenChange={handleCloseCertDialog}>
-        <DialogContent className="sm:max-w-[425px] md:max-w-[600px] w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl md:text-2xl">{isAddingNewCert ? 'Add New Certification' : 'Edit Certification'}</DialogTitle>
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden max-h-[90vh]">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
+          <DialogHeader className="space-y-3 relative">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
+                  <Award className="w-4 h-4 text-[#5A8DB8]" />
+                </div>
+                {isAddingNewCert ? 'Add New Certification' : 'Edit Certification'}
+              </DialogTitle>
+            </div>
+            <div className="h-0.5 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
           </DialogHeader>
-          <form onSubmit={handleCertSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-medium mb-1 text-sm">Certification Name</label>
+          <form onSubmit={handleCertSubmit} className="space-y-4 relative overflow-y-auto max-h-[calc(90vh-8rem)] pr-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5 group">
+                <Label htmlFor="certifications_name" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  Certification Name
+                </Label>
                 <Input
+                  id="certifications_name"
                   name="certifications_name"
                   value={certForm.certifications_name}
                   onChange={handleCertChange}
-                  className="bg-gray-50"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
                   required
                   disabled={isCertUpdating}
                   placeholder="Enter certification name"
                 />
               </div>
-              <div>
-                <label className="block font-medium mb-1 text-sm">Issuing Organization</label>
+              <div className="space-y-1.5 group">
+                <Label htmlFor="certifications_issuer" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <Building2 className="w-4 h-4" />
+                  Issuing Organization
+                </Label>
                 <Input
+                  id="certifications_issuer"
                   name="certifications_issuer"
                   value={certForm.certifications_issuer}
                   onChange={handleCertChange}
-                  className="bg-gray-50"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
                   required
                   disabled={isCertUpdating}
                   placeholder="Enter organization name"
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-medium mb-1 text-sm">Issue Date</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5 group">
+                <Label htmlFor="certifications_issued_date" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Issue Date
+                </Label>
                 <Input
+                  id="certifications_issued_date"
                   name="certifications_issued_date"
                   type="date"
                   value={certForm.certifications_issued_date}
                   onChange={handleCertChange}
-                  className="bg-gray-50"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
                   required
                   disabled={isCertUpdating}
                 />
               </div>
-              <div>
-                <label className="block font-medium mb-1 text-sm">Expiration Date (Optional)</label>
+              <div className="space-y-1.5 group">
+                <Label htmlFor="certifications_expiration_date" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Expiration Date 
+                </Label>
                 <Input
+                  id="certifications_expiration_date"
                   name="certifications_expiration_date"
                   type="date"
                   value={certForm.certifications_expiration_date}
                   onChange={handleCertChange}
-                  className="bg-gray-50"
+                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
                   disabled={isCertUpdating}
                 />
               </div>
             </div>
-            <div>
-              <label className="block font-medium mb-1 text-sm">Certification ID</label>
+            <div className="space-y-1.5 group">
+              <Label htmlFor="certifications_id" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
+                <Hash className="w-4 h-4" />
+                Certification ID
+              </Label>
               <Input
+                id="certifications_id"
                 name="certifications_id"
                 value={certForm.certifications_id}
                 onChange={handleCertChange}
-                className="bg-gray-50"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
                 required
                 disabled={isCertUpdating}
                 placeholder="Enter certification ID"
               />
             </div>
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+            <div className="border-2 border-dashed border-[#5A8DB8]/20 rounded-xl p-4 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/30 transition-all duration-300">
               <input
                 type="file"
                 accept="image/*"
@@ -1195,20 +1301,23 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 disabled={isCertUpdating}
               />
               {selectedCertImage ? (
-                <div className="text-sm text-gray-600 mb-4">
-                  Selected: {selectedCertImage.name}
+                <div className="text-sm text-[#5A8DB8] mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
+                  <Image className="w-4 h-4" />
+                  {selectedCertImage.name}
                 </div>
               ) : certForm.certifications_image_url ? (
-                <div className="mb-4">
+                <div className="relative group">
                   <img 
                     src={getFullImageUrl(certForm.certifications_image_url)} 
                     alt="Current certification"
-                    className="w-32 h-32 mx-auto object-cover rounded"
+                    className="w-32 h-32 mx-auto object-cover rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-105"
                   />
-                  <p className="text-sm text-gray-600 mt-2">Current image will be replaced</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <p className="text-sm text-[#5A8DB8] mt-2">Current image will be replaced</p>
                 </div>
               ) : (
-                <div className="text-sm text-gray-600 mb-4">
+                <div className="text-sm text-[#5A8DB8] mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
+                  <Image className="w-4 h-4" />
                   No image selected
                 </div>
               )}
@@ -1216,31 +1325,41 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 type="button"
                 variant="outline"
                 onClick={handleCertImageClick}
-                className="mb-2 w-full sm:w-auto"
+                className="mb-2 border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl h-9"
                 disabled={isCertUpdating}
               >
                 {isCertUpdating ? 'Uploading...' : 'Choose Image'}
               </Button>
-              <p className="text-gray-500 text-sm">
+              <p className="text-xs text-[#5A8DB8]/70">
                 Recommended: Square image, max 5MB
               </p>
             </div>
-            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+            <DialogFooter className="flex justify-end gap-3 pt-3 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCloseCertDialog}
                 disabled={isCertUpdating}
-                className="w-full sm:w-auto"
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full sm:w-auto"
                 disabled={isCertUpdating}
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2 h-9"
               >
-                {isCertUpdating ? 'Saving...' : (isAddingNewCert ? 'Add Certification' : 'Save Changes')}
+                {isCertUpdating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    {isAddingNewCert ? 'Add Certification' : 'Save Changes'}
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>

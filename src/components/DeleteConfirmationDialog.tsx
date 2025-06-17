@@ -27,25 +27,29 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] p-6">
-        <DialogHeader className="space-y-4">
+      <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-red-200/50 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-red-50/5 to-red-100/5 pointer-events-none"></div>
+        <DialogHeader className="space-y-4 relative">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-red-50">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-50 to-red-100/50 shadow-sm">
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
-            <DialogTitle className="text-xl font-semibold text-red-600">{title}</DialogTitle>
+            <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
+              {title}
+            </DialogTitle>
           </div>
+          <div className="h-0.5 w-full bg-gradient-to-r from-red-200/20 via-red-300/20 to-red-200/20 rounded-full"></div>
         </DialogHeader>
-        <div className="py-4">
-          <p className="text-gray-600 leading-relaxed">{description}</p>
+        <div className="py-4 px-1">
+          <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{description}</p>
         </div>
-        <DialogFooter className="gap-3">
+        <DialogFooter className="gap-3 pt-3 border-t border-red-100/50">
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
             disabled={isLoading}
-            className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/5 hover:text-[#3C5979] transition-colors duration-200"
+            className="border-red-200/50 text-red-600 hover:bg-red-50/50 hover:border-red-300/50 transition-all duration-300 rounded-xl h-9"
           >
             Cancel
           </Button>
@@ -54,7 +58,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
             variant="destructive"
             onClick={onConfirm}
             disabled={isLoading}
-            className="bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl h-9"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">

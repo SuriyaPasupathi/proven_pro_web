@@ -99,99 +99,126 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
   };
 
   return (
-    <header className="border-b border-[#5A8DB8]/10 bg-white/95 backdrop-blur-sm sticky top-0 z-50 w-full shadow-sm">
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center w-full md:w-auto gap-4">
-            {/* Logo Section */}
-            <div className="flex items-center gap-2 shrink-0 cursor-pointer transition-all duration-200 hover:opacity-80" onClick={() => navigate('/')}>
-              <img src={logo} alt="ProvenPro Logo" className="w-8 h-8" />
-              <span className="text-lg font-semibold bg-gradient-to-r from-[#5A8DB8] via-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent">
-                Proven<span className="font-light">Pro</span>
-              </span>
+    <header className="w-full border-b border-gray-200/50 bg-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 h-14 sm:h-16 flex items-center justify-between relative">
+        {/* Premium Background Effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#5A8DB8]/5 via-transparent to-[#3C5979]/5 opacity-30"></div>
+        
+        {/* Left: Logo & Search */}
+        <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto relative">
+          <div 
+            onClick={() => navigate("/")} 
+            className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group"
+          >
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
+              <img src={logo} alt="ProvenPro Logo" className="relative w-6 h-6 sm:w-8 sm:h-8 transform group-hover:scale-105 transition-transform duration-300" />
             </div>
+            <span className="text-base sm:text-lg font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+              Proven<span className="font-light">Pro</span>
+            </span>
+          </div>
 
-            {/* Search Bar - only shown on medium and up */}
-            <div className="hidden md:block w-full max-w-sm lg:max-w-md xl:max-w-lg ml-6">
-              <div className="relative group">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#5A8DB8] group-hover:text-[#3C5979] transition-colors duration-200" />
+          {/* Desktop Search Bar */}
+          <div className="hidden md:block md:ml-4 lg:ml-6 w-full max-w-xs relative">
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-0 group-hover:opacity-20 transition duration-300"></div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#5A8DB8] group-hover:text-[#3C5979] transition-colors duration-200" />
                 <Input 
                   placeholder="Search..." 
-                  className="pl-9 bg-white/80 backdrop-blur-sm border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-200 group-hover:bg-white" 
+                  className="pl-8 sm:pl-9 h-8 sm:h-9 text-sm bg-white/80 backdrop-blur-sm border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 transition-all duration-200 group-hover:bg-white"
                 />
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
-              onClick={() => navigate('/plans')}
+        {/* Right: Navigation Items */}
+        <div className="hidden md:flex items-center gap-4 lg:gap-6">
+          <button
+            type="button"
+            className="relative px-0 py-0 focus:outline-none group"
+            onClick={() => navigate('/plans')}
+          >
+            <span className="relative z-10 text-[#5A8DB8] group-hover:text-[#3C5979] transition-colors duration-200">Pricing</span>
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+          </button>
+          <button
+            type="button"
+            className="relative px-0 py-0 focus:outline-none group"
+            onClick={() => navigate('/contact')}
+          >
+            <span className="relative z-10 text-[#5A8DB8] group-hover:text-[#3C5979] transition-colors duration-200">Contact Us</span>
+            <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+          </button>
+          <NotificationSheet />
+          
+          {/* Account */}
+          <div className="relative" ref={dropdownRef}>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-2 hover:bg-[#5A8DB8]/10 transition-all duration-200 group"
+              onClick={() => setIsAccountOpen(!isAccountOpen)}
             >
-              Pricing
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
-              onClick={() => navigate('/contact')}
-            >
-              Contact Us
-            </Button>
-            <NotificationSheet />
-
-            {/* Account */}
-            <div className="relative" ref={dropdownRef}>
-              <Button
-                variant="ghost"
-                className="flex items-center gap-2 hover:bg-[#5A8DB8]/10 transition-all duration-200"
-                onClick={() => setIsAccountOpen(!isAccountOpen)}
-              >
-                {profileData?.profile_pic ? (
+              {profileData?.profile_pic ? (
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full blur opacity-0 group-hover:opacity-20 transition duration-300"></div>
                   <img 
                     src={profileData.profile_pic} 
                     alt={`${profileData.first_name} ${profileData.last_name}`}
-                    className="h-8 w-8 rounded-full object-cover ring-2 ring-[#5A8DB8]/20 hover:ring-[#5A8DB8]/40 transition-all duration-200"
+                    className="relative h-8 w-8 rounded-full object-cover ring-2 ring-[#5A8DB8]/20 group-hover:ring-[#5A8DB8]/40 transition-all duration-200"
                   />
-                ) : (
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] flex items-center justify-center text-white ring-2 ring-[#5A8DB8]/20 hover:ring-[#5A8DB8]/40 transition-all duration-200">
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full blur opacity-0 group-hover:opacity-20 transition duration-300"></div>
+                  <div className="relative h-8 w-8 rounded-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] flex items-center justify-center text-white ring-2 ring-[#5A8DB8]/20 group-hover:ring-[#5A8DB8]/40 transition-all duration-200">
                     <span className="text-sm font-medium">{getUserInitials()}</span>
                   </div>
-                )}
-                <ChevronDown className="h-4 w-4 text-[#5A8DB8] transition-transform duration-200" style={{ transform: isAccountOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-              </Button>
-              {isAccountOpen && <AccountDropdown closeDropdown={() => setIsAccountOpen(false)} />}
-            </div>
-          </nav>
-
-          {/* Mobile Actions */}
-          <div className="md:hidden flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
-              onClick={() => setIsSearchVisible(!isSearchVisible)}
-              aria-label="Search"
-            >
-              <Search className="w-5 h-5" />
+                </div>
+              )}
+              <ChevronDown className="h-4 w-4 text-[#5A8DB8] transition-transform duration-200" style={{ transform: isAccountOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
+            {isAccountOpen && <AccountDropdown closeDropdown={() => setIsAccountOpen(false)} />}
           </div>
         </div>
 
-        {/* Mobile Search - Slides down when active */}
-        {isSearchVisible && (
-          <div className="md:hidden px-4 py-3 border-t border-[#5A8DB8]/10 bg-white/95 backdrop-blur-sm">
-            <div className="relative group">
+        {/* Mobile Actions */}
+        <div className="md:hidden flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200 group"
+            onClick={() => setIsSearchVisible(!isSearchVisible)}
+            aria-label="Search"
+          >
+            <div className="relative">
+              <div className="absolute -inset-2 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-0 group-hover:opacity-20 transition duration-300"></div>
+              <Search className="relative w-5 h-5" />
+            </div>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200 group"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <div className="relative">
+              <div className="absolute -inset-2 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-0 group-hover:opacity-20 transition duration-300"></div>
+              {isMenuOpen ? <X className="relative w-5 h-5" /> : <Menu className="relative w-5 h-5" />}
+            </div>
+          </Button>
+        </div>
+      </div>
+
+      {/* Mobile Search */}
+      {isSearchVisible && (
+        <div className="md:hidden px-4 py-3 border-t border-[#5A8DB8]/10 bg-white/95 backdrop-blur-sm">
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-0 group-hover:opacity-20 transition duration-300"></div>
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#5A8DB8] group-hover:text-[#3C5979] transition-colors duration-200" />
               <Input
                 type="search"
@@ -201,8 +228,8 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
               />
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Mobile Menu */}
       {isMenuOpen && (
@@ -211,33 +238,36 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             <nav className="flex flex-col space-y-2">
               <Button 
                 variant="ghost" 
-                className="text-left text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 justify-start transition-all duration-200"
+                className="text-left text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 justify-start transition-all duration-200 group"
                 onClick={() => {
                   setIsReviewDialogOpen(true);
                   setIsMenuOpen(false);
                 }}
               >
-                Write a Review
+                <span className="relative z-10">Write a Review</span>
+                <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-left text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 justify-start transition-all duration-200"
+                className="text-left text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 justify-start transition-all duration-200 group"
                 onClick={() => {
                   navigate('/plans');
                   setIsMenuOpen(false);
                 }}
               >
-                Pricing
+                <span className="relative z-10">Pricing</span>
+                <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
               </Button>
               <Button 
                 variant="ghost" 
-                className="text-left text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 justify-start transition-all duration-200"
+                className="text-left text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 justify-start transition-all duration-200 group"
                 onClick={() => {
                   navigate('/contact');
                   setIsMenuOpen(false);
                 }}
               >
-                Contact Us
+                <span className="relative z-10">Contact Us</span>
+                <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
               </Button>
               
               {/* Mobile Account Section */}
@@ -252,18 +282,19 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                 </div>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200 group"
                   onClick={() => {
                     setIsMenuOpen(false);
                     setIsEditMode(false);
                     navigate('/profile');
                   }}
                 >
-                  My Profile
+                  <span className="relative z-10">My Profile</span>
+                  <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200 group"
                   onClick={() => {
                     setIsMenuOpen(false);
                     setIsEditMode(true);
@@ -272,47 +303,52 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                     }, 0);
                   }}
                 >
-                  Edit Profile
+                  <span className="relative z-10">Edit Profile</span>
+                  <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200 group"
                   onClick={() => {
                     navigate('/profile/verification');
                     setIsMenuOpen(false);
                   }}
                 >
-                  Verification
+                  <span className="relative z-10">Verification</span>
+                  <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200 group"
                   onClick={() => {
                     navigate('/profile/membership-plans');
                     setIsMenuOpen(false);
                   }}
                 >
-                  Membership Plan
+                  <span className="relative z-10">Membership Plan</span>
+                  <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200"
+                  className="w-full justify-start text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-200 group"
                   onClick={() => {
                     navigate('/profile/account-settings');
                     setIsMenuOpen(false);
                   }}
                 >
-                  Account Settings
+                  <span className="relative z-10">Account Settings</span>
+                  <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200"
+                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200 group"
                   onClick={() => {
                     handleLogout();
                     setIsMenuOpen(false);
                   }}
                 >
-                  Log out
+                  <span className="relative z-10">Log out</span>
+                  <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-red-600 to-red-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                 </Button>
               </div>
             </nav>
