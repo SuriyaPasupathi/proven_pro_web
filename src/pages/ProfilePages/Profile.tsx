@@ -98,18 +98,25 @@ const App: React.FC = () => {
   }));
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-12 w-12 rounded-full bg-gray-200 mb-4"></div>
+          <div className="h-4 w-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center p-8 max-w-md w-full mx-4">
           <h2 className="text-2xl font-bold text-red-500 mb-4">Error Loading Profile</h2>
           <p className="text-gray-600">{error.message}</p>
           {error.status === 401 && (
             <Button 
-              className="mt-4 bg-[#70a4d8] hover:bg-[#3C5979] text-white"
+              className="mt-4 bg-[#70a4d8] hover:bg-[#3C5979] text-white transition-all duration-300"
               onClick={() => navigate('/login')}
             >
               Go to Login
@@ -122,22 +129,27 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider defaultTheme="light">
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gray-50">
         <ProfileNav isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
         
         <div className="w-11/12 mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mt-6 md:mt-8">
             {/* Sidebar - takes 3 columns on large screens, full width on mobile */}
             <div className="lg:col-span-3 order-1">
-              <ProfileSidebar profileData={profile} />
+              <div className="sticky top-8">
+                <ProfileSidebar profileData={profile} />
+              </div>
             </div>
             
             {/* Main content - takes 9 columns on large screens */}
             <div className="lg:col-span-9 order-2">
-              <ProfileHeader profileData={profile} />
+              <div className="mb-8">
+                <ProfileHeader profileData={profile} />
+              </div>
               
               <div className="space-y-8 md:space-y-12 mt-6 md:mt-8">
                 <ReviewCarousel reviews={transformedReviews} />
+                
                 <ServicesSection 
                   categories={profile.categories}
                   services_categories={profile.services_categories}
@@ -145,13 +157,17 @@ const App: React.FC = () => {
                   rate_range={profile.rate_range}
                   availability={profile.availability}
                 />
+                
                 <ExperienceSection experiences={profile.work_experiences} />
+                
                 <SkillsSection 
                   technical_skills={profile.technical_skills}
                   soft_skills={profile.soft_skills}
                   skills_description={profile.skills_description}
                 />
+                
                 <ToolsSection primary_tools={profile.primary_tools} />
+                
                 <PortfolioSection 
                   projects={profile.portfolio}
                   portfolio={profile.portfolio}
