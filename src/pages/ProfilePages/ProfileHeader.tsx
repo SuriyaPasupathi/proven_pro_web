@@ -330,6 +330,40 @@ const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
   );
 };
 
+const calculateRatingDistribution = (reviews: Array<{ rating: number }> = []) => {
+  const totalReviews = reviews.length;
+  if (totalReviews === 0) return [
+    { label: "5-star", value: 0, color: "from-green-400 to-emerald-500" },
+    { label: "4-star", value: 0, color: "from-blue-400 to-indigo-500" },
+    { label: "3-star", value: 0, color: "from-yellow-400 to-orange-500" },
+    { label: "2-star", value: 0, color: "from-orange-400 to-red-500" },
+    { label: "1-star", value: 0, color: "from-red-400 to-pink-500" },
+  ];
+
+  // Initialize counts for 5-1 stars (in reverse order)
+  const distribution = [0, 0, 0, 0, 0];
+  
+  reviews.forEach(review => {
+    const rating = Math.round(review.rating);
+    if (rating >= 1 && rating <= 5) {
+      // Store in reverse order (5-star at index 0, 1-star at index 4)
+      distribution[5 - rating]++;
+    }
+  });
+
+  return distribution.map((count, index) => ({
+    label: `${5 - index}-star`,
+    value: Math.round((count / totalReviews) * 100),
+    color: [
+      "from-green-400 to-emerald-500",
+      "from-blue-400 to-indigo-500",
+      "from-yellow-400 to-orange-500",
+      "from-orange-400 to-red-500",
+      "from-red-400 to-pink-500"
+    ][index]
+  }));
+};
+
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
@@ -480,13 +514,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
 
             {/* Rating Bars */}
             <div className="flex flex-col gap-0.5 xs:gap-1 flex-1 w-full">
-              {[
-                { label: "5-star", value: 70, color: "from-green-400 to-emerald-500" },
-                { label: "4-star", value: 20, color: "from-blue-400 to-indigo-500" },
-                { label: "3-star", value: 5, color: "from-yellow-400 to-orange-500" },
-                { label: "2-star", value: 3, color: "from-orange-400 to-red-500" },
-                { label: "1-star", value: 2, color: "from-red-400 to-pink-500" },
-              ].map((rating, index) => (
+              {calculateRatingDistribution(profileData.reviews).map((rating, index) => (
                 <div key={index} className="flex items-center gap-1">
                   <span className="text-[10px] xs:text-xs min-w-[32px] xs:min-w-[36px] text-gray-600">{rating.label}</span>
                   <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
