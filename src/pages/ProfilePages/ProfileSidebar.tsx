@@ -492,7 +492,39 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   };
 
   const handleCertChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCertForm({ ...certForm, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // Add date validation for issue and expiration dates
+    if (name === 'certifications_issued_date' || name === 'certifications_expiration_date') {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+      if (selectedDate > today) {
+        toast.error("Cannot select future dates");
+        return;
+      }
+
+      // Validate expiration date is not before issue date
+      if (name === 'certifications_expiration_date' && certForm.certifications_issued_date) {
+        const issueDate = new Date(certForm.certifications_issued_date);
+        if (selectedDate < issueDate) {
+          toast.error("Expiration date cannot be before issue date");
+          return;
+        }
+      }
+
+      // Validate issue date is not after expiration date
+      if (name === 'certifications_issued_date' && certForm.certifications_expiration_date) {
+        const expirationDate = new Date(certForm.certifications_expiration_date);
+        if (selectedDate > expirationDate) {
+          toast.error("Issue date cannot be after expiration date");
+          return;
+        }
+      }
+    }
+
+    setCertForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleCertSubmit = async (e: React.FormEvent) => {

@@ -55,9 +55,41 @@ const WorkExp: React.FC = () => {
     index: number
   ) => {
     const newForms = [...workForms];
+    const { name, value } = e.target;
+
+    // Add date validation for start and end dates
+    if (name === 'experience_start_date' || name === 'experience_end_date') {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+      if (selectedDate > today) {
+        toast.error("Cannot select future dates");
+        return;
+      }
+
+      // Validate end date is not before start date
+      if (name === 'experience_end_date' && workForms[index].experience_start_date) {
+        const startDate = new Date(workForms[index].experience_start_date);
+        if (selectedDate < startDate) {
+          toast.error("End date cannot be before start date");
+          return;
+        }
+      }
+
+      // Validate start date is not after end date
+      if (name === 'experience_start_date' && workForms[index].experience_end_date) {
+        const endDate = new Date(workForms[index].experience_end_date);
+        if (selectedDate > endDate) {
+          toast.error("Start date cannot be after end date");
+          return;
+        }
+      }
+    }
+
     newForms[index] = {
       ...newForms[index],
-      [e.target.name]: e.target.value
+      [name]: value
     };
     setWorkForms(newForms);
   };

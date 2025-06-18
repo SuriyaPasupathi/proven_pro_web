@@ -99,7 +99,39 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+
+    // Add date validation for start and end dates
+    if (name === 'experience_start_date' || name === 'experience_end_date') {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+      if (selectedDate > today) {
+        toast.error("Cannot select future dates");
+        return;
+      }
+
+      // Validate end date is not before start date
+      if (name === 'experience_end_date' && form.experience_start_date) {
+        const startDate = new Date(form.experience_start_date);
+        if (selectedDate < startDate) {
+          toast.error("End date cannot be before start date");
+          return;
+        }
+      }
+
+      // Validate start date is not after end date
+      if (name === 'experience_start_date' && form.experience_end_date) {
+        const endDate = new Date(form.experience_end_date);
+        if (selectedDate > endDate) {
+          toast.error("Start date cannot be after end date");
+          return;
+        }
+      }
+    }
+
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handlePositionSelect = (value: string) => {
