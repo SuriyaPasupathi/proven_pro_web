@@ -70,7 +70,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/plans" element={<Plans />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/share/:profileId/:shareToken" element={<ShareProfilePage />} />
+              <Route path="/share/:shareToken" element={<ShareProfilePage />} />
 
               {/* Auth Routes */}
               <Route path="/signup" element={<SignUpForm />} />
