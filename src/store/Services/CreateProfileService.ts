@@ -688,6 +688,27 @@ export const getProfileReviews = createAsyncThunk(
   }
 );
 
+export const getProfileReviewsPublic = createAsyncThunk(
+  'profile/getProfileReviewsPublic',
+  async (user_id: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}request-profile-share/?action=get_reviews&user_id=${user_id}`,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Get public reviews error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
+
 export const deleteItem = createAsyncThunk(
   'profile/deleteItem',
   async (payload: { modelName: string; id: string }, { rejectWithValue }) => {
@@ -825,6 +846,55 @@ export const searchUsers = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error('User search error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);
+
+export const verifyShareToken = createAsyncThunk(
+  'profile/verifyShareToken',
+  async (shareToken: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}request-profile-share/?action=verify&token=${shareToken}`,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      // Transform the response data to match the expected profile structure
+      const profileData = response.data.profile;
+      const transformedData = {
+        ...profileData,
+        id: profileData.id,
+        verification_details: {
+          government_id: {
+            uploaded: profileData.gov_id_document || false,
+            verified: profileData.gov_id_verified || false,
+            percentage: profileData.gov_id_verified ? 100 : 0
+          },
+          address_proof: {
+            uploaded: profileData.address_document || false,
+            verified: profileData.address_verified || false,
+            percentage: profileData.address_verified ? 100 : 0
+          },
+          mobile: {
+            provided: !!profileData.mobile,
+            verified: profileData.mobile_verified || false,
+            percentage: profileData.mobile_verified ? 100 : 0
+          }
+        }
+      };
+
+      return {
+        profile: transformedData,
+        share_token: response.data.share_token
+      };
+    } catch (error) {
+      console.error('Share token verification error:', error);
       const profileError = handleProfileError(error);
       return rejectWithValue(profileError);
     }
