@@ -1,4 +1,4 @@
-import { ChevronDown, Loader2, ChevronUp, Wrench, Plus, X, Pencil, Trash2 } from 'lucide-react';
+import {  Loader2, Wrench, Plus, X, Pencil, Trash2, Sparkles, Award, Star, CheckCircle2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -17,6 +17,7 @@ import {
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { fetchSkills } from '../../store/Services/DropDownService';
+import { motion } from 'framer-motion';
 
 interface Skill {
   id: number;
@@ -48,7 +49,6 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isTechnicalSkillsOpen, setIsTechnicalSkillsOpen] = useState(false);
   const [isSoftSkillsOpen, setIsSoftSkillsOpen] = useState(false);
   const [form, setForm] = useState<SkillsForm>({
@@ -307,70 +307,103 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   };
 
   return (
-    <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
-      <div className="flex justify-between items-center mb-4 xs:mb-6">
-        <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
-          <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
-            <Wrench className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
-          </span>
-          Skills
-        </h2>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="relative bg-gradient-to-br from-white via-[#5A8DB8]/5 to-white rounded-2xl p-6 xs:p-8 shadow-lg"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 via-[#3C5979]/5 to-[#5A8DB8]/5 rounded-2xl"></div>
+      
+      <div className="relative flex justify-between items-center mb-8">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex items-center gap-4"
+        >
+          <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl shadow-lg">
+            <Wrench className="h-6 w-6 text-white" />
+          </div>
+          <h2 className="text-2xl xs:text-3xl font-bold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+            Skills
+          </h2>
+        </motion.div>
+        
         {isEditMode && (
-          <div className="flex gap-2">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex gap-2"
+          >
             <Button 
               variant="ghost" 
-              className="p-1 xs:p-1.5 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => setIsDialogOpen(true)}
             >
-              <Pencil className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
+              <Pencil className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
-              className="p-1 xs:p-1.5 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => setIsAddDialogOpen(true)}
             >
-              <Plus className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
+              <Plus className="w-5 h-5" />
             </Button>
-          </div>
+          </motion.div>
         )}
       </div>
 
       {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white to-gray-50/50">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#5A8DB8]">Edit Skills</DialogTitle>
+        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+          <DialogHeader className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
+                <Award className="w-6 h-6 text-white" />
+              </div>
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+                Edit Skills
+              </DialogTitle>
+            </div>
           </DialogHeader>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block font-medium mb-2 text-gray-700">Skills Description</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                <Star className="w-4 h-4 text-[#5A8DB8]" />
+                Skills Description
+              </label>
               <Textarea
                 value={form.skills_description}
                 onChange={(e) => setForm(prev => ({ ...prev, skills_description: e.target.value }))}
                 placeholder="Describe your skills and expertise..."
-                className="bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 min-h-[100px]"
+                className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 min-h-[120px] rounded-xl"
               />
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block font-medium mb-2 text-gray-700">Technical Skills</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#5A8DB8]" />
+                  Technical Skills
+                </label>
                 <Button
                   type="button"
                   onClick={() => setIsTechnicalSkillsOpen(true)}
-                  className="w-full justify-start bg-gray-50 border border-gray-300 hover:bg-gray-100 text-left"
+                  className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
                 >
                   {form.technical_skills.length > 0 ? form.technical_skills.join(", ") : "Select technical skills"}
                 </Button>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.technical_skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
+                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-[#5A8DB8] px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
                       <span>{skill}</span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-4 w-4 text-blue-800 hover:text-red-600 hover:bg-transparent"
+                        className="h-4 w-4 text-[#5A8DB8] hover:text-red-600 hover:bg-transparent"
                         onClick={() => handleDeleteClick(skill, 'technical_skills')}
                         disabled={isLoading}
                       >
@@ -381,23 +414,26 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 </div>
               </div>
 
-              <div>
-                <label className="block font-medium mb-2 text-gray-700">Soft Skills</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                  <Star className="w-4 h-4 text-[#5A8DB8]" />
+                  Soft Skills
+                </label>
                 <Button
                   type="button"
                   onClick={() => setIsSoftSkillsOpen(true)}
-                  className="w-full justify-start bg-gray-50 border border-gray-300 hover:bg-gray-100 text-left"
+                  className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
                 >
                   {form.soft_skills.length > 0 ? form.soft_skills.join(", ") : "Select soft skills"}
                 </Button>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.soft_skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-green-50 to-green-100 text-green-800 px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
+                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-[#5A8DB8] px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
                       <span>{skill}</span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-4 w-4 text-green-800 hover:text-red-600 hover:bg-transparent"
+                        className="h-4 w-4 text-[#5A8DB8] hover:text-red-600 hover:bg-transparent"
                         onClick={() => handleDeleteClick(skill, 'soft_skills')}
                         disabled={isLoading}
                       >
@@ -409,19 +445,19 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
               </div>
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isLoading}
-                className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -430,7 +466,10 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                     Saving Changes...
                   </>
                 ) : (
-                  'Save Changes'
+                  <>
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </>
                 )}
               </Button>
             </DialogFooter>
@@ -440,40 +479,53 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
       {/* Add New Skills Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white to-gray-50/50">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#5A8DB8]">Add New Skills</DialogTitle>
+        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+          <DialogHeader className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
+                <Plus className="w-6 h-6 text-white" />
+              </div>
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+                Add New Skills
+              </DialogTitle>
+            </div>
           </DialogHeader>
           
           <div className="space-y-6">
-            <div>
-              <label className="block font-medium mb-2 text-gray-700">Technical Skills</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#5A8DB8]" />
+                Technical Skills
+              </label>
               <Button
                 type="button"
                 onClick={() => setIsTechnicalSkillsOpen(true)}
-                className="w-full justify-start bg-gray-50 border border-gray-300 hover:bg-gray-100 text-left text-black"
+                className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
               >
                 {form.technical_skills.length > 0 ? form.technical_skills.join(", ") : "Select technical skills"}
               </Button>
             </div>
 
-            <div>
-              <label className="block font-medium mb-2 text-gray-700">Soft Skills</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                <Star className="w-4 h-4 text-[#5A8DB8]" />
+                Soft Skills
+              </label>
               <Button
                 type="button"
                 onClick={() => setIsSoftSkillsOpen(true)}
-                className="w-full justify-start bg-gray-50 border border-gray-300 hover:bg-gray-100 text-left text-black"
+                className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
               >
                 {form.soft_skills.length > 0 ? form.soft_skills.join(", ") : "Select soft skills"}
               </Button>
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsAddDialogOpen(false)}
-                className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/10"
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
               >
                 Cancel
               </Button>
@@ -483,7 +535,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                   handleSubmit(new Event('submit') as any);
                   setIsAddDialogOpen(false);
                 }}
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -492,7 +544,10 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                     Adding Skills...
                   </>
                 ) : (
-                  'Add Skills'
+                  <>
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Add Skills
+                  </>
                 )}
               </Button>
             </DialogFooter>
@@ -502,96 +557,165 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
       {/* Technical Skills Dialog */}
       <Dialog open={isTechnicalSkillsOpen} onOpenChange={setIsTechnicalSkillsOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Select Technical Skills</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-2">
-            {dropdownLoading ? (
-              <div className="col-span-2 flex justify-center">
-                <Loader2 className="h-6 w-6 animate-spin" />
+        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+          <DialogHeader className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
+                <Sparkles className="w-6 h-6 text-white" />
               </div>
-            ) : (
-              getSkillsArray(dropdownSkills).map((skill: Skill) => (
-                <Button
-                  key={skill.id}
-                  type="button"
-                  variant={form.technical_skills.includes(skill.name) ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => handleAddSkill(skill, 'technical_skills')}
-                >
-                  {skill.name}
-                </Button>
-              ))
-            )}
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+                Select Technical Skills
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              {dropdownLoading ? (
+                <div className="col-span-2 flex justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-[#5A8DB8]" />
+                </div>
+              ) : (
+                getSkillsArray(dropdownSkills).map((skill: Skill) => (
+                  <Button
+                    key={skill.id}
+                    type="button"
+                    variant={form.technical_skills.includes(skill.name) ? "default" : "outline"}
+                    className={`w-full justify-start ${
+                      form.technical_skills.includes(skill.name)
+                        ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
+                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979]'
+                    } rounded-xl`}
+                    onClick={() => handleAddSkill(skill, 'technical_skills')}
+                  >
+                    {skill.name}
+                  </Button>
+                ))
+              )}
+            </div>
           </div>
+          <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsTechnicalSkillsOpen(false)}
+              className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setIsTechnicalSkillsOpen(false)}
+              className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
+            >
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              Done
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Soft Skills Dialog */}
       <Dialog open={isSoftSkillsOpen} onOpenChange={setIsSoftSkillsOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Select Soft Skills</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-2">
-            {dropdownLoading ? (
-              <div className="col-span-2 flex justify-center">
-                <Loader2 className="h-6 w-6 animate-spin" />
+        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+          <DialogHeader className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
+                <Star className="w-6 h-6 text-white" />
               </div>
-            ) : (
-              getSkillsArray(dropdownSkills).map((skill: Skill) => (
-                <Button
-                  key={skill.id}
-                  type="button"
-                  variant={form.soft_skills.includes(skill.name) ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => handleAddSkill(skill, 'soft_skills')}
-                >
-                  {skill.name}
-                </Button>
-              ))
-            )}
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+                Select Soft Skills
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              {dropdownLoading ? (
+                <div className="col-span-2 flex justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-[#5A8DB8]" />
+                </div>
+              ) : (
+                getSkillsArray(dropdownSkills).map((skill: Skill) => (
+                  <Button
+                    key={skill.id}
+                    type="button"
+                    variant={form.soft_skills.includes(skill.name) ? "default" : "outline"}
+                    className={`w-full justify-start ${
+                      form.soft_skills.includes(skill.name)
+                        ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
+                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979]'
+                    } rounded-xl`}
+                    onClick={() => handleAddSkill(skill, 'soft_skills')}
+                  >
+                    {skill.name}
+                  </Button>
+                ))
+              )}
+            </div>
           </div>
+          <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsSoftSkillsOpen(false)}
+              className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setIsSoftSkillsOpen(false)}
+              className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
+            >
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              Done
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {form.skills_description && (
-        <div className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-lg p-4 xs:p-6 border border-[#5A8DB8]/10 mb-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-xl p-6 border border-[#5A8DB8]/10 mb-6"
+        >
           <p className="text-[#5A8DB8] font-bold">Skills Description: <span className="text-gray-600 font-semibold">{form.skills_description}</span></p>
-        </div>
+        </motion.div>
       )}
 
       <div className="space-y-6">
         <div>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-[#5A8DB8]">
-            <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 rounded-lg shadow-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-              </svg>
-            </span>
+            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-2 rounded-lg shadow-sm">
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
             Technical Skills
           </h3>
           <div className="flex flex-wrap gap-2">
             {form.technical_skills.length > 0 ? (
               form.technical_skills
-                .slice(0, isExpanded ? undefined : 2)
                 .map((skill, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-2 xs:p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10">
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="text-xs xs:text-sm font-medium text-[#5A8DB8]">{skill}</span>
+                      <span className="text-sm font-medium text-[#5A8DB8]">{skill}</span>
                     </div>
                     {isEditMode && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 xs:h-6 xs:w-6 text-[#5A8DB8] hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
+                        className="h-6 w-6 text-[#5A8DB8] hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
                         onClick={() => handleDeleteClick(skill, 'technical_skills')}
                       >
-                        <Trash2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                  </div>
+                  </motion.div>
                 ))
             ) : (
               <p className="text-gray-500">No technical skills added yet</p>
@@ -601,33 +725,36 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
         <div>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-[#5A8DB8]">
-            <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 rounded-lg shadow-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </span>
+            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-2 rounded-lg shadow-sm">
+              <Star className="h-5 w-5 text-white" />
+            </div>
             Soft Skills
           </h3>
           <div className="flex flex-wrap gap-2">
             {form.soft_skills.length > 0 ? (
               form.soft_skills
-                .slice(0, isExpanded ? undefined : 2)
                 .map((skill, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-2 xs:p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10">
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="text-xs xs:text-sm font-medium text-[#5A8DB8]">{skill}</span>
+                      <span className="text-sm font-medium text-[#5A8DB8]">{skill}</span>
                     </div>
                     {isEditMode && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 xs:h-6 xs:w-6 text-[#5A8DB8] hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
+                        className="h-6 w-6 text-[#5A8DB8] hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
                         onClick={() => handleDeleteClick(skill, 'soft_skills')}
                       >
-                        <Trash2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                  </div>
+                  </motion.div>
                 ))
             ) : (
               <p className="text-gray-500">No soft skills added yet</p>
@@ -636,20 +763,27 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         </div>
       </div>
       
-      {(form.technical_skills.length > 1 || form.soft_skills.length > 1) && (
-        <Button 
-          variant="link" 
-          className="mt-4 xs:mt-6 text-[#5A8DB8] hover:text-[#3C5979] flex items-center p-0 group transition-all duration-200"
-          onClick={() => setIsExpanded(!isExpanded)}
+      {/* {(form.technical_skills.length > 1 || form.soft_skills.length > 1) && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6"
         >
-          <span className="text-sm group-hover:underline">{isExpanded ? 'Show less' : 'Show all skills'}</span>
-          {isExpanded ? (
-            <ChevronUp className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
-          ) : (
-            <ChevronDown className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
-          )}
-        </Button>
-      )}
+          <Button 
+            variant="ghost" 
+            className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-xl px-4 py-2"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <span className="mr-2">{isExpanded ? 'Show less' : 'Show all skills'}</span>
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </motion.div>
+      )} */}
 
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
@@ -662,7 +796,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         description={`Are you sure you want to remove "${skillToDelete?.skill}" from your ${skillToDelete?.type === 'technical_skills' ? 'technical' : 'soft'} skills?`}
         isLoading={isDeleteLoading}
       />
-    </div>
+    </motion.div>
   );
 };
 

@@ -565,55 +565,72 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
             <p className="text-sm xs:text-base text-gray-600">No experience information available.</p>
           </div>
         ) : (
-          localExperiences
-            .slice(0, isExpanded ? undefined : 2)
-            .map((experience, index) => (
-              <div key={index} className="relative p-4 xs:p-6 border border-[#5A8DB8]/10 rounded-lg bg-gradient-to-br from-[#5A8DB8]/5 to-white hover:shadow-lg transition-all duration-300">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="space-y-2 flex-grow">
-                    <h3 className="text-base xs:text-lg text-[#5A8DB8] font-bold">
-                      Position: <span className="text-gray-700 font-semibold">{experience.position}</span>
-                    </h3>
-                    <p className="text-sm xs:text-base font-bold text-[#5A8DB8]">
-                      Company: <span className="text-gray-700 font-semibold">{experience.company_name}</span>
-                    </p>
-                    <div className="flex flex-col xs:flex-row xs:gap-4 text-sm text-gray-600">
-                      <p className="font-bold">
-                        Start Date: <span className="text-gray-700 font-semibold">{experience.experience_start_date}</span>
-                      </p>
-                      <p className="font-bold">
-                        End Date: <span className="text-gray-700 font-semibold">{experience.experience_end_date}</span>
-                      </p>
+          <div className="relative">
+            {/* Timeline connector */}
+            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#5A8DB8]/20 to-[#5A8DB8]/10"></div>
+            
+            {localExperiences
+              .slice(0, isExpanded ? undefined : 2)
+              .map((experience, index) => (
+                <div key={index} className="relative pl-12 mb-6 last:mb-0">
+                  {/* Timeline dot */}
+                  <div className="absolute left-4 top-6 w-4 h-4 rounded-full bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] border-2 border-white shadow-md transform -translate-x-1/2"></div>
+                  
+                  <div className="relative p-4 xs:p-6 border border-[#5A8DB8]/10 rounded-lg bg-gradient-to-br from-[#5A8DB8]/5 to-white hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] hover:border-[#5A8DB8]/20">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="space-y-3 flex-grow">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-base xs:text-lg text-[#5A8DB8] font-bold">
+                            {experience.position}
+                          </h3>
+                          <span className="px-2 py-1 text-xs font-medium bg-[#5A8DB8]/10 text-[#5A8DB8] rounded-full">
+                            {experience.company_name}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Calendar className="w-4 h-4 text-[#5A8DB8]" />
+                          <span>{experience.experience_start_date} - {experience.experience_end_date}</span>
+                        </div>
+                        
+                        <div className="mt-4">
+                          <h4 className="text-sm font-semibold text-[#5A8DB8] mb-2 flex items-center gap-2">
+                            <FileText className="w-4 h-4" />
+                            Key Responsibilities
+                          </h4>
+                          <p className="text-sm text-gray-700 leading-relaxed">
+                            {experience.key_responsibilities}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {isEditMode && (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-200 hover:scale-110"
+                            onClick={() => handleEdit(experience)}
+                            disabled={isLoading}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 hover:scale-110"
+                            onClick={() => handleDeleteClick(experience)}
+                            disabled={isLoading}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm xs:text-base font-bold text-[#5A8DB8]">
-                      Key Responsibilities: <span className="text-gray-700 font-semibold">{experience.key_responsibilities}</span>
-                    </p>
                   </div>
-                  {isEditMode && (
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 xs:h-8 xs:w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-200"
-                        onClick={() => handleEdit(experience)}
-                        disabled={isLoading}
-                      >
-                        <Pencil className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 xs:h-8 xs:w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
-                        onClick={() => handleDeleteClick(experience)}
-                        disabled={isLoading}
-                      >
-                        <Trash2 className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
-                      </Button>
-                    </div>
-                  )}
                 </div>
-              </div>
-            ))
+              ))}
+          </div>
         )}
       </div>
       
@@ -624,11 +641,13 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <span className="text-sm group-hover:underline">{isExpanded ? 'Show less' : 'Show all experiences'}</span>
-          {isExpanded ? (
-            <ChevronUp className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
-          ) : (
-            <ChevronDown className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
-          )}
+          <div className="ml-1 transition-transform duration-200 group-hover:translate-y-0.5">
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </div>
         </Button>
       )}
 

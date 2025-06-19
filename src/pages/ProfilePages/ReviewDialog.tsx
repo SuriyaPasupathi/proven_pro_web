@@ -6,20 +6,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import { useAppDispatch } from '../../store/store';
+import { submitProfileReview } from '../../store/Services/CreateProfileService';
+import { toast } from 'sonner';
 
 interface ReviewDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (review: { rating: number; content: string; name: string }) => void;
+  shareToken?: string;
+  profileId?: string;
 }
 
-const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
+const ReviewDialog = ({ isOpen, onClose, onSubmit, shareToken, profileId }: ReviewDialogProps) => {
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState('');
   const [name, setName] = useState('');
   const [hoverRating, setHoverRating] = useState(0);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const dispatch = useAppDispatch();
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -49,17 +55,32 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateForm() || isSubmitting) return;
     
     setIsSubmitting(true);
     
     try {
-      onSubmit({ 
-        rating, 
-        content: content.trim(), 
-        name: name.trim()
-      });
+      // If we have shareToken and profileId, use the real API
+      if (shareToken && profileId) {
+        const result = await dispatch(submitProfileReview({
+          id: profileId,
+          share_token: shareToken,
+          reviewer_name: name.trim(),
+          rating: rating,
+          comment: content.trim()
+        })).unwrap();
+        
+        toast.success('Review submitted successfully!');
+        console.log('Review submitted via API:', result);
+      } else {
+        // Fallback to the original onSubmit for backward compatibility
+        onSubmit({ 
+          rating, 
+          content: content.trim(), 
+          name: name.trim()
+        });
+      }
       
       // Reset form
       setRating(0);
@@ -67,9 +88,12 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit }: ReviewDialogProps) => {
       setName('');
       setErrors({});
       onClose();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Review submission error:', error);
+      const errorMessage = error?.message || 'Failed to submit review. Please try again.';
+      toast.error(errorMessage);
       setErrors({
-        submit: 'Failed to submit review. Please try again.'
+        submit: errorMessage
       });
     } finally {
       setIsSubmitting(false);

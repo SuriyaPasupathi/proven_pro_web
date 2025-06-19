@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -72,7 +73,7 @@ export default function Header() {
 
   return (
     <header className="w-full border-b border-gray-200/50 bg-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 h-14 sm:h-16 flex items-center justify-between relative">
+      <div className="w-11/12 mx-auto px-4 sm:px-6 md:px-8 h-14 sm:h-16 flex items-center justify-between relative">
         {/* Premium Background Effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#5A8DB8]/5 via-transparent to-[#3C5979]/5 opacity-30"></div>
         
@@ -84,7 +85,23 @@ export default function Header() {
           >
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
-              <img src={logo} alt="ProvenPro Logo" className="relative w-6 h-6 sm:w-8 sm:h-8 transform group-hover:scale-105 transition-transform duration-300" />
+              <img 
+                src={logo} 
+                alt="ProvenPro Logo" 
+                className="relative w-6 h-6 sm:w-8 sm:h-8 transform group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  console.error('Failed to load logo image:', e);
+                  // Try fallback to the alternative logo
+                  e.currentTarget.src = '../../assets/logo 2.png';
+                  e.currentTarget.onerror = () => {
+                    console.error('Both logo files failed to load');
+                    e.currentTarget.style.display = 'none';
+                  };
+                }}
+                onLoad={() => {
+                  console.log('Logo loaded successfully');
+                }}
+              />
             </div>
             <span className="text-base sm:text-lg font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
               Proven<span className="font-light">Pro</span>

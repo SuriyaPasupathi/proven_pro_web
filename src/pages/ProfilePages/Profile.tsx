@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ProfileNav from './ProfileNav'
 import ProfileHeader from './ProfileHeader';
 import ProfileSidebar from './ProfileSidebar';
-import ReviewCarousel from './ReviewCarousel';
+// import ReviewCarousel from './ReviewCarousel';
 import ServicesSection from './ServicesSection';
 import ExperienceSection from './ExperienceSection';
 import SkillsSection from './SkillsSection';
@@ -14,12 +14,15 @@ import ToolsSection from './ToolsSection';
 import PortfolioSection from './PortfolioSection';
 import { ThemeProvider } from './ThemeProvider';
 import { Button } from '@/components/ui/button';
+import ProfileSkeleton from '@/components/ui/profile-skeleton';
+import FullPageLoader from '@/components/ui/full-page-loader';
 import axios from 'axios';
 import { ProfileData } from '../../types/profile';
 import { useEditMode } from '../../context/EditModeContext';
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   useEditMode();
   const dispatch = useDispatch<AppDispatch>();
   const { profileId } = useParams();
@@ -69,10 +72,12 @@ const App: React.FC = () => {
         }
         await dispatch(getProfile(profileId));
         await dispatch(getProfileReviews(profileId));
+        setIsInitialLoading(false);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
           navigate('/login');
         }
+        setIsInitialLoading(false);
       }
     };
 
@@ -88,24 +93,20 @@ const App: React.FC = () => {
     }
   }, [profileData, reviews]);
 
-  // Transform reviews to match ReviewCarousel interface
-  const transformedReviews = reviews.map(review => ({
-    id: review.id,
-    name: review.reviewer_name,
-    company: review.company || 'Anonymous',
-    rating: review.rating,
-    content: review.comment
-  }));
-
-  if (loading) {
+  // Show initial loading spinner for first 1.5 seconds
+  if (isInitialLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="h-12 w-12 rounded-full bg-gray-200 mb-4"></div>
-          <div className="h-4 w-32 bg-gray-200 rounded"></div>
-        </div>
-      </div>
+      <FullPageLoader 
+        message="Loading your profile..." 
+        showSkeleton={false}
+        delay={1500}
+      />
     );
+  }
+
+  // Show skeleton loading after initial load
+  if (loading) {
+    return <ProfileSkeleton />;
   }
 
   if (error) {
@@ -132,7 +133,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-gray-50">
         <ProfileNav isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
         
-        <div className="w-11/12 mx-auto px-4 py-8">
+        <div className="w-11/12 mx-auto ">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mt-6 md:mt-8">
             {/* Sidebar - takes 3 columns on large screens, full width on mobile */}
             <div className="lg:col-span-3 order-1">
@@ -146,9 +147,11 @@ const App: React.FC = () => {
               <div className="mb-8">
                 <ProfileHeader profileData={profile} />
               </div>
-              
+
+              <div className="border-t border-gray-200"></div>
+
               <div className="space-y-8 md:space-y-12 mt-6 md:mt-8">
-                <ReviewCarousel reviews={transformedReviews} />
+                {/* <ReviewCarousel reviews={transformedReviews} /> */}
                 
                 <ServicesSection 
                   categories={profile.categories}
@@ -157,6 +160,8 @@ const App: React.FC = () => {
                   rate_range={profile.rate_range}
                   availability={profile.availability}
                 />
+                {/* Horizontal divider */}
+                <div className="border-t border-gray-200"></div>
                 
                 <ExperienceSection experiences={profile.work_experiences} />
                 
@@ -166,7 +171,13 @@ const App: React.FC = () => {
                   skills_description={profile.skills_description}
                 />
                 
+                {/* Horizontal divider */}
+                <div className="border-t border-gray-200"></div>
+                
                 <ToolsSection primary_tools={profile.primary_tools} />
+                
+                {/* Horizontal divider */}
+                <div className="border-t border-gray-200"></div>
                 
                 <PortfolioSection 
                   projects={profile.portfolio}

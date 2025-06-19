@@ -1,7 +1,7 @@
-import { ChevronDown, Pencil, Trash2, ChevronUp, Loader2 } from 'lucide-react';
+import { ChevronDown, Loader2, ChevronUp, Settings, Plus, X, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
+import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/store';
 import { updateProfile } from '../../store/Services/CreateProfileService';
 import { updateProfileData } from '../../store/Slice/CreateProfileSlice';
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
+import { motion } from 'framer-motion';
 
 interface ToolsSectionProps {
   primary_tools?: string[] | string;
@@ -30,20 +31,20 @@ interface Skill {
 const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const { isEditMode } = useEditMode();
   const dispatch = useAppDispatch();
-  const { profileData } = useAppSelector((state) => state.createProfile);
+  const { profileData: reduxProfileData } = useAppSelector((state) => state.createProfile);
   const { skills: dropdownSkills, loading: dropdownLoading } = useAppSelector((state) => state.dropdown);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isToolsOpen, setIsToolsOpen] = useState(false);
 
   // Add useDeleteItem hook
   const {
     isDeleteDialogOpen,
     openDeleteDialog,
     closeDeleteDialog,
-    handleDelete,
-    isLoading: isDeleteLoading,
-    error: deleteError,
-    success: deleteSuccess
+    isLoading: isDeleteLoading
   } = useDeleteItem();
 
   // State for tracking tool to delete
@@ -54,10 +55,21 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     if (Array.isArray(input)) return input;
     if (typeof input === 'string') {
       try {
+        // Handle empty string case
+        if (input.trim() === '') return [];
+        
+        // Try to parse the JSON string
         const parsed = JSON.parse(input);
         return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return input.split(',').map(tool => tool.trim()).filter(Boolean);
+      } catch (e) {
+        console.error('Error parsing tools:', e);
+        // If parsing fails, try to handle it as a comma-separated string
+        try {
+          return input.split(',').map(tool => tool.trim()).filter(Boolean);
+        } catch (e2) {
+          console.error('Error parsing tools as comma-separated string:', e2);
+          return [];
+        }
       }
     }
     return [];
@@ -65,113 +77,36 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
 
   const [tools, setTools] = useState<string[]>(() => getToolsArray(primary_tools));
 
-  // Fetch skills when dialog opens
+  // Initialize tools when component mounts or props change
   useEffect(() => {
-    if (isDialogOpen) {
-      dispatch(fetchSkills('primary'));
-    }
-  }, [isDialogOpen, dispatch]);
-
-  // Update tools when dialog opens or primary_tools changes
-  useEffect(() => {
-    if (isDialogOpen) {
-      const toolsArray = getToolsArray(primary_tools);
+    const toolsArray = getToolsArray(primary_tools);
+    console.log('Props received:', { primary_tools });
+    console.log('Parsed tools:', toolsArray);
+    console.log('Current tools state:', tools);
+    
+    // Only update if the values are different from current state
+    if (JSON.stringify(toolsArray) !== JSON.stringify(tools)) {
+      console.log('Updating tools state with new values');
       setTools(toolsArray);
     }
-  }, [isDialogOpen, primary_tools]);
+  }, [primary_tools]);
 
   // Update tools from Redux store
   useEffect(() => {
-    if (profileData?.primary_tools) {
-      const toolsArray = getToolsArray(profileData.primary_tools);
-      setTools(toolsArray);
-    }
-  }, [profileData?.primary_tools]);
-
-  const handleToolAdd = (tool: Skill) => {
-    const toolName = tool.name.trim();
-    if (toolName && !tools.includes(toolName)) {
-      setTools(prevTools => [...prevTools, toolName]);
-    }
-  };
-
-  const handleDeleteClick = (tool: string) => {
-    setToolToDelete(tool);
-    openDeleteDialog();
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!toolToDelete || !profileData?.id) {
-      toast.error("Missing required data for deletion");
-      return;
-    }
-
-    try {
-      // First delete the tool using the API
-      await handleDelete('tool', toolToDelete);
-
-      // If deletion was successful, update the local state and Redux store
-      if (deleteSuccess) {
-        const updatedTools = tools.filter(tool => tool !== toolToDelete);
-        
-        const formData = new FormData();
-        formData.append('subscription_type', profileData.subscription_type || 'premium');
-        formData.append('primary_tools', JSON.stringify(updatedTools));
-
-        const result = await dispatch(updateProfile({
-          data: formData,
-          profileId: profileData.id
-        })).unwrap();
-        
-        if (result) {
-          setTools(updatedTools);
-          dispatch(updateProfileData({
-            ...profileData,
-            primary_tools: updatedTools
-          }));
-          toast.success("Tool removed successfully!");
-        }
+    if (reduxProfileData?.primary_tools) {
+      const toolsArray = getToolsArray(reduxProfileData.primary_tools);
+      if (JSON.stringify(toolsArray) !== JSON.stringify(tools)) {
+        setTools(toolsArray);
       }
-    } catch (error) {
-      toast.error(deleteError || "Failed to remove tool");
-    } finally {
-      closeDeleteDialog();
-      setToolToDelete(null);
     }
-  };
+  }, [reduxProfileData?.primary_tools]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      const formData = new FormData();
-      formData.append('subscription_type', profileData?.subscription_type || 'premium');
-      formData.append('primary_tools', JSON.stringify(tools));
-
-      const result = await dispatch(updateProfile({
-        data: formData,
-        profileId: profileData?.id || ''
-      })).unwrap();
-      
-      if (result) {
-        dispatch(updateProfileData({
-          ...profileData,
-          primary_tools: tools
-        }));
-
-        toast.success("Tools updated successfully!");
-        setIsDialogOpen(false);
-      }
-    } catch (err) {
-      const error = err as { message: string; code?: string };
-      toast.error(error.message || "Failed to update tools");
+  // Fetch skills when dialog opens
+  useEffect(() => {
+    if (isToolsOpen) {
+      dispatch(fetchSkills('primary'));
     }
-  };
-
-  const handleCancel = () => {
-    setTools(getToolsArray(primary_tools));
-    setIsDialogOpen(false);
-  };
+  }, [isToolsOpen, dispatch]);
 
   const getSkillsArray = (skills: any): Skill[] => {
     if (!skills) return [];
@@ -190,151 +125,440 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     return [];
   };
 
-  if (!tools || tools.length === 0) {
-    return (
-      <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
-        <div className="flex justify-between items-center mb-4 xs:mb-6">
-          <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
-            <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </span>
-            Tools
-          </h2>
-          {isEditMode && (
-            <Button 
-              variant="ghost" 
-              className="p-1 xs:p-1.5 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
-              onClick={() => setIsDialogOpen(true)}
-            >
-              <Pencil className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
-            </Button>
-          )}
-        </div>
-        <div className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-lg p-4 xs:p-6 border border-[#5A8DB8]/10">
-          <p className="text-sm xs:text-base text-gray-600">No tools information available.</p>
-        </div>
-      </div>
-    );
-  }
+  const handleAddTool = (tool: Skill) => {
+    console.log('Adding tool:', tool);
+    setTools(prev => {
+      const currentValues = prev;
+      if (!currentValues.includes(tool.name)) {
+        const newValues = [...currentValues, tool.name];
+        console.log('New tools values:', newValues);
+        return newValues;
+      }
+      return prev;
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      if (!reduxProfileData?.id) {
+        toast.error("Profile ID is missing");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('subscription_type', reduxProfileData.subscription_type || 'premium');
+      formData.append('primary_tools', JSON.stringify(tools));
+
+      console.log('Submitting tools data:', {
+        primary_tools: tools
+      });
+
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: reduxProfileData.id
+      })).unwrap();
+      
+      if (result) {
+        console.log('Update successful, new data:', result);
+        
+        // Parse the tools from the response if they are strings
+        const parseResponseTools = (tools: any) => {
+          if (typeof tools === 'string') {
+            try {
+              return JSON.parse(tools);
+            } catch (e) {
+              console.error('Error parsing response tools:', e);
+              return [];
+            }
+          }
+          return Array.isArray(tools) ? tools : [];
+        };
+
+        const updatedTools = parseResponseTools(result.primary_tools);
+        
+        // Update Redux store with parsed data
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          primary_tools: updatedTools
+        }));
+
+        // Force update local state with parsed data
+        setTools(updatedTools);
+
+        toast.success("Tools updated successfully!");
+        setIsDialogOpen(false);
+        setIsAddDialogOpen(false);
+      }
+    } catch (err) {
+      const error = err as { message: string; code?: string };
+      console.error('Update failed:', error);
+      toast.error(error.message || "Failed to update tools");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setTools(getToolsArray(primary_tools));
+    setIsDialogOpen(false);
+  };
+
+  const handleDeleteClick = (tool: string) => {
+    setToolToDelete(tool);
+    openDeleteDialog();
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!toolToDelete || !reduxProfileData?.id) {
+      toast.error("Missing required data for deletion");
+      return;
+    }
+
+    try {
+      // Update the local state and Redux store first
+      const updatedTools = tools.filter(tool => tool !== toolToDelete);
+
+      const formData = new FormData();
+      formData.append('subscription_type', reduxProfileData.subscription_type || 'premium');
+      formData.append('primary_tools', JSON.stringify(updatedTools));
+
+      const result = await dispatch(updateProfile({
+        data: formData,
+        profileId: reduxProfileData.id
+      })).unwrap();
+      
+      if (result) {
+        setTools(updatedTools);
+        dispatch(updateProfileData({
+          ...reduxProfileData,
+          primary_tools: updatedTools
+        }));
+        toast.success("Tool removed successfully!");
+      }
+    } catch (error) {
+      toast.error("Failed to remove tool");
+    } finally {
+      closeDeleteDialog();
+      setToolToDelete(null);
+    }
+  };
 
   return (
-    <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
-      <div className="flex justify-between items-center mb-4 xs:mb-6">
-        <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
-          <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </span>
-          Tools
-        </h2>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="relative bg-gradient-to-br from-white via-[#5A8DB8]/5 to-white rounded-2xl p-6 xs:p-8 shadow-lg"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 via-[#3C5979]/5 to-[#5A8DB8]/5 rounded-2xl"></div>
+      
+      <div className="relative flex justify-between items-center mb-8">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex items-center gap-4"
+        >
+          <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl shadow-lg">
+            <Settings className="h-6 w-6 text-white" />
+          </div>
+          <h2 className="text-2xl xs:text-3xl font-bold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+            Tools
+          </h2>
+        </motion.div>
+        
         {isEditMode && (
-          <div className="flex gap-1.5 xs:gap-2">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex gap-2"
+          >
             <Button 
               variant="ghost" 
-              size="icon"
-              className="h-7 w-7 xs:h-8 xs:w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-200"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => setIsDialogOpen(true)}
             >
-              <Pencil className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
+              <Pencil className="w-5 h-5" />
             </Button>
-          </div>
+            <Button 
+              variant="ghost" 
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+              onClick={() => setIsAddDialogOpen(true)}
+            >
+              <Plus className="w-5 h-5" />
+            </Button>
+          </motion.div>
         )}
       </div>
 
+      {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white to-gray-50/50">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#5A8DB8]">Edit Tools</DialogTitle>
+        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+          <DialogHeader className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
+                <Settings className="w-6 h-6 text-white" />
+              </div>
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+                Edit Tools
+              </DialogTitle>
+            </div>
           </DialogHeader>
           
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
-              <div>
-                <label className="block font-medium mb-1.5 text-sm text-gray-700">
-                  Select Tools
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-[#5A8DB8]" />
+                  Tools
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {dropdownLoading ? (
-                    <div className="col-span-2 flex justify-center">
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                    </div>
-                  ) : (
-                    getSkillsArray(dropdownSkills).map((tool: Skill) => (
+                <Button
+                  type="button"
+                  onClick={() => setIsToolsOpen(true)}
+                  className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
+                >
+                  {tools.length > 0 ? tools.join(", ") : "Select tools"}
+                </Button>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {tools.map((tool, index) => (
+                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-[#5A8DB8] px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
+                      <span>{tool}</span>
                       <Button
-                        key={tool.id}
-                        type="button"
-                        variant={tools.includes(tool.name.trim()) ? "default" : "outline"}
-                        className="w-full justify-start"
-                        onClick={() => handleToolAdd(tool)}
+                        variant="ghost"
+                        size="icon"
+                        className="h-4 w-4 text-[#5A8DB8] hover:text-red-600 hover:bg-transparent"
+                        onClick={() => handleDeleteClick(tool)}
+                        disabled={isLoading}
                       >
-                        {tool.name}
+                        <X className="h-3 w-3" />
                       </Button>
-                    ))
-                  )}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                className="border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 transition-all duration-300"
+                disabled={isLoading}
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#2C4A6B] text-white shadow-sm hover:shadow-md transition-all duration-300"
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
+                disabled={isLoading}
               >
-                Save Changes
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving Changes...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      <div className="flex flex-wrap gap-2 xs:gap-3">
-        {tools
-          .slice(0, isExpanded ? undefined : 2)
-          .map((tool, index) => (
-          <div key={index} className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-2 xs:p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10">
-            <div className="flex items-center gap-2">
-              <span className="text-xs xs:text-sm font-medium text-[#5A8DB8]">{tool}</span>
+      {/* Add New Tools Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+          <DialogHeader className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
+                <Plus className="w-6 h-6 text-white" />
+              </div>
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+                Add New Tools
+              </DialogTitle>
             </div>
-            {isEditMode && (
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                <Settings className="w-4 h-4 text-[#5A8DB8]" />
+                Tools
+              </label>
               <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5 xs:h-6 xs:w-6 text-[#5A8DB8] hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
-                onClick={() => handleDeleteClick(tool)}
+                type="button"
+                onClick={() => setIsToolsOpen(true)}
+                className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
               >
-                <Trash2 className="h-3 w-3 xs:h-3.5 xs:w-3.5" />
+                {tools.length > 0 ? tools.join(", ") : "Select tools"}
               </Button>
+            </div>
+
+            <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsAddDialogOpen(false)}
+                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  handleSubmit(new Event('submit') as any);
+                  setIsAddDialogOpen(false);
+                }}
+                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Adding Tools...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Add Tools
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tools Selection Dialog */}
+      <Dialog open={isToolsOpen} onOpenChange={setIsToolsOpen}>
+        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+          <DialogHeader className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
+                <Settings className="w-6 h-6 text-white" />
+              </div>
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+                Select Tools
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              {dropdownLoading ? (
+                <div className="col-span-2 flex justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-[#5A8DB8]" />
+                </div>
+              ) : (
+                getSkillsArray(dropdownSkills).map((tool: Skill) => (
+                  <Button
+                    key={tool.id}
+                    type="button"
+                    variant={tools.includes(tool.name) ? "default" : "outline"}
+                    className={`w-full justify-start ${
+                      tools.includes(tool.name)
+                        ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
+                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979]'
+                    } rounded-xl`}
+                    onClick={() => handleAddTool(tool)}
+                  >
+                    {tool.name}
+                  </Button>
+                ))
+              )}
+            </div>
+          </div>
+          <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsToolsOpen(false)}
+              className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setIsToolsOpen(false)}
+              className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
+            >
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-[#5A8DB8]">
+            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-2 rounded-lg shadow-sm">
+              <Settings className="h-5 w-5 text-white" />
+            </div>
+            Tools
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {tools.length > 0 ? (
+              tools
+                .slice(0, isExpanded ? undefined : 2)
+                .map((tool, index) => (
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-[#5A8DB8]">{tool}</span>
+                    </div>
+                    {isEditMode && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-[#5A8DB8] hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
+                        onClick={() => handleDeleteClick(tool)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </motion.div>
+                ))
+            ) : (
+              <p className="text-gray-500">No tools added yet</p>
             )}
           </div>
-        ))}
+        </div>
       </div>
       
       {tools.length > 2 && (
-        <Button 
-          variant="link" 
-          className="mt-3 xs:mt-4 text-[#5A8DB8] hover:text-[#3C5979] flex items-center p-0 group transition-all duration-200"
-          onClick={() => setIsExpanded(!isExpanded)}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6"
         >
-          <span className="text-sm group-hover:underline">{isExpanded ? 'Show less' : 'Show all tools'}</span>
-          {isExpanded ? (
-            <ChevronUp className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
-          ) : (
-            <ChevronDown className="ml-1 h-3.5 w-3.5 xs:h-4 xs:w-4 transition-transform duration-200" />
-          )}
-        </Button>
+          <Button 
+            variant="ghost" 
+            className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-xl px-4 py-2"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <span className="mr-2">{isExpanded ? 'Show less' : 'Show all tools'}</span>
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </motion.div>
       )}
 
       <DeleteConfirmationDialog
@@ -348,7 +572,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         description={`Are you sure you want to remove "${toolToDelete}" from your tools?`}
         isLoading={isDeleteLoading}
       />
-    </div>
+    </motion.div>
   );
 };
 

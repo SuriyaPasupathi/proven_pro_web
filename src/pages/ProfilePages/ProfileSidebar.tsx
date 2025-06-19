@@ -1,5 +1,4 @@
 import { Video, Award, Pencil, Plus, Trash2, Image, FileVideo, Save, Upload, User, FileText, Calendar, Hash, Building2 } from 'lucide-react';
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProfileData } from '../../types/profile';
 import { useEditMode } from '../../context/EditModeContext';
@@ -23,6 +22,36 @@ import { Label } from "@/components/ui/label";
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
+
+// Add custom styles for animations (matching ProfileHeader)
+const blobAnimationStyles = `
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+  
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+`;
 
 interface ProfileSidebarProps {
   profileData: ProfileData;
@@ -691,731 +720,838 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
   // Update the renderCertification function to use the new delete handler
   const renderCertification = (cert: Certification, index: number) => (
-    <div key={index} className="space-y-3 p-3 sm:p-4 bg-gray-100 rounded-lg hover:bg-blue-50 transition-colors duration-200 relative">
-      {isEditMode && (
-        <div className="absolute top-2 right-2 flex gap-1.5">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="h-7 w-7 sm:h-8 sm:w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200 rounded-full"
-            onClick={() => handleOpenCertDialog(cert)}
-          >
-            <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="h-7 w-7 sm:h-8 sm:w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-200 rounded-full"
-            onClick={() => handleDeleteClick('certification', cert.certifications_id)}
-          >
-            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </Button>
-        </div>
-      )}
-      <div className="space-y-2.5 w-full">
-        <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
-          <h4 className="font-bold text-[#5A8DB8] min-w-[70px] text-sm sm:text-base">Name :</h4>
-          <span className="text-gray-700 font-medium text-sm sm:text-base break-words">{cert.certifications_name}</span>
-        </div>
-        <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
-          <p className="font-semibold text-[#5A8DB8] min-w-[70px] text-sm sm:text-base">Organization :</p>
-          <span className="text-gray-700 font-medium text-sm sm:text-base break-words">{cert.certifications_issuer}</span>
-        </div>
-        <div className="flex justify-between items-start gap-2 text-sm">
-          <div className="flex flex-col gap-1">
-            <p className="font-semibold text-[#5A8DB8] text-xs sm:text-sm">Issued :</p>
-            <span className="text-gray-700 font-medium text-xs sm:text-sm">{new Date(cert.certifications_issued_date).toLocaleDateString()}</span>
+    <div key={index} className="relative group">
+      <div className="bg-gradient-to-br from-white/95 to-gray-50/80 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-[#5A8DB8]/15 hover:border-[#5A8DB8]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#5A8DB8]/10 overflow-hidden">
+        {isEditMode && (
+          <div className="absolute top-3 right-3 xs:top-4 xs:right-4 flex gap-2 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white/95 shadow-lg hover:bg-white text-[#5A8DB8] border border-white/50 transition-all duration-300 hover:scale-110 hover:shadow-md"
+              onClick={() => handleOpenCertDialog(cert)}
+            >
+              <Pencil className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4.5 sm:w-4.5" />
+            </Button>
+            {(profileData.profile_pic_url || profileData.profile_pic) && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white/95 shadow-lg hover:bg-white text-red-600 border border-white/50 transition-all duration-300 hover:scale-110 hover:shadow-md"
+                onClick={() => handleDeleteClick('certification', cert.certifications_id)}
+              >
+                <Trash2 className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4.5 sm:w-4.5" />
+              </Button>
+            )}
           </div>
-          {cert.certifications_expiration_date && (
-            <div className="flex flex-col gap-1">
-              <p className="font-semibold text-[#5A8DB8] text-xs sm:text-sm">Expires :</p>
-              <span className="text-gray-700 font-medium text-xs sm:text-sm">{new Date(cert.certifications_expiration_date).toLocaleDateString()}</span>
+        )}
+        
+        <div className="p-4 xs:p-5 sm:p-6">
+          <div className="space-y-4 xs:space-y-5">
+            {/* Certification Name */}
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
+                <Award className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-[#5A8DB8] text-sm xs:text-base sm:text-lg mb-1">Certification Name</h4>
+                <p className="text-gray-800 font-medium text-sm xs:text-base sm:text-lg leading-relaxed break-words">{cert.certifications_name}</p>
+              </div>
+            </div>
+            
+            {/* Organization */}
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
+                <Building2 className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-[#5A8DB8] text-sm xs:text-base mb-1">Issuing Organization</p>
+                <span className="text-gray-800 font-medium text-sm xs:text-base leading-relaxed break-words">{cert.certifications_issuer}</span>
+              </div>
+            </div>
+            
+            {/* Dates */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 xs:gap-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
+                  <Calendar className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
+                </div>
+                <div>
+                  <p className="font-semibold text-[#5A8DB8] text-sm xs:text-base mb-1">Issue Date</p>
+                  <span className="text-gray-800 font-medium text-sm xs:text-base">{new Date(cert.certifications_issued_date).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}</span>
+                </div>
+              </div>
+              {cert.certifications_expiration_date && (
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
+                    <Calendar className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#5A8DB8] text-sm xs:text-base mb-1">Expiry Date</p>
+                    <span className="text-gray-800 font-medium text-sm xs:text-base">{new Date(cert.certifications_expiration_date).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Certification ID */}
+            {cert.certifications_id && (
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
+                  <Hash className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="font-semibold text-[#5A8DB8] text-sm xs:text-base mb-1 block">Certification ID</span>
+                  <span className="text-gray-800 font-medium text-sm xs:text-base break-words font-mono bg-gray-100 px-2 py-1 rounded-md">{cert.certifications_id}</span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Certification Image */}
+          {cert.certifications_image_url && (
+            <div className="mt-5 xs:mt-6 sm:mt-7 rounded-xl sm:rounded-2xl overflow-hidden border border-[#5A8DB8]/15 bg-gradient-to-br from-white to-gray-50/50 shadow-sm">
+              <img 
+                src={getFullImageUrl(cert.certifications_image_url)} 
+                alt={cert.certifications_name}
+                className="w-full h-auto object-cover max-h-32 xs:max-h-40 sm:max-h-48 hover:scale-[1.02] transition-transform duration-300"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+              />
             </div>
           )}
         </div>
-        {cert.certifications_id && (
-          <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2">
-            <span className="font-semibold text-[#5A8DB8] min-w-[70px] text-xs sm:text-sm">ID :</span>
-            <span className="text-gray-700 font-medium text-xs sm:text-sm break-words">{cert.certifications_id}</span>
-          </div>
-        )}
       </div>
-      {cert.certifications_image_url && (
-        <div className="mt-3 rounded-lg overflow-hidden border border-gray-200">
-          <img 
-            src={getFullImageUrl(cert.certifications_image_url)} 
-            alt={cert.certifications_name}
-            className="w-full h-auto object-cover max-h-32 sm:max-h-48 hover:scale-[1.02] transition-transform duration-200"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
-          />
-        </div>
-      )}
     </div>
   );
 
   return (
-    <div className="space-y-8">
-      {/* Profile Image */}
-      <div className="pb-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg opacity-20 blur-sm"></div>
-        <div className="relative bg-white rounded-lg p-1 shadow-lg">
-          <div className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4">
-            <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-gray-200 to-blue-900">
-              {!imageError && (profileData.profile_pic_url || profileData.profile_pic) ? (
-                <div className="relative">
-                  <img 
-                    src={getFullImageUrl(profileData.profile_pic_url || profileData.profile_pic)}
-                    alt={`${profileData.first_name || ''} ${profileData.last_name || ''}`}
-                    className="w-full aspect-square object-cover hover:scale-[1.02] transition-transform duration-300"
-                    onError={() => setImageError(true)}
-                  />
+    <>
+      <style dangerouslySetInnerHTML={{ __html: blobAnimationStyles }} />
+      <div className="relative space-y-4 xs:space-y-6 sm:space-y-8">
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 -left-4 w-32 h-32 xs:w-48 xs:h-48 sm:w-72 sm:h-72 bg-[#5A8DB8] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>
+          <div className="absolute top-0 -right-4 w-32 h-32 xs:w-48 xs:h-48 sm:w-72 sm:h-72 bg-[#3C5979] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-32 h-32 xs:w-48 xs:h-48 sm:w-72 sm:h-72 bg-[#5A8DB8] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-4000"></div>
+        </div>
+
+        {/* Profile Image */}
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
+          <div className="relative bg-white/95 backdrop-blur-sm rounded-lg xs:rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+            <div className="relative h-16 xs:h-20 sm:h-24 md:h-32 lg:h-40 xl:h-48 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979]">
+              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10  "></div>
+              <div className="absolute bottom-0 left-0 right-0 h-8 xs:h-12 sm:h-16 md:h-20 lg:h-24 xl:h-32 bg-gradient-to-t from-white/95 to-transparent"></div>
+            </div>
+
+            <div className="relative px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8 -mt-8 xs:-mt-10 sm:-mt-12 md:-mt-16 lg:-mt-20 xl:-mt-24">
+              {/* Profile Image - Full Width */}
+              <div className="mb-3 xs:mb-4 sm:mb-6">
+                <div className="relative group">
+                  <div className="w-full aspect-square rounded-lg xs:rounded-xl sm:rounded-2xl overflow-hidden shadow-xl transition-all duration-300  group-hover:shadow-2xl">
+                    {!imageError && (profileData.profile_pic_url || profileData.profile_pic) ? (
+                      <img 
+                        src={getFullImageUrl(profileData.profile_pic_url || profileData.profile_pic)}
+                        alt={`${profileData.first_name || ''} ${profileData.last_name || ''}`}
+                        className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                        onError={() => setImageError(true)}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center">
+                        <span className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white">
+                          {`${profileData.first_name?.[0] || ''}${profileData.last_name?.[0] || ''}`.toUpperCase() || '?'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   {isEditMode && (
-                    <div className="absolute top-2 right-2 flex gap-2">
+                    <div className="absolute top-2 right-2 xs:top-3 xs:right-3 flex gap-1 xs:gap-1.5 z-10">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 rounded-full bg-white/90 shadow-lg hover:bg-white text-[#5A8DB8] border-2 border-white transition-all duration-300 hover:scale-110"
+                        onClick={() => setIsImageDialogOpen(true)}
+                      >
+                        <Pencil className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5 xl:h-5 xl:w-5" />
+                      </Button>
+                      {(profileData.profile_pic_url || profileData.profile_pic) && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 rounded-full bg-white/90 shadow-lg hover:bg-white text-red-600 border-2 border-white transition-all duration-300 hover:scale-110"
+                          onClick={() => handleDeleteClick('image')}
+                        >
+                          <Trash2 className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5 xl:h-5 xl:w-5" />
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Name and Email - Centered Below Image */}
+              <div className="text-center mb-3 xs:mb-4 sm:mb-6">
+                <div className="flex items-center justify-center gap-1 xs:gap-2 mb-1 xs:mb-2">
+                  <h2 className="text-lg xs:text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-5xl font-bold text-[#5A8DB8] leading-tight">
+                    {profileData.first_name} {profileData.last_name}
+                  </h2>
+                  {isEditMode && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 xl:h-12 xl:w-12 rounded-full bg-white/90 shadow-lg hover:bg-white text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 border border-white/50 transition-all duration-300 hover:scale-110 hover:shadow-md"
+                      onClick={handleOpenProfileDialog}
+                    >
+                      <Pencil className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4.5 md:h-4.5 lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs xs:text-sm text-gray-600">{profileData.profile_mail}</p>
+              </div>
+
+              {/* Bio Section */}
+              <div className="p-2 xs:p-3 sm:p-4 md:p-6 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 rounded-lg xs:rounded-xl sm:rounded-2xl">
+                <p className="text-xs xs:text-sm italic text-gray-700">
+                  {profileData.bio || "No bio available"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Horizontal Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#5A8DB8]/20"></div>
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-white px-4 py-2 rounded-full border border-[#5A8DB8]/20 shadow-sm">
+              <div className="w-3 h-3 xs:w-4 xs:h-4 bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] rounded-full"></div>
+            </span>
+          </div>
+        </div>
+
+        {/* Video Introduction */}
+        {(profileData.video_intro || profileData.video_intro_url) && (
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
+            <div className="relative bg-white/95 backdrop-blur-sm rounded-lg xs:rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+              <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+                <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-6">
+                  <div className="flex items-center gap-1 xs:gap-2">
+                    <div className="p-1.5 xs:p-2 rounded-lg xs:rounded-xl bg-[#5A8DB8]/10">
+                      <Video className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
+                    </div>
+                    <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-[#5A8DB8]">Video Introduction</h3>
+                  </div>
+                  {isEditMode && (
+                    <div className="flex gap-1 xs:gap-2">
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        className="h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-[#5A8DB8] transition-colors duration-300"
-                        onClick={() => setIsImageDialogOpen(true)}
+                        className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
+                        onClick={handleOpenVideoDialog}
                       >
-                        <Pencil className="h-4 w-4" />
+                        <Pencil className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5 xl:h-5 xl:w-5" />
                       </Button>
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        className="h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-red-600 transition-colors duration-300"
-                        onClick={() => handleDeleteClick('image')}
+                        className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-300"
+                        onClick={() => handleDeleteClick('video')}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5 xl:h-5 xl:w-5" />
                       </Button>
                     </div>
                   )}
                 </div>
-              ) : (
-                <div className="relative w-full aspect-square bg-gradient-to-br from-gray-200 to-blue-900 flex items-center justify-center">
-                  <span className="text-2xl font-semibold text-white">
-                    {`${profileData.first_name?.[0] || ''}${profileData.last_name?.[0] || ''}`.toUpperCase() || '?'}
-                  </span>
-                  {isEditMode && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white text-gray-500 hover:text-[#5A8DB8] transition-colors duration-300"
-                      onClick={() => setIsImageDialogOpen(true)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                
+                <div className="space-y-3 xs:space-y-4 sm:space-y-6">
+                  <div className="relative bg-gray-100 rounded-lg xs:rounded-xl aspect-video overflow-hidden group hover:shadow-md transition-shadow duration-300">
+                    <video 
+                      src={getFullImageUrl(profileData.video_intro_url || profileData.video_intro)}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      controls
+                      preload="metadata"
+                      controlsList="nodownload"
+                      playsInline
+                    />
+                  </div>
+                  {profileData.video_description && (
+                    <div className="bg-gradient-to-br from-white to-gray-50/50 p-3 xs:p-4 rounded-lg xs:rounded-xl border border-[#5A8DB8]/10">
+                      <p className="text-xs xs:text-sm text-gray-700">{profileData.video_description}</p>
+                    </div>
                   )}
                 </div>
-              )}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-900/80 to-transparent h-1/4"></div>
-            </div>
-
-            <div className="mt-4 text-center mb-6">
-              <div className="flex justify-center items-center gap-2">
-                <h2 className="text-xl font-bold text-[#5A8DB8]">{profileData.first_name} {profileData.last_name}</h2>
-                {isEditMode && (
-                  <Button 
-                    variant="ghost" 
-                    className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10 transition-colors duration-300"
-                    onClick={handleOpenProfileDialog}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                )}
               </div>
-              <p className="text-sm text-gray-600">{profileData.profile_mail}</p>
             </div>
-
-            <Card className="p-4 bg-gradient-to-br from-gray-50 to-white border-[#5A8DB8]/10 hover:shadow-md transition-shadow duration-300">
-              <p className="text-sm italic text-gray-700">
-                {profileData.bio || "No bio available"}
-              </p>
-            </Card>
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Video Introduction */}
-      {(profileData.video_intro || profileData.video_intro_url) && (
-        <div className="pb-8 relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg opacity-20 blur-sm"></div>
-          <div className="relative bg-white rounded-lg p-1 shadow-lg">
-            <div className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Video className="h-5 w-5 text-[#5A8DB8]" />
-                  <h3 className="font-semibold text-lg text-[#5A8DB8]">Video Introduction</h3>
+        {/* Horizontal Divider */}
+        {(profileData.video_intro || profileData.video_intro_url) && (
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#5A8DB8]/20"></div>
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-white px-4 py-2 rounded-full border border-[#5A8DB8]/20 shadow-sm">
+                <div className="w-3 h-3 xs:w-4 xs:h-4 bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] rounded-full"></div>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Certifications */}
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
+          <div className="relative bg-white/95 backdrop-blur-sm rounded-lg xs:rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+            <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+              <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-6">
+                <div className="flex items-center gap-1 xs:gap-2">
+                  <div className="p-1.5 xs:p-2 rounded-lg xs:rounded-xl bg-[#5A8DB8]/10">
+                    <Award className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
+                  </div>
+                  <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-[#5A8DB8]">Certifications</h3>
                 </div>
                 {isEditMode && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-1 xs:gap-2">
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-8 w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
-                      onClick={handleOpenVideoDialog}
+                      className="p-0 h-auto text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
+                      onClick={() => handleOpenCertDialog()}
                     >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-300"
-                      onClick={() => handleDeleteClick('video')}
-                    >
-                      <Trash2 className="h-4 w-4" />
+                      <Plus className="w-4 h-4 xs:w-5 xs:h-5" />
                     </Button>
                   </div>
                 )}
               </div>
               
-              <div className="space-y-4">
-                <div className="relative bg-gray-200 rounded-lg aspect-video overflow-hidden hover:shadow-md transition-shadow duration-300">
-                  <video 
-                    src={getFullImageUrl(profileData.video_intro_url || profileData.video_intro)}
-                    className="w-full h-full object-cover"
-                    controls
-                    preload="metadata"
-                    controlsList="nodownload"
-                    playsInline
-                  />
-                </div>
-                {profileData.video_description && (
-                  <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-lg border border-[#5A8DB8]/10">
-                    <p className="text-sm text-gray-700">{profileData.video_description}</p>
+              <div className="space-y-3 xs:space-y-4 sm:space-y-6">
+                {profileData.certifications && profileData.certifications.length > 0 ? (
+                  profileData.certifications.map((cert, index) => (
+                    <div key={index} className="relative group">
+                      {renderCertification(cert, index)}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 xs:py-10 sm:py-12 bg-gradient-to-br from-white/95 to-gray-50/80 rounded-xl sm:rounded-2xl border border-[#5A8DB8]/15">
+                    <div className="p-4 xs:p-5 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#5A8DB8]/5 inline-block mb-4 xs:mb-5">
+                      <Award className="w-8 h-8 xs:w-10 xs:h-10 text-[#5A8DB8] mx-auto" />
+                    </div>
+                    <p className="text-gray-600 text-sm xs:text-base sm:text-lg font-medium mb-4 xs:mb-5">No certifications added yet</p>
+                    {isEditMode && (
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-colors duration-300 border-[#5A8DB8]/30 text-sm xs:text-base font-medium"
+                        onClick={() => handleOpenCertDialog()}
+                      >
+                        <Plus className="w-4 h-4 xs:w-5 xs:h-5 mr-2" />
+                        Add Your First Certification
+                      </Button>
+                    )}
                   </div>
                 )}
+
+      
               </div>
             </div>
           </div>
         </div>
-      )}
+                  {/* Horizontal Divider */}
+                  <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-[#5A8DB8]/20"></div>
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-white px-4 py-2 rounded-full border border-[#5A8DB8]/20 shadow-sm">
+              <div className="w-3 h-3 xs:w-4 xs:h-4 bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] rounded-full"></div>
+            </span>
+          </div>
+        </div>
 
-      {/* Certifications */}
-      <div className="pb-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg opacity-20 blur-sm"></div>
-        <div className="relative bg-white rounded-lg p-1 shadow-lg">
-          <div className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Award className="h-5 w-5 text-[#5A8DB8]" />
-                <h3 className="font-semibold text-lg text-[#5A8DB8]">Certifications</h3>
-              </div>
-              {isEditMode && (
-                <div className="flex gap-2">
-                  <Button 
-                    variant="ghost" 
-                    className="p-0 h-auto text-[#3C5979] hover:text-[#3C5979] hover:bg-[#3C5979]/10 transition-colors duration-300"
-                    onClick={() => handleOpenCertDialog()}
-                  >
-                    <Plus className="w-5 h-5 text-[#5A8DB8] hover:text-[#3C5979]" />
-                  </Button>
-                </div>
-              )}
-            </div>
-            
-            <div className="space-y-4">
-              {profileData.certifications && profileData.certifications.length > 0 ? (
-                profileData.certifications.map((cert, index) => (
-                  <div key={index} className="relative group">
-                    {renderCertification(cert, index)}
+        {/* Profile Edit Dialog */}
+        <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
+          <DialogContent className="w-[95vw] max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-300">
+            <DialogHeader className="space-y-3 px-4 sm:px-6">
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-[#5A8DB8]/10">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#5A8DB8]" />
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-8 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-[#5A8DB8]/10">
-                  <p className="text-gray-500 text-sm italic">No certifications added yet</p>
-                  {isEditMode && (
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      className="mt-2 text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#3C5979]/10 transition-colors duration-300"
-                      onClick={() => handleOpenCertDialog()}
-                    >
-                      Add Your First Certification
-                    </Button>
+                  Edit Profile Information
+                </DialogTitle>
+              </div>
+              <div className="h-1 w-16 sm:w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
+            </DialogHeader>
+            <form onSubmit={handleProfileSubmit} className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="first_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                    First Name
+                  </Label>
+                  <Input
+                    id="first_name"
+                    name="first_name"
+                    value={profileForm.first_name}
+                    onChange={handleProfileChange}
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    required
+                    disabled={isProfileUpdating}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="last_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Last Name
+                  </Label>
+                  <Input
+                    id="last_name"
+                    name="last_name"
+                    value={profileForm.last_name}
+                    onChange={handleProfileChange}
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    required
+                    disabled={isProfileUpdating}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bio" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                  <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+                  Bio
+                </Label>
+                <Textarea
+                  id="bio"
+                  name="bio"
+                  value={profileForm.bio}
+                  onChange={handleProfileChange}
+                  className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base min-h-[80px] sm:min-h-[100px]"
+                  disabled={isProfileUpdating}
+                />
+              </div>
+              <DialogFooter className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsProfileDialogOpen(false)}
+                  disabled={isProfileUpdating}
+                  className="w-full sm:w-auto border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition text-sm sm:text-base py-2 sm:py-2.5"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isProfileUpdating}
+                  className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+                >
+                  {isProfileUpdating ? (
+                    <>
+                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                      Save Changes
+                    </>
                   )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Image Edit Dialog */}
+        <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
+          <DialogContent className="w-[95vw] max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-300">
+            <DialogHeader className="space-y-3 px-4 sm:px-6">
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-[#5A8DB8]/10">
+                    <Image className="w-4 h-4 sm:w-5 sm:h-5 text-[#5A8DB8]" />
+                  </div>
+                  Update Profile Image
+                </DialogTitle>
+              </div>
+              <div className="h-1 w-16 sm:w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
+            </DialogHeader>
+            <form onSubmit={handleImageSubmit} className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="border-2 border-dashed border-[#5A8DB8]/30 rounded-xl p-6 sm:p-8 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/40 transition-all duration-300">
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={imageInputRef}
+                  className="hidden"
+                  onChange={handleImageChange}
+                  disabled={isImageUploading}
+                />
+                {imagePreview ? (
+                  <div className="relative group">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-40 h-40 mx-auto rounded-xl object-cover mb-4 shadow-lg transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                ) : (
+                  <div className="w-40 h-40 mx-auto bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10 rounded-xl flex items-center justify-center mb-4">
+                    <span className="text-[#5A8DB8]">No image selected</span>
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleImageClick}
+                  className="mb-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/40 transition-all duration-300"
+                  disabled={isImageUploading}
+                >
+                  {isImageUploading ? 'Uploading...' : 'Choose Image'}
+                </Button>
+                <p className="text-sm text-[#5A8DB8]/70">
+                  Recommended: Square image, max 5MB
+                </p>
+              </div>
+              <DialogFooter className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsImageDialogOpen(false)}
+                  disabled={isImageUploading}
+                  className="w-full sm:w-auto border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/40 transition-all duration-300"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={!selectedImage || isImageUploading}
+                  className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+                >
+                  {isImageUploading ? (
+                    <>
+                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
+                      Upload Image
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Video Edit Dialog */}
+        <Dialog open={isVideoDialogOpen} onOpenChange={(open) => {
+          if (!open) {
+            setSelectedVideo(null);
+            setVideoForm({ video_description: '' });
+          }
+          setIsVideoDialogOpen(open);
+        }}>
+          <DialogContent className="w-[95vw] max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-300">
+            <DialogHeader className="space-y-3 px-4 sm:px-6">
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-[#5A8DB8]/10">
+                    <Video className="w-4 h-4 sm:w-5 sm:h-5 text-[#5A8DB8]" />
+                  </div>
+                  Update Video Introduction
+                </DialogTitle>
+              </div>
+              <div className="h-1 w-16 sm:w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
+            </DialogHeader>
+            <form onSubmit={handleVideoSubmit} className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="border-2 border-dashed border-[#5A8DB8]/30 rounded-xl p-6 sm:p-8 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/40 transition-all duration-300">
+                <input
+                  type="file"
+                  accept="video/*"
+                  ref={videoInputRef}
+                  className="hidden"
+                  onChange={handleVideoFileChange}
+                  disabled={isVideoUpdating}
+                />
+                {selectedVideo ? (
+                  <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
+                    <FileVideo className="w-5 h-5" />
+                    {selectedVideo.name}
+                  </div>
+                ) : profileData.video_intro_url ? (
+                  <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
+                    <FileVideo className="w-5 h-5" />
+                    Current video will be replaced
+                  </div>
+                ) : (
+                  <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
+                    <FileVideo className="w-5 h-5" />
+                    No video selected
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleVideoClick}
+                  className="mb-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/40 transition-all duration-300"
+                  disabled={isVideoUpdating}
+                >
+                  {isVideoUpdating ? 'Uploading...' : 'Choose Video'}
+                </Button>
+                <p className="text-sm text-[#5A8DB8]/70">
+                  Recommended: MP4 format, max 100MB
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="video_description" className="text-sm font-medium text-[#3C5979]">Description</Label>
+                <Textarea
+                  id="video_description"
+                  value={videoForm.video_description}
+                  onChange={handleVideoDescriptionChange}
+                  placeholder="Add a description for your video..."
+                  className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base min-h-[80px] sm:min-h-[100px]"
+                  disabled={isVideoUpdating}
+                />
+              </div>
+              <DialogFooter className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsVideoDialogOpen(false)}
+                  disabled={isVideoUpdating}
+                  className="w-full sm:w-auto border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition text-sm sm:text-base py-2 sm:py-2.5"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isVideoUpdating}
+                  className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+                >
+                  {isVideoUpdating ? (
+                    <>
+                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Certification Edit Dialog */}
+        <Dialog open={isCertDialogOpen} onOpenChange={handleCloseCertDialog}>
+          <DialogContent className="w-[95vw] max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-300 max-h-[90vh]">
+            <DialogHeader className="space-y-3 px-4 sm:px-6">
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-[#5A8DB8]/10">
+                    <Award className="w-4 h-4 sm:w-5 sm:h-5 text-[#5A8DB8]" />
+                  </div>
+                  {isAddingNewCert ? 'Add New Certification' : 'Edit Certification'}
+                </DialogTitle>
+              </div>
+              <div className="h-1 w-16 sm:w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
+            </DialogHeader>
+            <form onSubmit={handleCertSubmit} className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6 overflow-y-auto max-h-[calc(90vh-8rem)] pr-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="certifications_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                    <Award className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Certification Name
+                  </Label>
+                  <Input
+                    id="certifications_name"
+                    name="certifications_name"
+                    value={certForm.certifications_name}
+                    onChange={handleCertChange}
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    required
+                    disabled={isCertUpdating}
+                    placeholder="Enter certification name"
+                  />
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
+                <div className="space-y-2">
+                  <Label htmlFor="certifications_issuer" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                    <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Issuing Organization
+                  </Label>
+                  <Input
+                    id="certifications_issuer"
+                    name="certifications_issuer"
+                    value={certForm.certifications_issuer}
+                    onChange={handleCertChange}
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    required
+                    disabled={isCertUpdating}
+                    placeholder="Enter organization name"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="certifications_issued_date" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Issue Date
+                  </Label>
+                  <Input
+                    id="certifications_issued_date"
+                    name="certifications_issued_date"
+                    type="date"
+                    value={certForm.certifications_issued_date}
+                    onChange={handleCertChange}
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    required
+                    disabled={isCertUpdating}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="certifications_expiration_date" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Expiration Date 
+                  </Label>
+                  <Input
+                    id="certifications_expiration_date"
+                    name="certifications_expiration_date"
+                    type="date"
+                    value={certForm.certifications_expiration_date}
+                    onChange={handleCertChange}
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    disabled={isCertUpdating}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="certifications_id" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
+                  <Hash className="w-3 h-3 sm:w-4 sm:h-4" />
+                  Certification ID
+                </Label>
+                <Input
+                  id="certifications_id"
+                  name="certifications_id"
+                  value={certForm.certifications_id}
+                  onChange={handleCertChange}
+                  className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                  required
+                  disabled={isCertUpdating}
+                  placeholder="Enter certification ID"
+                />
+              </div>
+              <div className="border-2 border-dashed border-[#5A8DB8]/30 rounded-xl p-4 sm:p-6 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/40 transition-all duration-300">
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={certImageInputRef}
+                  className="hidden"
+                  onChange={handleCertImageChange}
+                  disabled={isCertUpdating}
+                />
+                {selectedCertImage ? (
+                  <div className="text-sm text-[#5A8DB8] mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
+                    <Image className="w-4 h-4" />
+                    {selectedCertImage.name}
+                  </div>
+                ) : certForm.certifications_image_url ? (
+                  <div className="relative group">
+                    <img 
+                      src={getFullImageUrl(certForm.certifications_image_url)} 
+                      alt="Current certification"
+                      className="w-32 h-32 mx-auto object-cover rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <p className="text-sm text-[#5A8DB8] mt-2">Current image will be replaced</p>
+                  </div>
+                ) : (
+                  <div className="text-sm text-[#5A8DB8] mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
+                    <Image className="w-4 h-4" />
+                    No image selected
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCertImageClick}
+                  className="mb-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/40 transition-all duration-300"
+                  disabled={isCertUpdating}
+                >
+                  {isCertUpdating ? 'Uploading...' : 'Choose Image'}
+                </Button>
+                <p className="text-xs text-[#5A8DB8]/70">
+                  Recommended: Square image, max 5MB
+                </p>
+              </div>
+              <DialogFooter className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseCertDialog}
+                  disabled={isCertUpdating}
+                  className="w-full sm:w-auto border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition text-sm sm:text-base py-2 sm:py-2.5"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isCertUpdating}
+                  className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+                >
+                  {isCertUpdating ? (
+                    <>
+                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                      {isAddingNewCert ? 'Add Certification' : 'Save Changes'}
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* DeleteConfirmationDialog */}
+        <DeleteConfirmationDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={() => {
+            closeDeleteDialog();
+            setDeleteType(null);
+            setCertificationToDelete(null);
+          }}
+          onConfirm={handleDeleteConfirm}
+          title={`Delete ${deleteType ? deleteType.charAt(0).toUpperCase() + deleteType.slice(1) : ''}`}
+          description={
+            deleteType === 'certification' && certificationToDelete
+              ? `Are you sure you want to delete this certification? This action cannot be undone.`
+              : `Are you sure you want to delete your ${deleteType}? This action cannot be undone.`
+          }
+          isLoading={isDeleteLoading}
+        />
       </div>
-
-      {/* Profile Edit Dialog */}
-      <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
-          <DialogHeader className="space-y-4 relative">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
-                  <User className="w-5 h-5 text-[#5A8DB8]" />
-                </div>
-                Edit Profile Information
-              </DialogTitle>
-            </div>
-            <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
-          </DialogHeader>
-          <form onSubmit={handleProfileSubmit} className="space-y-6 relative">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2 group">
-                <Label htmlFor="first_name" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  First Name
-                </Label>
-                <Input
-                  id="first_name"
-                  name="first_name"
-                  value={profileForm.first_name}
-                  onChange={handleProfileChange}
-                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
-                  required
-                  disabled={isProfileUpdating}
-                />
-              </div>
-              <div className="space-y-2 group">
-                <Label htmlFor="last_name" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  Last Name
-                </Label>
-                <Input
-                  id="last_name"
-                  name="last_name"
-                  value={profileForm.last_name}
-                  onChange={handleProfileChange}
-                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
-                  required
-                  disabled={isProfileUpdating}
-                />
-              </div>
-            </div>
-            <div className="space-y-2 group">
-              <Label htmlFor="bio" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Bio
-              </Label>
-              <Textarea
-                id="bio"
-                name="bio"
-                value={profileForm.bio}
-                onChange={handleProfileChange}
-                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[100px] resize-y shadow-sm hover:shadow-md"
-                disabled={isProfileUpdating}
-              />
-            </div>
-            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsProfileDialogOpen(false)}
-                disabled={isProfileUpdating}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isProfileUpdating}
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
-              >
-                {isProfileUpdating ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Image Edit Dialog */}
-      <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
-          <DialogHeader className="space-y-4 relative">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
-                  <Image className="w-5 h-5 text-[#5A8DB8]" />
-                </div>
-                Update Profile Image
-              </DialogTitle>
-            </div>
-            <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
-          </DialogHeader>
-          <form onSubmit={handleImageSubmit} className="space-y-6 relative">
-            <div className="border-2 border-dashed border-[#5A8DB8]/20 rounded-2xl p-8 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/30 transition-all duration-300">
-              <input
-                type="file"
-                accept="image/*"
-                ref={imageInputRef}
-                className="hidden"
-                onChange={handleImageChange}
-                disabled={isImageUploading}
-              />
-              {imagePreview ? (
-                <div className="relative group">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-40 h-40 mx-auto rounded-2xl object-cover mb-4 shadow-lg transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-              ) : (
-                <div className="w-40 h-40 mx-auto bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10 rounded-2xl flex items-center justify-center mb-4">
-                  <span className="text-[#5A8DB8]">No image selected</span>
-                </div>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleImageClick}
-                className="mb-2 border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
-                disabled={isImageUploading}
-              >
-                {isImageUploading ? 'Uploading...' : 'Choose Image'}
-              </Button>
-              <p className="text-sm text-[#5A8DB8]/70">
-                Recommended: Square image, max 5MB
-              </p>
-            </div>
-            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsImageDialogOpen(false)}
-                disabled={isImageUploading}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={!selectedImage || isImageUploading}
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
-              >
-                {isImageUploading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4" />
-                    Upload Image
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Video Edit Dialog */}
-      <Dialog open={isVideoDialogOpen} onOpenChange={(open) => {
-        if (!open) {
-          setSelectedVideo(null);
-          setVideoForm({ video_description: '' });
-        }
-        setIsVideoDialogOpen(open);
-      }}>
-        <DialogContent className="sm:max-w-md bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
-          <DialogHeader className="space-y-4 relative">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
-                  <Video className="w-5 h-5 text-[#5A8DB8]" />
-                </div>
-                Update Video Introduction
-              </DialogTitle>
-            </div>
-            <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
-          </DialogHeader>
-          <form onSubmit={handleVideoSubmit} className="space-y-6 relative">
-            <div className="border-2 border-dashed border-[#5A8DB8]/20 rounded-2xl p-8 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/30 transition-all duration-300">
-              <input
-                type="file"
-                accept="video/*"
-                ref={videoInputRef}
-                className="hidden"
-                onChange={handleVideoFileChange}
-                disabled={isVideoUpdating}
-              />
-              {selectedVideo ? (
-                <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
-                  <FileVideo className="w-5 h-5" />
-                  {selectedVideo.name}
-                </div>
-              ) : profileData.video_intro_url ? (
-                <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
-                  <FileVideo className="w-5 h-5" />
-                  Current video will be replaced
-                </div>
-              ) : (
-                <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
-                  <FileVideo className="w-5 h-5" />
-                  No video selected
-                </div>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleVideoClick}
-                className="mb-2 border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
-                disabled={isVideoUpdating}
-              >
-                {isVideoUpdating ? 'Uploading...' : 'Choose Video'}
-              </Button>
-              <p className="text-sm text-[#5A8DB8]/70">
-                Recommended: MP4 format, max 100MB
-              </p>
-            </div>
-            <div className="space-y-2 group">
-              <Label htmlFor="video_description" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors">Description</Label>
-              <Textarea
-                id="video_description"
-                value={videoForm.video_description}
-                onChange={handleVideoDescriptionChange}
-                placeholder="Add a description for your video..."
-                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[100px] resize-y shadow-sm hover:shadow-md"
-                disabled={isVideoUpdating}
-              />
-            </div>
-            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsVideoDialogOpen(false)}
-                disabled={isVideoUpdating}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isVideoUpdating}
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
-              >
-                {isVideoUpdating ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Certification Edit Dialog */}
-      <Dialog open={isCertDialogOpen} onOpenChange={handleCloseCertDialog}>
-        <DialogContent className="sm:max-w-md bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden max-h-[90vh]">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
-          <DialogHeader className="space-y-3 relative">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
-                  <Award className="w-4 h-4 text-[#5A8DB8]" />
-                </div>
-                {isAddingNewCert ? 'Add New Certification' : 'Edit Certification'}
-              </DialogTitle>
-            </div>
-            <div className="h-0.5 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
-          </DialogHeader>
-          <form onSubmit={handleCertSubmit} className="space-y-4 relative overflow-y-auto max-h-[calc(90vh-8rem)] pr-1">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="space-y-1.5 group">
-                <Label htmlFor="certifications_name" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                  <Award className="w-4 h-4" />
-                  Certification Name
-                </Label>
-                <Input
-                  id="certifications_name"
-                  name="certifications_name"
-                  value={certForm.certifications_name}
-                  onChange={handleCertChange}
-                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
-                  required
-                  disabled={isCertUpdating}
-                  placeholder="Enter certification name"
-                />
-              </div>
-              <div className="space-y-1.5 group">
-                <Label htmlFor="certifications_issuer" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                  <Building2 className="w-4 h-4" />
-                  Issuing Organization
-                </Label>
-                <Input
-                  id="certifications_issuer"
-                  name="certifications_issuer"
-                  value={certForm.certifications_issuer}
-                  onChange={handleCertChange}
-                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
-                  required
-                  disabled={isCertUpdating}
-                  placeholder="Enter organization name"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="space-y-1.5 group">
-                <Label htmlFor="certifications_issued_date" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Issue Date
-                </Label>
-                <Input
-                  id="certifications_issued_date"
-                  name="certifications_issued_date"
-                  type="date"
-                  value={certForm.certifications_issued_date}
-                  onChange={handleCertChange}
-                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
-                  required
-                  disabled={isCertUpdating}
-                />
-              </div>
-              <div className="space-y-1.5 group">
-                <Label htmlFor="certifications_expiration_date" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Expiration Date 
-                </Label>
-                <Input
-                  id="certifications_expiration_date"
-                  name="certifications_expiration_date"
-                  type="date"
-                  value={certForm.certifications_expiration_date}
-                  onChange={handleCertChange}
-                  className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
-                  disabled={isCertUpdating}
-                />
-              </div>
-            </div>
-            <div className="space-y-1.5 group">
-              <Label htmlFor="certifications_id" className="text-sm font-medium text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                <Hash className="w-4 h-4" />
-                Certification ID
-              </Label>
-              <Input
-                id="certifications_id"
-                name="certifications_id"
-                value={certForm.certifications_id}
-                onChange={handleCertChange}
-                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md h-9"
-                required
-                disabled={isCertUpdating}
-                placeholder="Enter certification ID"
-              />
-            </div>
-            <div className="border-2 border-dashed border-[#5A8DB8]/20 rounded-xl p-4 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/30 transition-all duration-300">
-              <input
-                type="file"
-                accept="image/*"
-                ref={certImageInputRef}
-                className="hidden"
-                onChange={handleCertImageChange}
-                disabled={isCertUpdating}
-              />
-              {selectedCertImage ? (
-                <div className="text-sm text-[#5A8DB8] mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
-                  <Image className="w-4 h-4" />
-                  {selectedCertImage.name}
-                </div>
-              ) : certForm.certifications_image_url ? (
-                <div className="relative group">
-                  <img 
-                    src={getFullImageUrl(certForm.certifications_image_url)} 
-                    alt="Current certification"
-                    className="w-32 h-32 mx-auto object-cover rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <p className="text-sm text-[#5A8DB8] mt-2">Current image will be replaced</p>
-                </div>
-              ) : (
-                <div className="text-sm text-[#5A8DB8] mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
-                  <Image className="w-4 h-4" />
-                  No image selected
-                </div>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCertImageClick}
-                className="mb-2 border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl h-9"
-                disabled={isCertUpdating}
-              >
-                {isCertUpdating ? 'Uploading...' : 'Choose Image'}
-              </Button>
-              <p className="text-xs text-[#5A8DB8]/70">
-                Recommended: Square image, max 5MB
-              </p>
-            </div>
-            <DialogFooter className="flex justify-end gap-3 pt-3 border-t border-[#5A8DB8]/10">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCloseCertDialog}
-                disabled={isCertUpdating}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isCertUpdating}
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2 h-9"
-              >
-                {isCertUpdating ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    {isAddingNewCert ? 'Add Certification' : 'Save Changes'}
-                  </>
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* DeleteConfirmationDialog */}
-      <DeleteConfirmationDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => {
-          closeDeleteDialog();
-          setDeleteType(null);
-          setCertificationToDelete(null);
-        }}
-        onConfirm={handleDeleteConfirm}
-        title={`Delete ${deleteType ? deleteType.charAt(0).toUpperCase() + deleteType.slice(1) : ''}`}
-        description={
-          deleteType === 'certification' && certificationToDelete
-            ? `Are you sure you want to delete this certification? This action cannot be undone.`
-            : `Are you sure you want to delete your ${deleteType}? This action cannot be undone.`
-        }
-        isLoading={isDeleteLoading}
-      />
-    </div>
+    </>
   );
 };
 

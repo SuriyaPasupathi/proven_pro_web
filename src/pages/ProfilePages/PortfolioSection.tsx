@@ -137,9 +137,18 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
 
   // Function to get full image URL
   const getFullImageUrl = (url: string | undefined) => {
-    if (!url) return PLACEHOLDER_IMAGE;
-    if (url.startsWith('http')) return url;
-    return `${baseUrl}${url}`;
+    console.log('getFullImageUrl input:', url);
+    if (!url) {
+      console.log('No URL provided, returning placeholder');
+      return PLACEHOLDER_IMAGE;
+    }
+    if (url.startsWith('http')) {
+      console.log('URL is already absolute:', url);
+      return url;
+    }
+    const fullUrl = `${baseUrl}${url}`;
+    console.log('Constructed full URL:', fullUrl);
+    return fullUrl;
   };
 
   const handleItemClick = (id: number) => {
@@ -262,29 +271,45 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
       })).unwrap();
       
       if (result) {
+        // Always use the server response data which includes the updated image URLs
+        const updatedItem = result.portfolio?.[0] || portfolioPayload[0];
+        
+        console.log('Server response:', result);
+        console.log('Updated item:', updatedItem);
+        console.log('Image URL from response:', updatedItem?.project_image_url || updatedItem?.project_image);
+        
         // Update local state with the new/updated item
         if (editingItem) {
-          setProjectItems(prevItems => 
-            prevItems.map(item => 
-              item.id === editingItem.id ? portfolioPayload[0] : item
-            )
-          );
+          setProjectItems(prevItems => {
+            const newItems = prevItems.map(item => 
+              item.id === editingItem.id ? updatedItem : item
+            );
+            console.log('Updated projectItems:', newItems);
+            
+            // Update Redux store with the updated state
+            dispatch(updateProfileData({
+              ...profileData,
+              portfolio: newItems
+            }));
+            
+            return newItems;
+          });
         } else {
           // For new items, use the response from the server which includes the generated ID
-          const newItem = result.portfolio?.[0] || portfolioPayload[0];
-          setProjectItems(prevItems => [...prevItems, newItem]);
+          setProjectItems(prevItems => {
+            const newItems = [...prevItems, updatedItem];
+            console.log('New projectItems:', newItems);
+            
+            // Update Redux store with the updated state
+            dispatch(updateProfileData({
+              ...profileData,
+              portfolio: newItems
+            }));
+            
+            return newItems;
+          });
         }
         
-        // Update Redux store with the complete profile data
-        dispatch(updateProfileData({
-          ...profileData,
-          portfolio: editingItem 
-            ? projectItems.map(item => 
-                item.id === editingItem.id ? portfolioPayload[0] : item
-              )
-            : [...projectItems, result.portfolio?.[0] || portfolioPayload[0]]
-        }));
-
         toast.success(editingItem ? "Project updated successfully!" : "Project added successfully!");
         setIsDialogOpen(false);
         setEditingItem(null);
@@ -475,6 +500,13 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
           .map((item: Project, index: number) => {
           const imageUrl = getFullImageUrl(item.project_image_url || item.project_image);
           
+          console.log(`Project ${index}:`, {
+            title: item.project_title,
+            project_image: item.project_image,
+            project_image_url: item.project_image_url,
+            finalImageUrl: imageUrl
+          });
+          
           return (
             <div 
               key={index}
@@ -488,7 +520,11 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
+                    console.log('Image failed to load:', imageUrl);
                     target.src = PLACEHOLDER_IMAGE;
+                  }}
+                  onLoad={() => {
+                    console.log('Image loaded successfully:', imageUrl);
                   }}
                 />
               </div>
