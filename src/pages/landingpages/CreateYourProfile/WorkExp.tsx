@@ -57,12 +57,13 @@ const WorkExp: React.FC = () => {
     const newForms = [...workForms];
     const { name, value } = e.target;
 
-    // Add date validation for start and end dates
+    // Enhanced date validation for start and end dates
     if (name === 'experience_start_date' || name === 'experience_end_date') {
       const selectedDate = new Date(value);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Reset time to start of day
+      today.setHours(23, 59, 59, 999); // Set to end of today
 
+      // Validate that selected date is not in the future
       if (selectedDate > today) {
         toast.error("Cannot select future dates");
         return;
@@ -126,6 +127,9 @@ const WorkExp: React.FC = () => {
   };
 
   const validateForm = () => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Set to end of today
+
     for (const form of workForms) {
       if (!form.company_name || form.company_name.trim() === '') {
         toast.error("Please enter company name");
@@ -145,6 +149,28 @@ const WorkExp: React.FC = () => {
       }
       if (!form.key_responsibilities || form.key_responsibilities.trim() === '') {
         toast.error("Please enter key responsibilities");
+        return false;
+      }
+
+      // Additional date validation
+      const startDate = new Date(form.experience_start_date);
+      const endDate = new Date(form.experience_end_date);
+
+      // Check if start date is in the future
+      if (startDate > today) {
+        toast.error("Start date cannot be in the future");
+        return false;
+      }
+
+      // Check if end date is in the future
+      if (endDate > today) {
+        toast.error("End date cannot be in the future");
+        return false;
+      }
+
+      // Check if end date is before start date
+      if (endDate < startDate) {
+        toast.error("End date cannot be before start date");
         return false;
       }
     }
