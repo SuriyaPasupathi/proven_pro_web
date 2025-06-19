@@ -49,10 +49,16 @@ const registerSlice = createSlice({
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
+        console.log('RegisterUser fulfilled - action.payload:', action.payload);
         state.loading = false;
         state.verificationSent = true;
         state.error = null;
         state.email = action.payload.email;
+        // Store email in localStorage as backup
+        if (action.payload.email) {
+          localStorage.setItem('registrationEmail', action.payload.email);
+        }
+        console.log('RegisterUser fulfilled - state after update:', state);
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;

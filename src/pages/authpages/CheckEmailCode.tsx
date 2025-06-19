@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import { toast } from "react-hot-toast";
 import { verifyOTP, resendOTP } from "@/store/Services/RegisterService";
@@ -12,11 +12,26 @@ const CheckEmailCode: React.FC = () => {
   const [code, setCode] = useState(Array(CODE_LENGTH).fill(""));
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const dispatch = useAppDispatch();
   const { email, loading, error, verified } = useAppSelector((state) => state.register);
 
+  // Get email from URL params as fallback
+  const emailFromUrl = searchParams.get('email');
+  const emailFromStorage = localStorage.getItem('registrationEmail');
+  const finalEmail = email || emailFromUrl || emailFromStorage;
+
+  useEffect(() => {
+    console.log('CheckEmailCode mounted - Redux state:', { email, loading, error, verified });
+    console.log('Email from URL params:', emailFromUrl);
+    console.log('Email from localStorage:', emailFromStorage);
+    console.log('Final email to use:', finalEmail);
+  }, [email, loading, error, verified, emailFromUrl, emailFromStorage, finalEmail]);
+
   useEffect(() => {
     if (verified) {
+      // Clean up localStorage
+      localStorage.removeItem('registrationEmail');
       navigate('/verified-email');
     }
   }, [verified, navigate]);
@@ -60,7 +75,7 @@ const CheckEmailCode: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted');
-    console.log('Current state:', { email, code: code.join(''), loading, verified });
+    console.log('Current state:', { email: finalEmail, code: code.join(''), loading, verified });
     
     const otp = code.join("");
     if (otp.length !== CODE_LENGTH) {
@@ -68,14 +83,14 @@ const CheckEmailCode: React.FC = () => {
       return;
     }
 
-    if (!email) {
+    if (!finalEmail) {
       toast.error("Email not found");
       return;
     }
 
     try {
-      console.log('Dispatching verifyOTP action with:', { email, otp });
-      const result = await dispatch(verifyOTP({ email, otp })).unwrap();
+      console.log('Dispatching verifyOTP action with:', { email: finalEmail, otp });
+      const result = await dispatch(verifyOTP({ email: finalEmail, otp })).unwrap();
       console.log('Verification result:', result);
       
       if (result.access) {
@@ -91,13 +106,13 @@ const CheckEmailCode: React.FC = () => {
   };
 
   const handleResend = async () => {
-    if (!email) {
+    if (!finalEmail) {
       toast.error("Email not found");
       return;
     }
 
     try {
-      const result = await dispatch(resendOTP(email)).unwrap();
+      const result = await dispatch(resendOTP(finalEmail)).unwrap();
       console.log('Resend result:', result);
       
       if (result.message) {
@@ -122,7 +137,7 @@ const CheckEmailCode: React.FC = () => {
         <h1 className="text-xl sm:text-2xl font-bold mb-2 text-center">Check your email</h1>
         <p className="text-sm sm:text-base text-gray-700 text-center mb-4 sm:mb-6">
           We sent a verification code to<br />
-          <span className="text-gray-900 font-medium">{email}</span>
+          <span className="text-gray-900 font-medium">{finalEmail}</span>
         </p>
         <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
           <div className="flex gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">

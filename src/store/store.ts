@@ -16,6 +16,7 @@ export const store = configureStore({
     createProfile: createProfileReducer,
     dropdown: dropDownReducer,
   },
+  devTools: process.env.NODE_ENV !== 'production',
 });
 
 export type RootState = ReturnType<typeof store.getState>;

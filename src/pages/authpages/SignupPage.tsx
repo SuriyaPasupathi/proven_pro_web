@@ -105,11 +105,15 @@ export function SignUpForm() {
     setIsLoading(true);
     
     try {
+      console.log('Submitting registration with data:', data);
       const result = await dispatch(registerUser({
         email: data.email,
         username: data.username,
         password: data.password,
       })).unwrap();
+
+      console.log('Registration result:', result);
+      console.log('Redux state after registration:', useSelector((state: RootState) => state.register));
 
       if (result) {
         toast.success('Account created successfully!', {
@@ -120,6 +124,7 @@ export function SignUpForm() {
         navigate('/email-verify');
       }
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast.error('Registration failed', {
         description: error.message || 'Please check your information and try again.',
         duration: 4000,
