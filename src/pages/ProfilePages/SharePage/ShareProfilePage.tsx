@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../store/store';
-import { getProfile, submitProfileReview, getProfileReviews } from '../../../store/Services/CreateProfileService';
+import { getProfile, submitProfileReview, getProfileReviews, getProfileReviewsPublic, verifyShareToken } from '../../../store/Services/CreateProfileService';
 import { resetReviewState, resetReviewsState } from '../../../store/Slice/CreateProfileSlice';
 import ProfileHeader from '../ProfileHeader';
 import ExperienceSection from '../ExperienceSection';
@@ -30,14 +30,26 @@ const ShareProfilePage = () => {
   } = useAppSelector((state) => state.createProfile);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verifiedProfileId, setVerifiedProfileId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        if (profileId && shareToken) {
-          await dispatch(getProfile(profileId)).unwrap();
-          // Fetch reviews after profile is loaded
-          await dispatch(getProfileReviews(profileId)).unwrap();
+        if (shareToken) {
+          if (profileId) {
+            // If both profileId and shareToken are available, use the existing approach
+            await dispatch(getProfile(profileId)).unwrap();
+            await dispatch(getProfileReviews(profileId)).unwrap();
+            setVerifiedProfileId(profileId);
+          } else {
+            // If only shareToken is available, verify it first
+            const result = await dispatch(verifyShareToken(shareToken)).unwrap();
+            setVerifiedProfileId(result.profile.id);
+            // Fetch reviews after profile is loaded using public endpoint
+            if (result.profile.id) {
+              await dispatch(getProfileReviewsPublic(result.profile.id)).unwrap();
+            }
+          }
         }
       } catch (err) {
         setError('Failed to load profile. Please try again later.');
@@ -59,29 +71,31 @@ const ShareProfilePage = () => {
       dispatch(resetReviewState());
       setIsSubmitting(false);
       // Refresh both profile and reviews after successful submission
-      if (profileId) {
+      const targetProfileId = verifiedProfileId || profileId;
+      if (targetProfileId) {
         Promise.all([
-          dispatch(getProfile(profileId)),
-          dispatch(getProfileReviews(profileId))
+          dispatch(getProfile(targetProfileId)),
+          dispatch(getProfileReviewsPublic(targetProfileId))
         ]).catch(err => {
           console.error('Error refreshing data:', err);
           toast.error('Failed to refresh data. Please try again.');
         });
       }
     }
-  }, [reviewSubmissionSuccess, dispatch, profileId]);
+  }, [reviewSubmissionSuccess, dispatch, profileId, verifiedProfileId]);
 
   const handleReviewSubmit = async (review: { rating: number; content: string; name: string }) => {
     if (!shareToken || isSubmitting) return;
 
     try {
       setIsSubmitting(true);
+      const targetProfileId = verifiedProfileId || profileId;
       await dispatch(submitProfileReview({
         share_token: shareToken,
         reviewer_name: review.name,
         rating: review.rating,
         comment: review.content,
-        id: profileId || ''
+        id: targetProfileId || ''
       })).unwrap();
     } catch (err) {
       toast.error('Failed to submit review. Please try again.');
@@ -128,6 +142,8 @@ const ShareProfilePage = () => {
     content: review.comment
   }));
 
+  const targetProfileId = verifiedProfileId || profileId;
+
   return (
     <ThemeProvider defaultTheme="light">
       <div className="min-h-screen bg-gray-50">
@@ -136,12 +152,12 @@ const ShareProfilePage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Sidebar */}
             <div className="lg:col-span-1">
-              <ProfileSidebar profileData={{ ...profileData, id: profileId || '' }} />
+              <ProfileSidebar profileData={{ ...profileData, id: targetProfileId || '' }} />
             </div>
 
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
-              <ProfileHeader profileData={{ ...profileData, id: profileId || '' }} />
+              <ProfileHeader profileData={{ ...profileData, id: targetProfileId || '' }} />
               
               {/* Reviews Section */}
               <div className="bg-white rounded-lg shadow-md p-6">

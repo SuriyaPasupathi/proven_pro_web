@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, deleteItem, searchUsers } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, getProfileReviewsPublic, deleteItem, searchUsers, verifyShareToken } from '../Services/CreateProfileService';
 import { ProfileData } from '../../types/profile';
 
 interface ProfileError {
@@ -353,6 +353,19 @@ const createProfileSlice = createSlice({
         state.reviewsLoading = false;
         state.error = action.payload as ProfileError;
       })
+      .addCase(getProfileReviewsPublic.pending, (state) => {
+        state.reviewsLoading = true;
+        state.error = null;
+      })
+      .addCase(getProfileReviewsPublic.fulfilled, (state, action) => {
+        state.reviewsLoading = false;
+        state.reviews = action.payload;
+        state.error = null;
+      })
+      .addCase(getProfileReviewsPublic.rejected, (state, action) => {
+        state.reviewsLoading = false;
+        state.error = action.payload as ProfileError;
+      })
       .addCase(deleteItem.pending, (state) => {
         state.deleteLoading = true;
         state.error = null;
@@ -380,6 +393,20 @@ const createProfileSlice = createSlice({
       .addCase(searchUsers.rejected, (state, action) => {
         state.searchLoading = false;
         state.searchError = action.payload as ProfileError;
+      })
+      .addCase(verifyShareToken.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyShareToken.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.profileData = action.payload.profile;
+        state.verificationDetails = action.payload.profile.verification_details || null;
+      })
+      .addCase(verifyShareToken.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as ProfileError;
       });
   },
 });
