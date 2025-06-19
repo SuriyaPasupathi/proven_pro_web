@@ -113,7 +113,6 @@ export function SignUpForm() {
       })).unwrap();
 
       console.log('Registration result:', result);
-      console.log('Redux state after registration:', useSelector((state: RootState) => state.register));
 
       if (result) {
         toast.success('Account created successfully!', {
