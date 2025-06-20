@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import profileImg from '../../../../assets/profilepage.jpg';
-import { useNavigate } from 'react-router-dom';
 
 interface FreePlanDialogProps {
   open: boolean;
@@ -10,7 +9,6 @@ interface FreePlanDialogProps {
 const FreePlanDailog: React.FC<FreePlanDialogProps> = ({ open, onClose }) => {
   const [copied, setCopied] = useState(false);
   const profileUrl = "http://www.mytutsworld.com/john-d-aj11137p";
-  const navigate = useNavigate();
   if (!open) return null;
 
   const handleCopy = () => {
@@ -114,7 +112,7 @@ const FreePlanDailog: React.FC<FreePlanDialogProps> = ({ open, onClose }) => {
               </div>
             </div>
             {/* Footer Buttons */}
-            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-4 sm:mt-6">
+            {/* <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-4 sm:mt-6">
               <button
                 className="px-4 sm:px-6 py-2 rounded border border-[#5A8DB8] bg-white text-[#5A8DB8] hover:bg-[#E6F0FA] text-xs sm:text-base font-semibold transition-all duration-200 hover:-translate-y-0.5"
                 onClick={onClose}
@@ -128,7 +126,7 @@ const FreePlanDailog: React.FC<FreePlanDialogProps> = ({ open, onClose }) => {
               >
                 Continue to Checkout
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
