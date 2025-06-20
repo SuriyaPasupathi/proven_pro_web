@@ -194,14 +194,14 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-3 sm:gap-4 relative">
           <Button
             variant="default"
-            className="h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-300"
+            className="h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm bg-[#5A8DB8] hover:bg-[#3C5979] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-300"
             onClick={() => navigate("/login")}
           >
             Sign in
           </Button>
           <Button
             variant="default"
-            className="h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-300"
+            className="h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm bg-[#5A8DB8] hover:bg-[#3C5979] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-300"
             onClick={() => navigate("/signup")}
           >
             Get Started
@@ -254,7 +254,7 @@ export default function Header() {
 
             {/* Auth Buttons Mobile */}
             <Button
-              className="w-full h-8 sm:h-9 text-xs sm:text-sm bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-300 mt-2"
+              className="w-full h-8 sm:h-9 text-xs sm:text-sm bg-[#5A8DB8] hover:bg-[#3C5979] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-300 mt-2"
               onClick={() => {
                 setIsMenuOpen(false);
                 navigate("/login");
@@ -263,7 +263,7 @@ export default function Header() {
               Sign in
             </Button>
             <Button
-              className="w-full h-8 sm:h-9 text-xs sm:text-sm bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-300 mt-2"
+              className="w-full h-8 sm:h-9 text-xs sm:text-sm bg-[#5A8DB8] hover:bg-[#3C5979] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-300 mt-2"
               onClick={() => {
                 setIsMenuOpen(false);
                 navigate("/signup");

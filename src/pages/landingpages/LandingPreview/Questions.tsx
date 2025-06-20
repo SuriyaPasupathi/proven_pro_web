@@ -80,7 +80,7 @@ export default function Questions() {
           <p className="text-gray-700 mb-4 text-lg">
             Still have questions? We're here to help!
           </p>
-          <button className="px-6 py-3 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity">
+          <button className="px-6 py-3 bg-[#5A8DB8] hover:bg-[#3C5979] text-white rounded-lg font-semibold transition-all duration-300">
             Contact Support
           </button>
         </div>

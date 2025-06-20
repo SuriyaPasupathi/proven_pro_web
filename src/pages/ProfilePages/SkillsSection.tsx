@@ -457,7 +457,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white rounded-xl shadow-lg hover:shadow-xl px-6 transition-all duration-300"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -535,7 +535,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                   handleSubmit(new Event('submit') as any);
                   setIsAddDialogOpen(false);
                 }}
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white rounded-xl shadow-lg hover:shadow-xl px-6 transition-all duration-300"
                 disabled={isLoading}
               >
                 {isLoading ? (

@@ -1156,7 +1156,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 <Button
                   type="submit"
                   disabled={isProfileUpdating}
-                  className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+                  className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
                 >
                   {isProfileUpdating ? (
                     <>
@@ -1239,7 +1239,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 <Button
                   type="submit"
                   disabled={!selectedImage || isImageUploading}
-                  className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+                  className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
                 >
                   {isImageUploading ? (
                     <>
@@ -1341,7 +1341,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 <Button
                   type="submit"
                   disabled={isVideoUpdating}
-                  className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+                  className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
                 >
                   {isVideoUpdating ? (
                     <>
@@ -1514,7 +1514,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 <Button
                   type="submit"
                   disabled={isCertUpdating}
-                  className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+                  className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
                 >
                   {isCertUpdating ? (
                     <>

@@ -112,7 +112,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
       <div className="py-4 xs:py-6 sm:py-8 md:py-10 lg:py-12">
         <div className="flex justify-start mb-4 xs:mb-6 sm:mb-8">
           <Button 
-            className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 xs:gap-2 text-xs xs:text-sm sm:text-base"
+            className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 xs:gap-2 text-xs xs:text-sm sm:text-base"
             // onClick={() => setIsReviewDialogOpen(true)}
             // disabled={isSubmitting}
           >
@@ -138,7 +138,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
     <div className="relative">
       <div className="flex justify-start mb-4 xs:mb-6 sm:mb-8">
         <Button 
-          className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 xs:gap-2 text-xs xs:text-sm sm:text-base"
+          className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 xs:gap-2 text-xs xs:text-sm sm:text-base"
             // onClick={() => setIsReviewDialogOpen(true)}
             // disabled={isSubmitting}
         >

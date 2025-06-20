@@ -231,7 +231,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             </Button>
             <Button 
               type="submit" 
-              className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+              className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
             >
               <Save className="w-3 h-3 sm:w-4 sm:h-4" />
               Save Changes
@@ -341,7 +341,7 @@ const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full sm:w-auto bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
+              className="w-full sm:w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center justify-center gap-2 text-sm sm:text-base py-2 sm:py-2.5"
             >
               {isLoading ? (
                 <>

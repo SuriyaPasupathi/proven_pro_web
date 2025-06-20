@@ -169,7 +169,7 @@ const PremiumPlan: React.FC = () => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-orange-500 hover:to-yellow-500 text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
+                  className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-800 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Processing..." : `Complete Payment ($${PLAN_PRICE}.00)`}

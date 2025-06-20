@@ -471,7 +471,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white rounded-xl shadow-lg hover:shadow-xl px-6 transition-all duration-300"
                 disabled={isLoading || servicesLoading}
               >
                 {isLoading ? (

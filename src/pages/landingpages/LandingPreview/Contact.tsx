@@ -32,7 +32,7 @@ export default function Contact({ isInLandingPage = false }: ContactProps) {
               Our team is here to help you with any questions you might have about our platform, features, or services.
             </p>
             <Button 
-              className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-300"
+              className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-300"
             >
               Contact us
             </Button>

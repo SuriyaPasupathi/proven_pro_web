@@ -208,7 +208,7 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit, shareToken, profileId }: Revi
           </Button>
           <Button 
             onClick={handleSubmit}
-            className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
+            className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

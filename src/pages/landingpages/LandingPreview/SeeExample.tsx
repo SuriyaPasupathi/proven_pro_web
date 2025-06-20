@@ -84,7 +84,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
             className={`flex-1 text-white transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 rounded-lg font-semibold whitespace-nowrap text-xs sm:text-sm ${
               highlight
                 ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-orange-500 hover:to-yellow-500'
-                : 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8]'
+                : 'bg-[#5A8DB8] hover:bg-[#3C5979]'
             }`}
             style={{ border: highlight ? '1px solid #FFD700' : '1px solid #5A8DB8' }}
             onClick={onSelect}

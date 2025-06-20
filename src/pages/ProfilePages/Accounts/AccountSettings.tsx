@@ -186,7 +186,7 @@ const AccountSettings: React.FC = () => {
                     <DialogFooter className="gap-3">
                       <Button 
                         type="submit" 
-                        className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 flex items-center gap-2"
+                        className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 flex items-center gap-2"
                         disabled={emailChangeLoading}
                       >
                         {emailChangeLoading ? (
@@ -278,7 +278,7 @@ const AccountSettings: React.FC = () => {
               <div className="flex items-center justify-end">
                 <Button 
                   type="submit" 
-                  className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 flex items-center gap-2"
+                  className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 flex items-center gap-2"
                   disabled={passwordChangeLoading}
                 >
                   {passwordChangeLoading ? (
@@ -362,7 +362,7 @@ const AccountSettings: React.FC = () => {
               <div className="flex gap-3">
                 <Button 
                   type="submit" 
-                  className="bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] transition-all duration-300 flex items-center gap-2"
+                  className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 flex items-center gap-2"
                   disabled={otpVerificationLoading}
                 >
                   {otpVerificationLoading ? (

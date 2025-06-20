@@ -355,7 +355,7 @@ export function SignUpForm() {
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-gradient-to-r from-[#3C5979] to-[#2C3E50] hover:from-[#2C3E50] hover:to-[#3C5979] text-white font-semibold transition-all duration-300"
+                className="w-full h-11 bg-[#5A8DB8] hover:bg-[#3C5979] text-white font-semibold transition-all duration-300"
                 disabled={isLoading || !agreedToTerms}
               >
                 {isLoading ? 'Creating account...' : 'Create account'}

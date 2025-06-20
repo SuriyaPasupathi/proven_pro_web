@@ -166,7 +166,7 @@ const StandardPlan: React.FC = () => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
+                  className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Processing..." : `Complete Payment ($${PLAN_PRICE}.00)`}

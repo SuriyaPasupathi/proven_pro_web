@@ -40,7 +40,7 @@ export default function Hero() {
           </p>
           <div className="mt-4 sm:mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
             <Button
-              className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 transform"
+              className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 transform"
               onClick={() => navigate("/signup")}
             >
               Create Your Profile

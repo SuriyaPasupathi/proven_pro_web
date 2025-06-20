@@ -160,9 +160,9 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
               <Button
                 className={`mt-auto w-full text-xs sm:text-sm md:text-base transition-all duration-300 ${
                   plan.highlight
-                    ? "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-orange-500 hover:to-yellow-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform"
+                    ? "bg-yellow-200 hover:bg-yellow-500 text-gray-800 hover:text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transform"
                     : plan.name === "Standard"
-                      ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform"
+                      ? "bg-[#5A8DB8] hover:bg-[#3C5979] text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transform"
                       : "bg-white border-2 border-gray-200 text-gray-800 hover:bg-[#5A8DB8] hover:text-white hover:border-[#5A8DB8] hover:-translate-y-0.5 transform transition-all duration-300"
                 }`}
                 style={plan.highlight ? { border: '1px solid #FFD700' } : {}}
