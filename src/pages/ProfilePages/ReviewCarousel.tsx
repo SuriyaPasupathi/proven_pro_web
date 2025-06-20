@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Star, MessageSquare, User, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, MessageSquare, User, Calendar, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
@@ -26,11 +26,14 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
   isSubmitting = false 
 }) => {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const { toast } = useToast();
-  const visibleReviews = 3; // Number of reviews visible at once on desktop
+  
+  // Pagination settings
+  const reviewsPerPage = 3; // Number of reviews per page
   const totalReviews = reviews.length;
+  const totalPages = Math.ceil(totalReviews / reviewsPerPage);
 
   // Update reviews whenever initialReviews changes and clean up duplicates
   useEffect(() => {
@@ -51,34 +54,70 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
       }, []);
       
       setReviews(uniqueReviews);
+      // Reset to first page when reviews change
+      setCurrentPage(1);
     } else {
       setReviews([]);
+      setCurrentPage(1);
     }
   }, [initialReviews]);
 
-  const goToPrevious = () => {
-    setActiveIndex((prevIndex) => (prevIndex === 0 ? totalReviews - 1 : prevIndex - 1));
+  // Get current page reviews
+  const getCurrentPageReviews = () => {
+    const startIndex = (currentPage - 1) * reviewsPerPage;
+    const endIndex = startIndex + reviewsPerPage;
+    return reviews.slice(startIndex, endIndex);
   };
 
-  const goToNext = () => {
-    setActiveIndex((prevIndex) => (prevIndex === 0 ? totalReviews - 1 : prevIndex + 1));
+  // Navigation functions
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
-  // Calculate which reviews to show based on the active index
-  const getVisibleReviews = () => {
-    if (totalReviews === 0) return [];
-    const result = [];
-    const reviewsToShow = Math.min(visibleReviews, totalReviews);
-    for (let i = 0; i < reviewsToShow; i++) {
-      const index = (activeIndex + i) % totalReviews;
-      if (reviews[index]) {
-        result.push({
-          ...reviews[index],
-          displayIndex: i
-        });
+  const goToFirstPage = () => {
+    setCurrentPage(1);
+  };
+
+  const goToLastPage = () => {
+    setCurrentPage(totalPages);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(prev => Math.max(1, prev - 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages, prev + 1));
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total is small
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show pages around current page
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      // Adjust if we're near the end
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
       }
     }
-    return result;
+    
+    return pages;
   };
 
   const handleReviewSubmit = (review: { rating: number; content: string; name: string }) => {
@@ -113,8 +152,8 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
         <div className="flex justify-start mb-4 xs:mb-6 sm:mb-8">
           <Button 
             className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 xs:gap-2 text-xs xs:text-sm sm:text-base"
-            // onClick={() => setIsReviewDialogOpen(true)}
-            // disabled={isSubmitting}
+            onClick={() => setIsReviewDialogOpen(true)}
+            disabled={isSubmitting}
           >
             <MessageSquare className="h-3 w-3 xs:h-4 xs:w-4" />
             Reviews
@@ -134,64 +173,125 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
     );
   }
 
+  const currentPageReviews = getCurrentPageReviews();
+  const pageNumbers = getPageNumbers();
+
   return (
     <div className="relative">
-      <div className="flex justify-start mb-4 xs:mb-6 sm:mb-8">
+      <div className="flex justify-between items-center mb-4 xs:mb-6 sm:mb-8">
         <Button 
           className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 xs:gap-2 text-xs xs:text-sm sm:text-base"
-            // onClick={() => setIsReviewDialogOpen(true)}
-            // disabled={isSubmitting}
+          onClick={() => setIsReviewDialogOpen(true)}
+          disabled={isSubmitting}
         >
           <MessageSquare className="h-3 w-3 xs:h-4 xs:w-4" />
           Reviews
         </Button>
-      </div>
-      <div className="hidden md:grid md:grid-cols-3 gap-4 xs:gap-6 lg:gap-8">
-        {getVisibleReviews().map((review) => (
-          <ReviewCard key={`${review.id}-${review.displayIndex}`} review={review} />
-        ))}
-      </div>
-
-      {/* Tablet version - show 2 reviews */}
-      <div className="hidden sm:block md:hidden">
-        <div className="grid grid-cols-2 gap-4 xs:gap-6">
-          {getVisibleReviews().slice(0, 2).map((review) => (
-            <ReviewCard key={`${review.id}-${review.displayIndex}-tablet`} review={review} />
-          ))}
+        
+        {/* Reviews count and page info */}
+        <div className="text-sm text-gray-600">
+          <span className="hidden sm:inline">Showing </span>
+          <span className="font-medium text-[#5A8DB8]">
+            {((currentPage - 1) * reviewsPerPage) + 1}-{Math.min(currentPage * reviewsPerPage, totalReviews)}
+          </span>
+          <span className="hidden sm:inline"> of {totalReviews} reviews</span>
+          <span className="sm:hidden"> • {totalReviews} total</span>
         </div>
       </div>
 
-      {/* Mobile version - show only one review */}
-      <div className="sm:hidden">
-        {reviews[activeIndex] && (
+      {/* Reviews Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 xs:gap-6 lg:gap-8 mb-6">
+        {currentPageReviews.map((review, index) => (
           <ReviewCard 
-            key={`${reviews[activeIndex].id}-mobile`} 
-            review={reviews[activeIndex]} 
+            key={`${review.id}-${currentPage}-${index}`} 
+            review={review} 
           />
-        )}
+        ))}
       </div>
 
-      {/* Navigation buttons */}
-      {totalReviews > 1 && (
-        <div className="flex justify-between mt-4 xs:mt-6 sm:mt-8">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-1/2 -left-2 xs:-left-4 -translate-y-1/2 md:static md:translate-y-0 bg-white border border-[#5A8DB8]/20 shadow-sm hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 h-8 w-8 xs:h-10 xs:w-10 sm:h-12 sm:w-12"
-            onClick={goToPrevious}
-          >
-            <ChevronLeft className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
-            <span className="sr-only">Previous</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-1/2 -right-2 xs:-right-4 -translate-y-1/2 md:static md:translate-y-0 bg-white border border-[#5A8DB8]/20 shadow-sm hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 h-8 w-8 xs:h-10 xs:w-10 sm:h-12 sm:w-12"
-            onClick={goToNext}
-          >
-            <ChevronRight className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
-            <span className="sr-only">Next</span>
-          </Button>
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+          {/* Page info for mobile */}
+          <div className="sm:hidden text-sm text-gray-600">
+            Page {currentPage} of {totalPages}
+          </div>
+
+          {/* Navigation buttons */}
+          <div className="flex items-center gap-1 xs:gap-2">
+            {/* First page button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 xs:h-10 xs:w-10 bg-white border border-[#5A8DB8]/20 shadow-sm hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={goToFirstPage}
+              disabled={currentPage === 1}
+            >
+              <ChevronsLeft className="h-4 w-4" />
+              <span className="sr-only">First page</span>
+            </Button>
+
+            {/* Previous page button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 xs:h-10 xs:w-10 bg-white border border-[#5A8DB8]/20 shadow-sm hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="sr-only">Previous page</span>
+            </Button>
+
+            {/* Page numbers */}
+            <div className="flex items-center gap-1">
+              {pageNumbers.map((pageNum) => (
+                <Button
+                  key={pageNum}
+                  variant={currentPage === pageNum ? "default" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "h-8 w-8 xs:h-10 xs:w-10 text-xs xs:text-sm font-medium transition-all duration-300",
+                    currentPage === pageNum
+                      ? "bg-[#5A8DB8] text-white shadow-md"
+                      : "bg-white border border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10"
+                  )}
+                  onClick={() => goToPage(pageNum)}
+                >
+                  {pageNum}
+                </Button>
+              ))}
+            </div>
+
+            {/* Next page button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 xs:h-10 xs:w-10 bg-white border border-[#5A8DB8]/20 shadow-sm hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+              <span className="sr-only">Next page</span>
+            </Button>
+
+            {/* Last page button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 xs:h-10 xs:w-10 bg-white border border-[#5A8DB8]/20 shadow-sm hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={goToLastPage}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronsRight className="h-4 w-4" />
+              <span className="sr-only">Last page</span>
+            </Button>
+          </div>
+
+          {/* Page info for desktop */}
+          <div className="hidden sm:block text-sm text-gray-600">
+            Page {currentPage} of {totalPages}
+          </div>
         </div>
       )}
 

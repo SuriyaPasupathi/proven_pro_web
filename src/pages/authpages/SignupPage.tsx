@@ -340,7 +340,7 @@ export function SignUpForm() {
                     className="text-[#3C5979] hover:underline font-medium"
                     onClick={() => navigate('/terms')}
                   >
-                    terms of service
+                    terms & conditions
                   </button>
                   {' '}and{' '}
                   <button
