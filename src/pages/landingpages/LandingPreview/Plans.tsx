@@ -122,7 +122,7 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
                         {plan.price.match(/\d+/)}
                       </span>
                       <span className="text-xs sm:text-sm font-bold text-gray-600">
-                        {plan.price.replace(/USD|\d+/, "")}
+                        {plan.price.replace(/.*?\d+/, "")}
                       </span>
                     </div>
                   ) : (
