@@ -83,7 +83,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           <button
             className={`flex-1 text-white transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 rounded-lg font-semibold whitespace-nowrap text-xs sm:text-sm ${
               highlight
-                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-orange-500 hover:to-yellow-500'
+                ? 'bg-yellow-400 hover:bg-yellow-500'
                 : 'bg-[#5A8DB8] hover:bg-[#3C5979]'
             }`}
             style={{ border: highlight ? '1px solid #FFD700' : '1px solid #5A8DB8' }}
@@ -142,7 +142,7 @@ const SeeExample: React.FC = () => {
       planLabel: 'Premium Plan',
       selectLabel: 'Select Premium',
       badge: (
-        <span className="flex items-center gap-1 bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold shadow-md hover:shadow-lg transition-all duration-200">
+        <span className="flex items-center gap-1 bg-yellow-200 hover:bg-yellow-500 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold shadow-md hover:shadow-lg transition-all duration-200">
           <FaRocket className="text-yellow-500" /> Premium
         </span>
       ),
