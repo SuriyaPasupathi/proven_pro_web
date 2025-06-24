@@ -23,35 +23,7 @@ import { Label } from "@/components/ui/label";
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
 
-// Add custom styles for animations (matching ProfileHeader)
-const blobAnimationStyles = `
-  @keyframes blob {
-    0% {
-      transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-      transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
-    }
-    100% {
-      transform: translate(0px, 0px) scale(1);
-    }
-  }
-  
-  .animate-blob {
-    animation: blob 7s infinite;
-  }
-  
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-  
-  .animation-delay-4000 {
-    animation-delay: 4s;
-  }
-`;
+
 
 interface ProfileSidebarProps {
   profileData: ProfileData;
@@ -836,20 +808,12 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: blobAnimationStyles }} />
-      <div className="relative space-y-4 xs:space-y-6 sm:space-y-8">
-        {/* Animated Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 -left-4 w-32 h-32 xs:w-48 xs:h-48 sm:w-72 sm:h-72 bg-[#5A8DB8] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>
-          <div className="absolute top-0 -right-4 w-32 h-32 xs:w-48 xs:h-48 sm:w-72 sm:h-72 bg-[#3C5979] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-32 h-32 xs:w-48 xs:h-48 sm:w-72 sm:h-72 bg-[#5A8DB8] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-4000"></div>
-        </div>
-
+      <div className="relative space-y-4 xs:space-y-6 sm:space-y-8 max-w-full w-full px-2 sm:px-4 md:px-6">
         {/* Profile Image */}
-        <div className="relative">
+        <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto">
           <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
           <div className="relative bg-white/95 backdrop-blur-sm rounded-lg xs:rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl">
-            <div className="relative h-16 xs:h-20 sm:h-24 md:h-32 lg:h-40 xl:h-48 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979]">
+            <div className="relative h-16 xs:h-20 sm:h-24 md:h-32 lg:h-40 xl:h-48 ">
               <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10  "></div>
               <div className="absolute bottom-0 left-0 right-0 h-8 xs:h-12 sm:h-16 md:h-20 lg:h-24 xl:h-32 bg-gradient-to-t from-white/95 to-transparent"></div>
             </div>
@@ -930,7 +894,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         </div>
 
         {/* Horizontal Divider */}
-        <div className="relative">
+        <div className="relative w-full max-w-lg mx-auto">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-[#5A8DB8]/20"></div>
           </div>
@@ -943,7 +907,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
         {/* Video Introduction */}
         {(profileData.video_intro || profileData.video_intro_url) && (
-          <div className="relative">
+          <div className="relative w-full max-w-lg mx-auto">
             <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
             <div className="relative bg-white/95 backdrop-blur-sm rounded-lg xs:rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl">
               <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
@@ -977,10 +941,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 </div>
                 
                 <div className="space-y-3 xs:space-y-4 sm:space-y-6">
-                  <div className="relative bg-gray-100 rounded-lg xs:rounded-xl aspect-video overflow-hidden group hover:shadow-md transition-shadow duration-300">
+                  <div className="relative bg-gray-100 rounded-lg xs:rounded-xl aspect-video overflow-x-auto group hover:shadow-md transition-shadow duration-300">
                     <video 
                       src={getFullImageUrl(profileData.video_intro_url || profileData.video_intro)}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-auto max-h-60 sm:max-h-80 object-cover transition-transform duration-500 group-hover:scale-105"
                       controls
                       preload="metadata"
                       controlsList="nodownload"
@@ -1000,7 +964,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
         {/* Horizontal Divider */}
         {(profileData.video_intro || profileData.video_intro_url) && (
-          <div className="relative">
+          <div className="relative w-full max-w-lg mx-auto">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-[#5A8DB8]/20"></div>
             </div>
@@ -1013,7 +977,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         )}
 
         {/* Certifications */}
-        <div className="relative">
+        <div className="relative w-full max-w-lg mx-auto">
           <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
           <div className="relative bg-white/95 backdrop-blur-sm rounded-lg xs:rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl">
             <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
@@ -1071,7 +1035,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           </div>
         </div>
                   {/* Horizontal Divider */}
-                  <div className="relative">
+                  <div className="relative w-full max-w-lg mx-auto">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-[#5A8DB8]/20"></div>
           </div>

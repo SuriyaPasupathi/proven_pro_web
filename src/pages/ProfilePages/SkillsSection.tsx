@@ -311,21 +311,21 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="relative bg-gradient-to-br from-white via-[#5A8DB8]/5 to-white rounded-2xl p-6 xs:p-8 shadow-lg"
+      className="relative bg-gradient-to-br from-white via-[#5A8DB8]/5 to-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 via-[#3C5979]/5 to-[#5A8DB8]/5 rounded-2xl"></div>
       
-      <div className="relative flex justify-between items-center mb-8">
+      <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 sm:gap-0">
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex items-center gap-4"
+          className="flex items-center gap-3 sm:gap-4"
         >
-          <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl shadow-lg">
-            <Wrench className="h-6 w-6 text-white" />
+          <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-2.5 sm:p-3 rounded-xl shadow-lg">
+            <Wrench className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
           </div>
-          <h2 className="text-2xl xs:text-3xl font-bold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
             Skills
           </h2>
         </motion.div>
@@ -339,17 +339,17 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
           >
             <Button 
               variant="ghost" 
-              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-2.5 sm:p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => setIsDialogOpen(true)}
             >
-              <Pencil className="w-5 h-5" />
+              <Pencil className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             <Button 
               variant="ghost" 
-              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-2.5 sm:p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => setIsAddDialogOpen(true)}
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </motion.div>
         )}
@@ -357,7 +357,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
       {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+        <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
@@ -479,7 +479,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
       {/* Add New Skills Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+        <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
@@ -557,7 +557,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
       {/* Technical Skills Dialog */}
       <Dialog open={isTechnicalSkillsOpen} onOpenChange={setIsTechnicalSkillsOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+        <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
@@ -568,8 +568,8 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
               </DialogTitle>
             </div>
           </DialogHeader>
-          <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="max-h-[300px] sm:max-h-[400px] overflow-y-auto pr-1 sm:pr-2 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {dropdownLoading ? (
                 <div className="col-span-2 flex justify-center">
                   <Loader2 className="h-6 w-6 animate-spin text-[#5A8DB8]" />
@@ -616,7 +616,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
       {/* Soft Skills Dialog */}
       <Dialog open={isSoftSkillsOpen} onOpenChange={setIsSoftSkillsOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
+        <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
@@ -627,8 +627,8 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
               </DialogTitle>
             </div>
           </DialogHeader>
-          <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="max-h-[300px] sm:max-h-[400px] overflow-y-auto pr-1 sm:pr-2 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {dropdownLoading ? (
                 <div className="col-span-2 flex justify-center">
                   <Loader2 className="h-6 w-6 animate-spin text-[#5A8DB8]" />
@@ -677,17 +677,17 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-xl p-6 border border-[#5A8DB8]/10 mb-6"
+          className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-xl p-4 sm:p-6 border border-[#5A8DB8]/10 mb-4 sm:mb-6"
         >
-          <p className="text-[#5A8DB8] font-bold">Skills Description: <span className="text-gray-600 font-semibold">{form.skills_description}</span></p>
+          <p className="text-[#5A8DB8] font-bold text-base sm:text-lg">Skills Description: <span className="text-gray-600 font-semibold">{form.skills_description}</span></p>
         </motion.div>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div>
-          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-[#5A8DB8]">
-            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-2 rounded-lg shadow-sm">
-              <Sparkles className="h-5 w-5 text-white" />
+          <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-[#5A8DB8]">
+            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-1.5 sm:p-2 rounded-lg shadow-sm">
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </div>
             Technical Skills
           </h3>
@@ -724,9 +724,9 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-[#5A8DB8]">
-            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-2 rounded-lg shadow-sm">
-              <Star className="h-5 w-5 text-white" />
+          <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-[#5A8DB8]">
+            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-1.5 sm:p-2 rounded-lg shadow-sm">
+              <Star className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </div>
             Soft Skills
           </h3>

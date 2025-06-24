@@ -24,35 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import ReviewDialog from './ReviewDialog';
 import ReviewCarousel from './ReviewCarousel';
 
-// Add custom styles for animations
-const blobAnimationStyles = `
-  @keyframes blob {
-    0% {
-      transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-      transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
-    }
-    100% {
-      transform: translate(0px, 0px) scale(1);
-    }
-  }
-  
-  .animate-blob {
-    animation: blob 7s infinite;
-  }
-  
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-  
-  .animation-delay-4000 {
-    animation-delay: 4s;
-  }
-`;
+
 
 interface VerificationDetails {
   government_id: {
@@ -456,19 +428,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: blobAnimationStyles }} />
-      <div className="relative min-h-screen bg-gradient-to-br from-[#5A8DB8]/5 via-white to-[#3C5979]/5">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 -left-4 w-48 h-48 sm:w-72 sm:h-72 bg-[#5A8DB8] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>
-          <div className="absolute top-0 -right-4 w-48 h-48 sm:w-72 sm:h-72 bg-[#3C5979] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-48 h-48 sm:w-72 sm:h-72 bg-[#5A8DB8] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-4000"></div>
-        </div>
+      <div className="relative min-h-screen bg-gradient-to-br from-[#5A8DB8]/5 via-white to-[#3C5979]/5 rounded-xl sm:rounded-2xl lg:rounded-3xl">
+       
 {/* Main Content */}
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-12">
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-12 ">
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
             <div className="xl:col-span-9 space-y-4 sm:space-y-5 md:space-y-6 h-fit">
               <div className="bg-white/95 backdrop-blur-sm rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl h-full">
-                <div className="relative h-24 sm:h-32 md:h-40 lg:h-48 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979]">
+                <div className="relative h-24 sm:h-32 md:h-40 lg:h-48 ">
                   <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
                   <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 md:h-24 lg:h-32 bg-gradient-to-t from-white/95 to-transparent"></div>
                 </div>
