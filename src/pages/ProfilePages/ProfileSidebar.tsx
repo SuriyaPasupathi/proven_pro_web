@@ -103,8 +103,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     closeDeleteDialog,
     handleDelete,
     isLoading: isDeleteLoading,
-    error: deleteError,
-    success: deleteSuccess
+    error: deleteError
   } = useDeleteItem();
 
   // Update handleDeleteClick to use the new hook
@@ -165,19 +164,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         // Then make the API call
         const result = await handleDelete('certification', certificationToDelete);
 
-        // If deletion was successful, update the backend state
-        if (result?.success && deleteSuccess) {
-          const formData = new FormData();
-          formData.append('certifications', JSON.stringify(updatedCerts));
-
-          const updateResult = await dispatch(updateProfile({
-            data: formData,
-            profileId: profileData.id
-          })).unwrap();
-          
-          if (updateResult) {
-            toast.success("Certification deleted successfully!");
-          }
+        // If deletion was successful, the optimistic update is already in place
+        if (result?.success) {
+          toast.success("Certification deleted successfully!");
         } else {
           // If deletion failed, revert the optimistic update
           dispatch(updateProfileData({
@@ -704,16 +693,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             >
               <Pencil className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4.5 sm:w-4.5" />
             </Button>
-            {(profileData.profile_pic_url || profileData.profile_pic) && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white/95 shadow-lg hover:bg-white text-red-600 border border-white/50 transition-all duration-300 hover:scale-110 hover:shadow-md"
-                onClick={() => handleDeleteClick('certification', cert.certifications_id)}
-              >
-                <Trash2 className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4.5 sm:w-4.5" />
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white/95 shadow-lg hover:bg-white text-red-600 border border-white/50 transition-all duration-300 hover:scale-110 hover:shadow-md"
+              onClick={() => handleDeleteClick('certification', cert.certifications_id)}
+            >
+              <Trash2 className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4.5 sm:w-4.5" />
+            </Button>
           </div>
         )}
         
