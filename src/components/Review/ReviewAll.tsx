@@ -57,46 +57,19 @@ const ReviewAll: React.FC = () => {
     <div className="min-h-screen bg-[#f0f0f3]">
       <Header />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 gap-4 sm:gap-6">
-          <div className="relative">
-            <div className="bg-[#f0f0f3] p-4 rounded-2xl shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff]">
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#5A8DB8]">Find Users</h1>
-              <p className="mt-2 text-base sm:text-lg text-gray-600 font-medium">Discover and connect with talented professionals</p>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
-            <div className="relative flex-1 sm:flex-none">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-[#f0f0f3] border-none rounded-xl shadow-[inset_4px_4px_8px_#d1d1d1,inset_-4px_-4px_8px_#ffffff] focus:outline-none focus:ring-2 focus:ring-[#5A8DB8] transition-all duration-300 text-sm sm:text-base"
-                />
-                <svg
-                  className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-            </div>
+        {/* Top bar: sort left, search right, single row */}
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 sm:mb-12 gap-4 sm:gap-0 w-full">
+          {/* Sort dropdown (left) */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <span className="text-xs text-gray-500 font-medium mr-2">Sort by:</span>
             <div className="relative">
               <button
                 onClick={() => setShowSort(!showSort)}
-                className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-[#f0f0f3] border-none rounded-xl shadow-[4px_4px_8px_#d1d1d1,-4px_-4px_8px_#ffffff] hover:shadow-[inset_4px_4px_8px_#d1d1d1,inset_-4px_-4px_8px_#ffffff] transition-all duration-300 flex items-center justify-between gap-2 sm:gap-3 text-sm sm:text-base"
+                className="px-3 py-1.5 bg-white border border-gray-200 rounded shadow-sm text-sm text-gray-700 flex items-center gap-2 min-w-[90px] focus:outline-none"
               >
-                <span className="text-gray-700">Sort by: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
+                {sortOptions.find(opt => opt.value === sortBy)?.label}
                 <svg
-                  className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-500 transition-transform duration-300 ${showSort ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${showSort ? 'rotate-180' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -105,7 +78,7 @@ const ReviewAll: React.FC = () => {
                 </svg>
               </button>
               {showSort && (
-                <div className="absolute right-0 mt-2 w-48 bg-[#f0f0f3] rounded-xl shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff] border border-[#e0e0e0] z-10 overflow-hidden">
+                <div className="absolute left-0 mt-1 w-32 bg-white rounded shadow-lg border border-gray-200 z-10">
                   {sortOptions.map((option) => (
                     <button
                       key={option.value}
@@ -113,9 +86,7 @@ const ReviewAll: React.FC = () => {
                         setSortBy(option.value);
                         setShowSort(false);
                       }}
-                      className={`flex items-center w-full px-4 py-2.5 sm:py-3 text-sm hover:bg-[#e8e8e8] transition-colors duration-200 ${
-                        sortBy === option.value ? 'text-[#5A8DB8] font-medium' : 'text-gray-700'
-                      }`}
+                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${sortBy === option.value ? 'text-[#5A8DB8] font-semibold' : 'text-gray-700'}`}
                     >
                       {option.label}
                     </button>
@@ -123,6 +94,32 @@ const ReviewAll: React.FC = () => {
                 </div>
               )}
             </div>
+          </div>
+          {/* Search bar (right) */}
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <div className="relative w-full sm:w-72">
+              <input
+                type="text"
+                placeholder="Search by name"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#5A8DB8]"
+              />
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+            <a href="#" className="ml-2 text-xs text-[#5A8DB8] font-medium hover:underline whitespace-nowrap">Search with filters</a>
           </div>
         </div>
 
