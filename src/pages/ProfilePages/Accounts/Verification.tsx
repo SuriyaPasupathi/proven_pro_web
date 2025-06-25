@@ -189,8 +189,16 @@ const Verification = () => {
       return;
     }
 
+    if (!profileId) {
+      toast.error('Profile ID is required');
+      return;
+    }
+
     try {
-      const result = await dispatch(requestMobileVerification(phoneNumber)).unwrap();
+      const result = await dispatch(requestMobileVerification({
+        mobile: phoneNumber,
+        user_id: profileId
+      })).unwrap();
       setIsOtpDialogOpen(true);
       setCountdown(60);
       startCountdown();
@@ -240,8 +248,16 @@ const Verification = () => {
       return;
     }
 
+    if (!profileId) {
+      toast.error('Profile ID is required');
+      return;
+    }
+
     try {
-      const result = await dispatch(verifyMobileOTP(otpValue)).unwrap();
+      const result = await dispatch(verifyMobileOTP({
+        otp: otpValue,
+        user_id: profileId
+      })).unwrap();
       toast.success(result.message);
       setIsOtpDialogOpen(false);
       setOtp(['', '', '', '', '', '']);
@@ -262,8 +278,16 @@ const Verification = () => {
       return;
     }
 
+    if (!profileId) {
+      toast.error('Profile ID is required');
+      return;
+    }
+
     try {
-      const result = await dispatch(requestMobileVerification(phoneNumber)).unwrap();
+      const result = await dispatch(requestMobileVerification({
+        mobile: phoneNumber,
+        user_id: profileId
+      })).unwrap();
       setCountdown(60);
       startCountdown();
       toast.success(result.message);

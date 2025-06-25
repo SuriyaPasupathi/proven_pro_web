@@ -458,12 +458,15 @@ export const uploadVerificationDocument = createAsyncThunk(
 
 export const requestMobileVerification = createAsyncThunk(
   'profile/requestMobileVerification',
-  async (mobile: string, { rejectWithValue }) => {
+  async (payload: { mobile: string; user_id: string }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const response = await axios.post(
         `${baseUrl}request-mobile-verification/`,
-        { mobile },
+        { 
+          mobile: payload.mobile,
+          user_id: payload.user_id
+        },
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -481,12 +484,12 @@ export const requestMobileVerification = createAsyncThunk(
 
 export const verifyMobileOTP = createAsyncThunk(
   'profile/verifyMobileOTP',
-  async (otp: string, { rejectWithValue }) => {
+  async (payload: { otp: string; user_id: string }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const response = await axios.post(
-        `${baseUrl}verify-mobile-otp/`,
-        { otp },
+        `${baseUrl}verify-mobile-otp/?user_id=${payload.user_id}`,
+        { otp: payload.otp },
         {
           headers: {
             'Authorization': `Bearer ${token}`
