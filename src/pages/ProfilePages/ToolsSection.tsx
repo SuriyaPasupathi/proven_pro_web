@@ -1,4 +1,4 @@
-import { ChevronDown, Loader2, ChevronUp, Settings, Plus, X, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, Loader2, ChevronUp, Plus, X, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
-import { motion } from 'framer-motion';
 
 interface ToolsSectionProps {
   primary_tools?: string[] | string;
@@ -247,51 +246,33 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="relative bg-gradient-to-br from-white via-[#5A8DB8]/5 to-white rounded-2xl p-6 xs:p-8 shadow-lg"
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 via-[#3C5979]/5 to-[#5A8DB8]/5 rounded-2xl"></div>
+    <div className="relative ">
+      <div className="absolute inset-0 "></div>
       
       <div className="relative flex justify-between items-center mb-8">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex items-center gap-4"
-        >
-          <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl shadow-lg">
-            <Settings className="h-6 w-6 text-white" />
-          </div>
-          <h2 className="text-2xl xs:text-3xl font-bold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl xs:text-4xl font-bold text-black">
             Tools
           </h2>
-        </motion.div>
+        </div>
         
         {isEditMode && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="flex gap-2"
-          >
+          <div className="flex gap-2">
             <Button 
               variant="ghost" 
-              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-black hover:text-black p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => setIsDialogOpen(true)}
             >
               <Pencil className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
-              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-black hover:text-black p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => setIsAddDialogOpen(true)}
             >
               <Plus className="w-5 h-5" />
             </Button>
-          </motion.div>
+          </div>
         )}
       </div>
 
@@ -300,10 +281,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
-                <Settings className="w-6 h-6 text-white" />
-              </div>
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl font-semibold text-black">
                 Edit Tools
               </DialogTitle>
             </div>
@@ -312,25 +290,24 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-[#5A8DB8]" />
+                <label className="text-sm font-medium text-black">
                   Tools
                 </label>
                 <Button
                   type="button"
                   onClick={() => setIsToolsOpen(true)}
-                  className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
+                  className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black rounded-xl"
                 >
                   {tools.length > 0 ? tools.join(", ") : "Select tools"}
                 </Button>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {tools.map((tool, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-[#5A8DB8] px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
+                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
                       <span>{tool}</span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-4 w-4 text-[#5A8DB8] hover:text-red-600 hover:bg-transparent"
+                        className="h-4 w-4 text-black hover:text-red-600 hover:bg-transparent"
                         onClick={() => handleDeleteClick(tool)}
                         disabled={isLoading}
                       >
@@ -348,7 +325,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isLoading}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+                className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
               >
                 Cancel
               </Button>
@@ -379,10 +356,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
-                <Plus className="w-6 h-6 text-white" />
-              </div>
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl font-semibold text-black">
                 Add New Tools
               </DialogTitle>
             </div>
@@ -390,14 +364,13 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
           
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                <Settings className="w-4 h-4 text-[#5A8DB8]" />
+              <label className="text-sm font-medium text-black">
                 Tools
               </label>
               <Button
                 type="button"
                 onClick={() => setIsToolsOpen(true)}
-                className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
+                className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black rounded-xl"
               >
                 {tools.length > 0 ? tools.join(", ") : "Select tools"}
               </Button>
@@ -408,7 +381,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                 type="button"
                 variant="outline"
                 onClick={() => setIsAddDialogOpen(false)}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+                className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
               >
                 Cancel
               </Button>
@@ -443,10 +416,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
-                <Settings className="w-6 h-6 text-white" />
-              </div>
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl font-semibold text-black">
                 Select Tools
               </DialogTitle>
             </div>
@@ -466,7 +436,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                     className={`w-full justify-start ${
                       tools.includes(tool.name)
                         ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
-                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979]'
+                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black'
                     } rounded-xl`}
                     onClick={() => handleAddTool(tool)}
                   >
@@ -481,7 +451,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
               type="button"
               variant="outline"
               onClick={() => setIsToolsOpen(false)}
-              className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+              className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
             >
               Cancel
             </Button>
@@ -499,38 +469,32 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
 
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-[#5A8DB8]">
-            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-2 rounded-lg shadow-sm">
-              <Settings className="h-5 w-5 text-white" />
-            </div>
-            Tools
+          <h3 className="text-lg font-semibold mb-3 text-black">
+            Primary Tools
           </h3>
           <div className="flex flex-wrap gap-2">
             {tools.length > 0 ? (
               tools
                 .slice(0, isExpanded ? undefined : 2)
                 .map((tool, index) => (
-                  <motion.div 
+                  <div 
                     key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
                     className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[#5A8DB8]">{tool}</span>
+                      <span className="text-sm font-medium text-black">{tool}</span>
                     </div>
                     {isEditMode && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 text-[#5A8DB8] hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
+                        className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
                         onClick={() => handleDeleteClick(tool)}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                  </motion.div>
+                  </div>
                 ))
             ) : (
               <p className="text-gray-500">No tools added yet</p>
@@ -540,15 +504,10 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       </div>
       
       {tools.length > 2 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6"
-        >
+        <div className="mt-6">
           <Button 
             variant="ghost" 
-            className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-xl px-4 py-2"
+            className="text-black hover:text-black hover:bg-[#5A8DB8]/10 rounded-xl px-4 py-2"
             onClick={() => setIsExpanded(!isExpanded)}
           >
             <span className="mr-2">{isExpanded ? 'Show less' : 'Show all tools'}</span>
@@ -558,7 +517,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
               <ChevronDown className="h-4 w-4" />
             )}
           </Button>
-        </motion.div>
+        </div>
       )}
 
       <DeleteConfirmationDialog
@@ -572,7 +531,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
         description={`Are you sure you want to remove "${toolToDelete}" from your tools?`}
         isLoading={isDeleteLoading}
       />
-    </motion.div>
+    </div>
   );
 };
 

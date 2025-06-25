@@ -6,7 +6,7 @@ import AccountDropdown from './AccountDropdown';
 import logo from '../../assets/logo.png';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
-import NotificationSheet from "@/components/layout/notificationsheet";
+// import NotificationSheet from "@/components/layout/notificationsheet";
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
@@ -152,7 +152,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             <span className="relative z-10 text-black">Contact Us</span>
             <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
           </button>
-          <NotificationSheet />
+          {/* <NotificationSheet /> */}
           
           {/* Account */}
           <div className="relative" ref={dropdownRef}>

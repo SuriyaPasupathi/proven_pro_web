@@ -74,12 +74,12 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
             {userData?.first_name?.[0] || 'U'}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-[#3C5979] truncate">
+            <div className="font-semibold text-black truncate">
               {userData?.first_name && userData?.last_name 
                 ? `${userData.first_name} ${userData.last_name}`
                 : 'User'}
             </div>
-            <div className="text-sm text-[#5A8DB8]/70 truncate">{userEmail}</div>
+            <div className="text-sm text-black/70 truncate">{userEmail}</div>
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
       <div className="py-2 max-h-[calc(100vh-200px)] overflow-y-auto">
         <Button 
           variant="ghost" 
-          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
+          className="w-full justify-between px-4 py-3 text-sm text-black hover:text-black hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             setIsEditMode(false);
             navigate(`/profile/${userData.id}`);
@@ -106,7 +106,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
 
         <Button 
           variant="ghost" 
-          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
+          className="w-full justify-between px-4 py-3 text-sm text-black hover:text-black hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             handleEditProfile();
             closeDropdown();
@@ -123,7 +123,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
 
         <Button 
           variant="ghost" 
-          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
+          className="w-full justify-between px-4 py-3 text-sm text-black hover:text-black hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             navigate(`/profile/verification/${userData.id}`);
             closeDropdown();
@@ -140,7 +140,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
 
         <Button 
           variant="ghost" 
-          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
+          className="w-full justify-between px-4 py-3 text-sm text-black hover:text-black hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             navigate(`/profile/membership-plans/${userData.id}`);
             closeDropdown();
@@ -157,7 +157,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
 
         <Button
           variant="ghost"
-          className="w-full justify-between px-4 py-3 text-sm text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
+          className="w-full justify-between px-4 py-3 text-sm text-black hover:text-black hover:bg-[#5A8DB8]/5 transition-all duration-300 group"
           onClick={() => {
             navigate(`/profile/account-settings/${userData.id}`);
             closeDropdown();

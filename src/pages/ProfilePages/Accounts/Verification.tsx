@@ -320,7 +320,7 @@ const Verification = () => {
               Let's Verify Your Identity
             </span>
           </h1>
-          <p className="text-sm sm:text-base md:text-lg text-[#5A8DB8]/80 font-medium">
+          <p className="text-sm sm:text-base md:text-lg text-black font-medium">
             Proving your identity helps employers trust you more and feel confident about hiring Filipino workers like you.
           </p>
         </div>
@@ -333,14 +333,14 @@ const Verification = () => {
                 <Shield className="h-6 w-6 text-[#5A8DB8]" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-[#3C5979]">Government ID</h2>
-                <p className="text-sm text-[#5A8DB8]/70">Required for verification</p>
+                <h2 className="text-xl font-semibold text-black">Government ID</h2>
+                <p className="text-sm text-black/70">Required for verification</p>
               </div>
             </div>
 
             <div className="mb-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#5A8DB8]/10 to-[#5A8DB8]/5">
-                <span className="text-lg font-semibold text-[#3C5979]">+50 Proven Proof</span>
+                <span className="text-lg font-semibold text-black">+50 Proven Proof</span>
                 <div className="h-1 w-1 rounded-full bg-[#5A8DB8]/40"></div>
                 {profileData?.verification_details?.government_id && (
                   <div className="flex items-center gap-2">
@@ -357,7 +357,7 @@ const Verification = () => {
               </div>
             </div>
 
-            <p className="text-sm text-[#5A8DB8]/70 mb-6">Provide a photo of your valid Government ID and a selfie showing it</p>
+            <p className="text-sm text-black/70 mb-6">Provide a photo of your valid Government ID and a selfie showing it</p>
 
             <div className="space-y-4">
               <input
@@ -371,7 +371,7 @@ const Verification = () => {
               <div className="flex flex-col gap-4">
                 <Button 
                   variant="outline" 
-                  className="w-full border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 flex items-center gap-2"
+                  className="w-full border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300 flex items-center gap-2"
                   onClick={triggerFileInput}
                   disabled={isUploading}
                 >
@@ -383,9 +383,9 @@ const Verification = () => {
                   <div className="p-4 border rounded-xl bg-white/60 backdrop-blur-sm">
                     <div className="flex justify-between items-start">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#3C5979]">Selected File:</p>
-                        <p className="text-sm text-[#5A8DB8]/70 truncate">{selectedFile.name}</p>
-                        <p className="text-xs text-[#5A8DB8]/50">
+                        <p className="text-sm font-medium text-black">Selected File:</p>
+                        <p className="text-sm text-black/70 truncate">{selectedFile.name}</p>
+                        <p className="text-xs text-black/50">
                           {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                       </div>
@@ -394,7 +394,7 @@ const Verification = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-300"
+                            className="text-black hover:text-black hover:bg-[#5A8DB8]/10 transition-all duration-300"
                             onClick={() => {
                               setPreviewType('gov_id');
                               setIsPreviewOpen(true);
@@ -446,14 +446,14 @@ const Verification = () => {
                 <MapPin className="h-6 w-6 text-[#5A8DB8]" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-[#3C5979]">Address Validation</h2>
-                <p className="text-sm text-[#5A8DB8]/70">Optional verification</p>
+                <h2 className="text-xl font-semibold text-black">Address Validation</h2>
+                <p className="text-sm text-black/70">Optional verification</p>
               </div>
             </div>
 
             <div className="mb-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#5A8DB8]/10 to-[#5A8DB8]/5">
-                <span className="text-lg font-semibold text-[#3C5979]">+25 Proven Proof</span>
+                <span className="text-lg font-semibold text-black">+25 Proven Proof</span>
                 <div className="h-1 w-1 rounded-full bg-[#5A8DB8]/40"></div>
                 {profileData?.verification_details?.address_proof && (
                   <div className="flex items-center gap-2">
@@ -470,7 +470,7 @@ const Verification = () => {
               </div>
             </div>
 
-            <p className="text-sm text-[#5A8DB8]/70 mb-6">Upload a picture of the document showing your billing address</p>
+            <p className="text-sm text-black/70 mb-6">Upload a picture of the document showing your billing address</p>
 
             <div className="space-y-4">
               <input
@@ -484,7 +484,7 @@ const Verification = () => {
               <div className="flex flex-col gap-4">
                 <Button 
                   variant="outline" 
-                  className="w-full border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 flex items-center gap-2"
+                  className="w-full border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300 flex items-center gap-2"
                   onClick={triggerAddressFileInput}
                   disabled={isAddressUploading}
                 >
@@ -496,9 +496,9 @@ const Verification = () => {
                   <div className="p-4 border rounded-xl bg-white/60 backdrop-blur-sm">
                     <div className="flex justify-between items-start">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#3C5979]">Selected Document:</p>
-                        <p className="text-sm text-[#5A8DB8]/70 truncate">{selectedAddressFile.name}</p>
-                        <p className="text-xs text-[#5A8DB8]/50">
+                        <p className="text-sm font-medium text-black">Selected Document:</p>
+                        <p className="text-sm text-black/70 truncate">{selectedAddressFile.name}</p>
+                        <p className="text-xs text-black/50">
                           {(selectedAddressFile.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                       </div>
@@ -507,7 +507,7 @@ const Verification = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-all duration-300"
+                            className="text-black hover:text-black hover:bg-[#5A8DB8]/10 transition-all duration-300"
                             onClick={() => {
                               setPreviewType('address');
                               setIsPreviewOpen(true);
@@ -559,14 +559,14 @@ const Verification = () => {
                 <Phone className="h-6 w-6 text-[#5A8DB8]" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-[#3C5979]">Mobile Number</h2>
-                <p className="text-sm text-[#5A8DB8]/70">Optional verification</p>
+                <h2 className="text-xl font-semibold text-black">Mobile Number</h2>
+                <p className="text-sm text-black/70">Optional verification</p>
               </div>
             </div>
 
             <div className="mb-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#5A8DB8]/10 to-[#5A8DB8]/5">
-                <span className="text-lg font-semibold text-[#3C5979]">+25 Proven Proof</span>
+                <span className="text-lg font-semibold text-black">+25 Proven Proof</span>
                 <div className="h-1 w-1 rounded-full bg-[#5A8DB8]/40"></div>
                 {profileData?.verification_details?.mobile && (
                   <div className="flex items-center gap-2">
@@ -583,7 +583,7 @@ const Verification = () => {
               </div>
             </div>
 
-            <p className="text-sm text-[#5A8DB8]/70 mb-6">Enter your mobile number to receive a verification code</p>
+            <p className="text-sm text-black/70 mb-6">Enter your mobile number to receive a verification code</p>
             
             <div className="space-y-4">
               <PhoneInput
@@ -597,7 +597,7 @@ const Verification = () => {
               />
               <Button 
                 variant="outline" 
-                className="w-full border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 flex items-center gap-2"
+                className="w-full border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300 flex items-center gap-2"
                 onClick={handlePhoneSubmit}
               >
                 <ArrowRight className="w-5 h-5" />
@@ -616,12 +616,12 @@ const Verification = () => {
               <div className="h-10 w-10 rounded-xl bg-[#5A8DB8]/10 flex items-center justify-center">
                 <Phone className="h-5 w-5 text-[#5A8DB8]" />
               </div>
-              <DialogTitle className="text-xl font-semibold text-[#3C5979]">Enter Verification Code</DialogTitle>
+              <DialogTitle className="text-xl font-semibold text-black">Enter Verification Code</DialogTitle>
             </div>
             <div className="h-1 w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
           </DialogHeader>
           <div className="py-6">
-            <p className="text-sm text-[#5A8DB8]/70 mb-4">
+            <p className="text-sm text-black/70 mb-4">
               We've sent a verification code to {phoneNumber}
             </p>
             <div className="flex justify-between gap-2 mb-4">
@@ -642,14 +642,14 @@ const Verification = () => {
             </div>
             <div className="text-center">
               {countdown > 0 ? (
-                <p className="text-sm text-[#5A8DB8]/70">
+                <p className="text-sm text-black/70">
                   Resend code in {countdown} seconds
                 </p>
               ) : (
                 <Button
                   variant="link"
                   onClick={handleResendOtp}
-                  className="text-[#5A8DB8] hover:text-[#3C5979] text-sm transition-all duration-300"
+                  className="text-black hover:text-black text-sm transition-all duration-300"
                 >
                   Resend code
                 </Button>
@@ -660,7 +660,7 @@ const Verification = () => {
             <Button
               variant="outline"
               onClick={() => setIsOtpDialogOpen(false)}
-              className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300"
+              className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300"
             >
               Cancel
             </Button>
@@ -683,7 +683,7 @@ const Verification = () => {
               <div className="h-10 w-10 rounded-xl bg-[#5A8DB8]/10 flex items-center justify-center">
                 <Eye className="h-5 w-5 text-[#5A8DB8]" />
               </div>
-              <DialogTitle className="text-xl font-semibold text-[#3C5979]">
+              <DialogTitle className="text-xl font-semibold text-black">
                 {previewType === 'gov_id' ? 'Government ID Preview' : 'Address Document Preview'}
               </DialogTitle>
             </div>
@@ -704,7 +704,7 @@ const Verification = () => {
             <Button
               variant="outline"
               onClick={() => setIsPreviewOpen(false)}
-              className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300"
+              className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300"
             >
               Close
             </Button>

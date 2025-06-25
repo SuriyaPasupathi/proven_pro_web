@@ -9,7 +9,6 @@ import { createUserProfile } from "../../../store/Services/CreateProfileService"
 import { updateProfileData } from "../../../store/Slice/CreateProfileSlice";
 import { fetchJobPositions } from "../../../store/Services/DropDownService";
 import toast from "react-hot-toast";
-import { Plus, X, ArrowLeft, ArrowRight, Sparkles, Briefcase, Building2, Calendar, ListChecks, Award } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 const TOTAL_STEPS = 8;
@@ -221,11 +220,10 @@ const WorkExp: React.FC = () => {
       {/* Step Progress */}
       <div className="mb-10 w-full max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
+          <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+          <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
             {progressPercent}% Complete
           </span>
         </div>
@@ -241,14 +239,11 @@ const WorkExp: React.FC = () => {
       <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex flex-col gap-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
-              <Briefcase className="h-7 w-7 text-white" />
-            </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+              <h1 className="text-2xl sm:text-3xl font-bold text-black">
                 Work Experience
               </h1>
-              <p className="text-sm text-[#5A8DB8]/70 mt-1">Add your professional experience</p>
+              <p className="text-sm text-black/70 mt-1">Add your professional experience</p>
             </div>
           </div>
           <Button
@@ -256,7 +251,6 @@ const WorkExp: React.FC = () => {
             onClick={addNewWorkExperience}
             className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 px-4 py-2 rounded-xl"
           >
-            <Plus className="w-5 h-5" />
             Add Experience
           </Button>
         </div>
@@ -274,20 +268,18 @@ const WorkExp: React.FC = () => {
                 className="absolute top-4 right-4 text-[#5A8DB8]/40 hover:text-red-500 hover:bg-red-50 transition-colors duration-300"
                 onClick={() => removeWorkExperience(index)}
               >
-                <X className="w-4 h-4" />
+                ×
               </Button>
             )}
             <div className="flex items-center gap-2">
-              <Award className="w-5 h-5 text-[#5A8DB8]" />
-              <h3 className="text-lg font-semibold text-[#3C5979]">
+              <h3 className="text-lg font-semibold text-black">
                 Work Experience {index + 1}
               </h3>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label htmlFor={`company_name_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                  <Building2 className="w-4 h-4" />
+                <label htmlFor={`company_name_${index}`} className="text-sm font-medium text-black mb-2">
                   Company Name
                 </label>
                 <Input
@@ -302,8 +294,7 @@ const WorkExp: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor={`position_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                  <Briefcase className="w-4 h-4" />
+                <label htmlFor={`position_${index}`} className="text-sm font-medium text-black mb-2">
                   Position
                 </label>
                 <Select
@@ -325,8 +316,7 @@ const WorkExp: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor={`experience_start_date_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                    <Calendar className="w-4 h-4" />
+                  <label htmlFor={`experience_start_date_${index}`} className="text-sm font-medium text-black mb-2">
                     Start Date
                   </label>
                   <Input
@@ -340,8 +330,7 @@ const WorkExp: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor={`experience_end_date_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                    <Calendar className="w-4 h-4" />
+                  <label htmlFor={`experience_end_date_${index}`} className="text-sm font-medium text-black mb-2">
                     End Date
                   </label>
                   <Input
@@ -357,8 +346,7 @@ const WorkExp: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor={`key_responsibilities_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                  <ListChecks className="w-4 h-4" />
+                <label htmlFor={`key_responsibilities_${index}`} className="text-sm font-medium text-black mb-2">
                   Key Responsibilities
                 </label>
                 <Textarea
@@ -378,8 +366,7 @@ const WorkExp: React.FC = () => {
         {/* Error Message */}
         {error && (
           <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
-            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
-              <Briefcase className="w-4 h-4" />
+            <p className="text-sm text-black flex items-center gap-2">
               {error.message}
             </p>
           </div>
@@ -390,11 +377,10 @@ const WorkExp: React.FC = () => {
           <Button
             type="button"
             variant="outline"
-            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
+            className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading || isUpdating || jobPositionsLoading}
           >
-            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
@@ -410,7 +396,6 @@ const WorkExp: React.FC = () => {
             ) : (
               <>
                 Save and Continue
-                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>

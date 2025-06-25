@@ -131,26 +131,28 @@ const App: React.FC = () => {
   return (
     <ThemeProvider defaultTheme="light">
       <div className="min-h-screen bg-gray-50">
-        <ProfileNav isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+        {/* Fixed Header */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+          <ProfileNav isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+        </div>
         
-        <div className="w-11/12 mx-auto ">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mt-6 md:mt-8">
-            {/* Sidebar - takes 3 columns on large screens, full width on mobile */}
+        {/* Main content with responsive padding */}
+        <div className="pt-16 sm:pt-20 w-11/12 mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8 mt-4 sm:mt-6 md:mt-8">
+            {/* Sidebar - responsive sticky behavior */}
             <div className="lg:col-span-3 order-1">
-              <div className="sticky top-8">
+              <div className="lg:sticky lg:top-20 sm:top-24">
                 <ProfileSidebar profileData={profile} />
               </div>
             </div>
             
-            {/* Main content - takes 9 columns on large screens */}
+            {/* Main content - responsive columns */}
             <div className="lg:col-span-9 order-2">
-              <div className="mb-8">
+              <div className="">
                 <ProfileHeader profileData={profile} />
               </div>
 
-              <div className="border-t border-gray-200"></div>
-
-              <div className="space-y-8 md:space-y-12 mt-6 md:mt-8">
+              <div className="space-y-6 sm:space-y-8 md:space-y-12 mt-4 sm:mt-6 md:mt-8 mb-8 sm:mb-10">
                 {/* <ReviewCarousel reviews={transformedReviews} /> */}
                 
                 <ServicesSection 
@@ -161,7 +163,7 @@ const App: React.FC = () => {
                   availability={profile.availability}
                 />
                 {/* Horizontal divider */}
-                <div className="border-t border-gray-200"></div>
+                <div className="border-t border-black"></div>
                 
                 <ExperienceSection experiences={profile.work_experiences} />
                 
@@ -172,17 +174,20 @@ const App: React.FC = () => {
                 />
                 
                 {/* Horizontal divider */}
-                <div className="border-t border-gray-200"></div>
+                <div className="border-t border-black"></div>
                 
                 <ToolsSection primary_tools={profile.primary_tools} />
                 
                 {/* Horizontal divider */}
-                <div className="border-t border-gray-200"></div>
+                <div className="border-t border-black"></div>
                 
                 <PortfolioSection 
                   projects={profile.portfolio}
                   portfolio={profile.portfolio}
                 />
+
+                {/* Horizontal divider */}
+                <div className="border-t border-black"></div>
               </div>
             </div>
           </div>

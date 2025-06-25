@@ -8,7 +8,6 @@ import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import { fetchServices } from "../../../store/Services/DropDownService";
 import toast from "react-hot-toast";
-import { Plus, X, ArrowLeft, ArrowRight, Sparkles, Briefcase, DollarSign, Clock, ListChecks } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 interface ServiceForm {
@@ -175,11 +174,10 @@ const ServicesOffer: React.FC = () => {
       {/* Progress Section */}
       <div className="mb-10 w-full max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
+          <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+          <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
             {progressPercent}% Complete
           </span>
         </div>
@@ -198,14 +196,11 @@ const ServicesOffer: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
-              <Briefcase className="h-7 w-7 text-white" />
-            </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+              <h1 className="text-2xl sm:text-3xl font-bold text-black">
                 Services Offered
               </h1>
-              <p className="text-sm text-[#5A8DB8]/70 mt-1">Add the services you provide</p>
+              <p className="text-sm text-black/70 mt-1">Add the services you provide</p>
             </div>
           </div>
           <Button
@@ -213,7 +208,6 @@ const ServicesOffer: React.FC = () => {
             onClick={addNewService}
             className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 px-4 py-2 rounded-xl"
           >
-            <Plus className="w-5 h-5" />
             Add Service
           </Button>
         </div>
@@ -231,20 +225,18 @@ const ServicesOffer: React.FC = () => {
                 className="absolute top-4 right-4 text-[#5A8DB8]/40 hover:text-red-500 hover:bg-red-50 transition-colors duration-300"
                 onClick={() => removeService(index)}
               >
-                <X className="w-4 h-4" />
+                ×
               </Button>
             )}
             <div className="flex items-center gap-2">
-              <ListChecks className="w-5 h-5 text-[#5A8DB8]" />
-              <h3 className="text-lg font-semibold text-[#3C5979]">
+              <h3 className="text-lg font-semibold text-black">
                 Service Category {index + 1}
               </h3>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label htmlFor={`services_categories_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                  <Briefcase className="w-4 h-4" />
+                <label htmlFor={`services_categories_${index}`} className="text-sm font-medium text-black mb-2">
                   Main Service Category
                 </label>
                 <Select
@@ -271,8 +263,7 @@ const ServicesOffer: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor={`services_description_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                  <ListChecks className="w-4 h-4" />
+                <label htmlFor={`services_description_${index}`} className="text-sm font-medium text-black mb-2">
                   Service Description
                 </label>
                 <Textarea
@@ -288,8 +279,7 @@ const ServicesOffer: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor={`rate_range_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                    <DollarSign className="w-4 h-4" />
+                  <label htmlFor={`rate_range_${index}`} className="text-sm font-medium text-black mb-2">
                     Rate Range
                   </label>
                   <input
@@ -305,8 +295,7 @@ const ServicesOffer: React.FC = () => {
                 </div>
 
                 <div>
-                  <label htmlFor={`availability_${index}`} className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                    <Clock className="w-4 h-4" />
+                  <label htmlFor={`availability_${index}`} className="text-sm font-medium text-black mb-2">
                     Availability
                   </label>
                   <input
@@ -328,8 +317,7 @@ const ServicesOffer: React.FC = () => {
         {/* Error Message */}
         {error && (
           <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
-            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
-              <ListChecks className="w-4 h-4" />
+            <p className="text-sm text-black flex items-center gap-2">
               {error.message}
             </p>
           </div>
@@ -340,11 +328,10 @@ const ServicesOffer: React.FC = () => {
           <Button
             type="button"
             variant="outline"
-            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
+            className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading || servicesLoading}
           >
-            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
@@ -360,7 +347,6 @@ const ServicesOffer: React.FC = () => {
             ) : (
               <>
                 Save and Continue
-                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>

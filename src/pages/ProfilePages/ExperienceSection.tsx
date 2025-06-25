@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp, Building2, Calendar, Briefcase, FileText } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp,  } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -65,6 +65,17 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
 
   // State for tracking experience to delete
   const [experienceToDelete, setExperienceToDelete] = useState<Experience | null>(null);
+
+  // Function to format date to show month in text
+  const formatDateToText = (dateString: string) => {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    const year = date.getFullYear();
+    
+    return `${month} ${year}`;
+  };
 
   // Fetch job positions when component mounts
   useEffect(() => {
@@ -357,10 +368,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     return (
       <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
         <div className="flex justify-between items-center mb-4 xs:mb-6">
-          <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
-            <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
-              <Building2 className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
-            </span>
+          <h2 className="text-xl xs:text-4xl font-bold text-black">
             Experience
           </h2>
           {isEditMode && (
@@ -395,10 +403,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
   return (
     <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
       <div className="flex justify-between items-center mb-4 xs:mb-6">
-        <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
-          <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
-            <Building2 className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
-          </span>
+        <h2 className="text-xl xs:text-4xl font-bold text-black">
           Experience
         </h2>
         {isEditMode && (
@@ -429,10 +434,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
           <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
           <DialogHeader className="space-y-4 relative">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
-                  <Briefcase className="w-5 h-5 text-[#5A8DB8]" />
-                </div>
+              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent">
                 {editingExperience ? 'Edit Experience' : 'Add Experience'}
               </DialogTitle>
             </div>
@@ -440,8 +442,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-6 relative">
             <div className="space-y-2 group">
-              <label htmlFor="company_name" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                <Building2 className="w-4 h-4" />
+              <label htmlFor="company_name" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors">
                 Company Name
               </label>
               <Input
@@ -456,8 +457,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
             </div>
 
             <div className="space-y-2 group">
-              <label htmlFor="position" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                <Briefcase className="w-4 h-4" />
+              <label htmlFor="position" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors">
                 Position
               </label>
               <Select
@@ -479,8 +479,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2 group">
-                <label htmlFor="experience_start_date" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
+                <label htmlFor="experience_start_date" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors">
                   Start Date
                 </label>
                 <Input
@@ -494,8 +493,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
                 />
               </div>
               <div className="space-y-2 group">
-                <label htmlFor="experience_end_date" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
+                <label htmlFor="experience_end_date" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors">
                   End Date
                 </label>
                 <Input
@@ -511,8 +509,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
             </div>
 
             <div className="space-y-2 group">
-              <label htmlFor="key_responsibilities" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                <FileText className="w-4 h-4" />
+              <label htmlFor="key_responsibilities" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors">
                 Key Responsibilities
               </label>
               <Textarea
@@ -573,55 +570,67 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
               .map((experience, index) => (
                 <div key={index} className="relative pl-12 mb-6 last:mb-0">
                   {/* Timeline dot */}
-                  <div className="absolute left-4 top-6 w-4 h-4 rounded-full bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] border-2 border-white shadow-md transform -translate-x-1/2"></div>
+                  {/* <div className="absolute left-4 top-6 w-4 h-4 rounded-full bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] border-2 border-white shadow-md transform -translate-x-1/2"></div> */}
                   
-                  <div className="relative p-4 xs:p-6 border border-[#5A8DB8]/10 rounded-lg bg-gradient-to-br from-[#5A8DB8]/5 to-white hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] hover:border-[#5A8DB8]/20">
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="space-y-3 flex-grow">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-base xs:text-lg text-[#5A8DB8] font-bold">
-                            {experience.position}
-                          </h3>
-                          <span className="px-2 py-1 text-xs font-medium bg-[#5A8DB8]/10 text-[#5A8DB8] rounded-full">
-                            {experience.company_name}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Calendar className="w-4 h-4 text-[#5A8DB8]" />
-                          <span>{experience.experience_start_date} - {experience.experience_end_date}</span>
-                        </div>
-                        
-                        <div className="mt-4">
-                          <h4 className="text-sm font-semibold text-[#5A8DB8] mb-2 flex items-center gap-2">
-                            <FileText className="w-4 h-4" />
-                            Key Responsibilities
-                          </h4>
-                          <p className="text-sm text-gray-700 leading-relaxed">
-                            {experience.key_responsibilities}
-                          </p>
+                  <div className="relative p-4 ">
+                    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+                      {/* Main content - 75% width on large screens, full width on mobile */}
+                      <div className="flex-1 w-full lg:w-3/4">
+                        <div className="flex flex-col space-y-4">
+                          {/* Header row with date, company, position */}
+                          <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-2 xs:gap-4">
+                            {/* Date - Left side */}
+                            <div className="flex-shrink-0 text-xs xs:text-sm text-gray-600 font-medium order-1 xs:order-1">
+                              {formatDateToText(experience.experience_start_date)} - {formatDateToText(experience.experience_end_date)}
+                            </div>
+                            
+                            {/* Company Name - Center */}
+                            <div className="flex-1 text-center order-2 xs:order-2">
+                              <h3 className="text-sm xs:text-base lg:text-lg font-bold">
+                                {experience.company_name}
+                              </h3>
+                            </div>
+                            
+                            {/* Position - Right side */}
+                            <div className="flex-shrink-0 text-right order-3 xs:order-3">
+                              <span className="text-xs xs:text-sm lg:text-base font-semibold">
+                                {experience.position}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Key Responsibilities - Below */}
+                          <div className="mt-4 pt-4 border-t border-[#5A8DB8]/10">
+                            <h4 className="text-xs xs:text-sm font-semibold mb-2">
+                              Key Responsibilities
+                            </h4>
+                            <p className="text-xs xs:text-sm text-gray-700 leading-relaxed">
+                              {experience.key_responsibilities}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       
+                      {/* Edit buttons - 25% width on large screens, full width on mobile */}
                       {isEditMode && (
-                        <div className="flex gap-2">
+                        <div className="flex-shrink-0 w-full lg:w-1/4 flex justify-center lg:justify-end gap-2 order-4 xs:order-4 lg:order-1">
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-200 hover:scale-110"
+                            className="h-6 w-6 xs:h-8 xs:w-8 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-200 hover:scale-110"
                             onClick={() => handleEdit(experience)}
                             disabled={isLoading}
                           >
-                            <Pencil className="h-4 w-4" />
+                            <Pencil className="h-3 w-3 xs:h-4 xs:w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 hover:scale-110"
+                            className="h-6 w-6 xs:h-8 xs:w-8 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 hover:scale-110"
                             onClick={() => handleDeleteClick(experience)}
                             disabled={isLoading}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3 w-3 xs:h-4 xs:w-4" />
                           </Button>
                         </div>
                       )}

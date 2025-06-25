@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
-import {  Upload, ArrowLeft, ArrowRight, Sparkles, Image as ImageIcon } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
@@ -129,11 +128,10 @@ const ProfileImg: React.FC = () => {
       {/* Progress Bar */}
       <div className="w-full max-w-4xl mx-auto mb-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
+          <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+          <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
             {progressPercent}% Complete
           </span>
         </div>
@@ -148,14 +146,11 @@ const ProfileImg: React.FC = () => {
       {/* Image Upload Section */}
       <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex flex-col gap-8">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
-            <ImageIcon className="h-7 w-7 text-white" />
-          </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">
               Profile Image
             </h1>
-            <p className="text-sm text-[#5A8DB8]/70 mt-1">Upload your profile picture</p>
+            <p className="text-sm text-black/70 mt-1">Upload your profile picture</p>
           </div>
         </div>
 
@@ -190,7 +185,7 @@ const ProfileImg: React.FC = () => {
               </div>
             ) : (
               <div className="bg-[#5A8DB8]/10 rounded-full w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center mb-4 group hover:bg-[#5A8DB8]/20 transition-colors duration-300">
-                <Upload className="w-12 h-12 text-[#5A8DB8]/40 group-hover:text-[#5A8DB8]/60 transition-colors" />
+                <div className="text-[#5A8DB8]/40 group-hover:text-[#5A8DB8]/60 transition-colors text-4xl font-bold">+</div>
               </div>
             )}
 
@@ -208,11 +203,10 @@ const ProfileImg: React.FC = () => {
               className="mt-2 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-lg hover:shadow-xl transition-all duration-300"
               onClick={handleUploadClick}
             >
-              <Upload className="w-4 h-4 mr-2" />
               Upload Image
             </Button>
 
-            <p className="text-[#5A8DB8]/70 text-sm mt-4 text-center max-w-sm">
+            <p className="text-black/70 text-sm mt-4 text-center max-w-sm">
               Recommended: Square image, at least 400x400 pixels for best results.
               <br />
               Drag and drop your image here or click to browse
@@ -223,8 +217,7 @@ const ProfileImg: React.FC = () => {
         {/* Error Message */}
         {error && (
           <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
-            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
-              <ImageIcon className="w-4 h-4" />
+            <p className="text-sm text-black flex items-center gap-2">
               {error.message}
             </p>
           </div>
@@ -235,11 +228,10 @@ const ProfileImg: React.FC = () => {
           <Button
             type="button"
             variant="outline"
-            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
+            className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading}
           >
-            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
@@ -255,7 +247,6 @@ const ProfileImg: React.FC = () => {
             ) : (
               <>
                 Save and Continue
-                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>

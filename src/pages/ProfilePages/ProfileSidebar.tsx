@@ -1,4 +1,3 @@
-import { Video, Award, Pencil, Plus, Trash2, Image, FileVideo, Save, Upload, User, FileText, Calendar, Hash, Building2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ProfileData } from '../../types/profile';
 import { useEditMode } from '../../context/EditModeContext';
@@ -19,6 +18,7 @@ import {
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { Label } from "@/components/ui/label";
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
@@ -682,24 +682,26 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   // Update the renderCertification function to use the new delete handler
   const renderCertification = (cert: Certification, index: number) => (
     <div key={index} className="relative group">
-      <div className="bg-gradient-to-br from-white/95 to-gray-50/80 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-[#5A8DB8]/15 hover:border-[#5A8DB8]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#5A8DB8]/10 overflow-hidden">
+      <div className="">
         {isEditMode && (
           <div className="absolute top-3 right-3 xs:top-4 xs:right-4 flex gap-2 z-10">
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white/95 shadow-lg hover:bg-white text-[#5A8DB8] border border-white/50 transition-all duration-300 hover:scale-110 hover:shadow-md"
+              className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white border border-white/50 transition-all duration-300 hover:scale-110"
               onClick={() => handleOpenCertDialog(cert)}
             >
-              <Pencil className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4.5 sm:w-4.5" />
+              <Pencil size={18} className=" mr-1" />
+              
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white/95 shadow-lg hover:bg-white text-red-600 border border-white/50 transition-all duration-300 hover:scale-110 hover:shadow-md"
+              className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white text-red-600 border border-white/50 transition-all duration-300 hover:scale-110"
               onClick={() => handleDeleteClick('certification', cert.certifications_id)}
             >
-              <Trash2 className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4.5 sm:w-4.5" />
+              <Trash2 size={18} className=" mr-1" />
+              
             </Button>
           </div>
         )}
@@ -708,22 +710,18 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           <div className="space-y-4 xs:space-y-5">
             {/* Certification Name */}
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
-                <Award className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
-              </div>
+              
               <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-[#5A8DB8] text-sm xs:text-base sm:text-lg mb-1">Certification Name</h4>
+                <h4 className="font-bold text-gray-800 text-sm xs:text-base sm:text-lg mb-1">Certification Name :</h4>
                 <p className="text-gray-800 font-medium text-sm xs:text-base sm:text-lg leading-relaxed break-words">{cert.certifications_name}</p>
               </div>
             </div>
             
             {/* Organization */}
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
-                <Building2 className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
-              </div>
+             
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[#5A8DB8] text-sm xs:text-base mb-1">Issuing Organization</p>
+                <p className="font-semibold text-gray-800 text-sm xs:text-base mb-1">Issuing Organization :</p>
                 <span className="text-gray-800 font-medium text-sm xs:text-base leading-relaxed break-words">{cert.certifications_issuer}</span>
               </div>
             </div>
@@ -731,11 +729,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             {/* Dates */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 xs:gap-4">
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
-                  <Calendar className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
-                </div>
+               
                 <div>
-                  <p className="font-semibold text-[#5A8DB8] text-sm xs:text-base mb-1">Issue Date</p>
+                  <p className="font-semibold text-gray-800 text-sm xs:text-base mb-1">Issue Date :</p>
                   <span className="text-gray-800 font-medium text-sm xs:text-base">{new Date(cert.certifications_issued_date).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long', 
@@ -745,11 +741,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               </div>
               {cert.certifications_expiration_date && (
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
-                    <Calendar className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
-                  </div>
+                 
                   <div>
-                    <p className="font-semibold text-[#5A8DB8] text-sm xs:text-base mb-1">Expiry Date</p>
+                    <p className="font-semibold text-gray-800 text-sm xs:text-base mb-1">Expiry Date :</p>
                     <span className="text-gray-800 font-medium text-sm xs:text-base">{new Date(cert.certifications_expiration_date).toLocaleDateString('en-US', { 
                       year: 'numeric', 
                       month: 'long', 
@@ -763,11 +757,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             {/* Certification ID */}
             {cert.certifications_id && (
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/15 to-[#5A8DB8]/10 flex-shrink-0">
-                  <Hash className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
-                </div>
+              
                 <div className="flex-1 min-w-0">
-                  <span className="font-semibold text-[#5A8DB8] text-sm xs:text-base mb-1 block">Certification ID</span>
+                    <span className="font-semibold text-gray-800 text-sm xs:text-base mb-1 block">Certification ID :</span>
                   <span className="text-gray-800 font-medium text-sm xs:text-base break-words font-mono bg-gray-100 px-2 py-1 rounded-md">{cert.certifications_id}</span>
                 </div>
               </div>
@@ -776,7 +768,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           
           {/* Certification Image */}
           {cert.certifications_image_url && (
-            <div className="mt-5 xs:mt-6 sm:mt-7 rounded-xl sm:rounded-2xl overflow-hidden border border-[#5A8DB8]/15 bg-gradient-to-br from-white to-gray-50/50 shadow-sm">
+            <div className="mt-5 xs:mt-6 sm:mt-7 rounded-xl sm:rounded-2xl overflow-hidden border border-black/15 bg-gradient-to-br from-white to-gray-50/50 shadow-sm">
               <img 
                 src={getFullImageUrl(cert.certifications_image_url)} 
                 alt={cert.certifications_name}
@@ -795,26 +787,23 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
   return (
     <>
-      <div className="relative space-y-4 xs:space-y-6 sm:space-y-8 max-w-full w-full px-2 sm:px-4 md:px-6">
+      <div className="relative ">
         {/* Profile Image */}
         <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
-          <div className="relative bg-white/95 backdrop-blur-sm rounded-lg xs:rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl">
-            <div className="relative h-16 xs:h-20 sm:h-24 md:h-32 lg:h-40 xl:h-48 ">
-              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10  "></div>
-              <div className="absolute bottom-0 left-0 right-0 h-8 xs:h-12 sm:h-16 md:h-20 lg:h-24 xl:h-32 bg-gradient-to-t from-white/95 to-transparent"></div>
-            </div>
+          <div className="absolute inset-0 "></div>
+          <div className="relative w-full mx-auto">
+           
 
             <div className="relative px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8 -mt-8 xs:-mt-10 sm:-mt-12 md:-mt-16 lg:-mt-20 xl:-mt-24">
               {/* Profile Image - Full Width */}
               <div className="mb-3 xs:mb-4 sm:mb-6">
                 <div className="relative group">
-                  <div className="w-full aspect-square rounded-lg xs:rounded-xl sm:rounded-2xl overflow-hidden shadow-xl transition-all duration-300  group-hover:shadow-2xl">
+                  <div className="w-full aspect-square overflow-hidden bg-white border-4 border-black/20 transition-all duration-300 hover:border-black/40">
                     {!imageError && (profileData.profile_pic_url || profileData.profile_pic) ? (
                       <img 
                         src={getFullImageUrl(profileData.profile_pic_url || profileData.profile_pic)}
                         alt={`${profileData.first_name || ''} ${profileData.last_name || ''}`}
-                        className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-all duration-500"
                         onError={() => setImageError(true)}
                       />
                     ) : (
@@ -830,19 +819,19 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 rounded-full bg-white/90 shadow-lg hover:bg-white text-[#5A8DB8] border-2 border-white transition-all duration-300 hover:scale-110"
+                        className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-800"
                         onClick={() => setIsImageDialogOpen(true)}
                       >
-                        <Pencil className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5 xl:h-5 xl:w-5" />
+                        <Pencil size={18} className=" mr-1" />
                       </Button>
                       {(profileData.profile_pic_url || profileData.profile_pic) && (
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 rounded-full bg-white/90 shadow-lg hover:bg-white text-red-600 border-2 border-white transition-all duration-300 hover:scale-110"
+                          className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 "
                           onClick={() => handleDeleteClick('image')}
                         >
-                          <Trash2 className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5 xl:h-5 xl:w-5" />
+                          <Trash2 size={18} className=" mr-1" />
                         </Button>
                       )}
                     </div>
@@ -853,17 +842,17 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               {/* Name and Email - Centered Below Image */}
               <div className="text-center mb-3 xs:mb-4 sm:mb-6">
                 <div className="flex items-center justify-center gap-1 xs:gap-2 mb-1 xs:mb-2">
-                  <h2 className="text-lg xs:text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-5xl font-bold text-[#5A8DB8] leading-tight">
+                  <h2 className="text-2xl font-bold text-gray-800 leading-tight">
                     {profileData.first_name} {profileData.last_name}
                   </h2>
                   {isEditMode && (
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 xl:h-12 xl:w-12 rounded-full bg-white/90 shadow-lg hover:bg-white text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 border border-white/50 transition-all duration-300 hover:scale-110 hover:shadow-md"
+                      className="h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 "
                       onClick={handleOpenProfileDialog}
                     >
-                      <Pencil className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4.5 md:h-4.5 lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
+                      <Pencil size={18} className=" mr-1" />
                     </Button>
                   )}
                 </div>
@@ -871,7 +860,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               </div>
 
               {/* Bio Section */}
-              <div className="p-2 xs:p-3 sm:p-4 md:p-6 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 rounded-lg xs:rounded-xl sm:rounded-2xl">
+              <div className="p-2 xs:p-3 sm:p-4 md:p-6  rounded-lg xs:rounded-xl sm:rounded-2xl">
                 <p className="text-xs xs:text-sm italic text-gray-700">
                   {profileData.bio || "No bio available"}
                 </p>
@@ -880,30 +869,16 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           </div>
         </div>
 
-        {/* Horizontal Divider */}
-        <div className="relative w-full max-w-lg mx-auto">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#5A8DB8]/20"></div>
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-white px-4 py-2 rounded-full border border-[#5A8DB8]/20 shadow-sm">
-              <div className="w-3 h-3 xs:w-4 xs:h-4 bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] rounded-full"></div>
-            </span>
-          </div>
-        </div>
-
         {/* Video Introduction */}
         {(profileData.video_intro || profileData.video_intro_url) && (
           <div className="relative w-full max-w-lg mx-auto">
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
-            <div className="relative bg-white/95 backdrop-blur-sm rounded-lg xs:rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+            <div className="absolute inset-0 bg-white xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
+            <div className="relative w-full mx-auto">
               <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
                 <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-6">
                   <div className="flex items-center gap-1 xs:gap-2">
-                    <div className="p-1.5 xs:p-2 rounded-lg xs:rounded-xl bg-[#5A8DB8]/10">
-                      <Video className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
-                    </div>
-                    <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-[#5A8DB8]">Video Introduction</h3>
+                  
+                    <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-gray-800">Video Introduction (Optional)</h3>
                   </div>
                   {isEditMode && (
                     <div className="flex gap-1 xs:gap-2">
@@ -913,16 +888,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                         className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
                         onClick={handleOpenVideoDialog}
                       >
-                        <Pencil className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5 xl:h-5 xl:w-5" />
+                        <Pencil size={18} className=" mr-1" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-300"
-                        onClick={() => handleDeleteClick('video')}
-                      >
-                        <Trash2 className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5 xl:h-5 xl:w-5" />
-                      </Button>
+                    
                     </div>
                   )}
                 </div>
@@ -949,31 +917,15 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           </div>
         )}
 
-        {/* Horizontal Divider */}
-        {(profileData.video_intro || profileData.video_intro_url) && (
-          <div className="relative w-full max-w-lg mx-auto">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#5A8DB8]/20"></div>
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-white px-4 py-2 rounded-full border border-[#5A8DB8]/20 shadow-sm">
-                <div className="w-3 h-3 xs:w-4 xs:h-4 bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] rounded-full"></div>
-              </span>
-            </div>
-          </div>
-        )}
-
         {/* Certifications */}
         <div className="relative w-full max-w-lg mx-auto">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500 via-[#5A8DB8] to-[#3C5979] rounded-lg xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
-          <div className="relative bg-white/95 backdrop-blur-sm rounded-lg xs:rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+          <div className="absolute inset-0 bg-white xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
+          <div className="relative w-full mx-auto">
             <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
               <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-6">
                 <div className="flex items-center gap-1 xs:gap-2">
-                  <div className="p-1.5 xs:p-2 rounded-lg xs:rounded-xl bg-[#5A8DB8]/10">
-                    <Award className="h-4 w-4 xs:h-5 xs:w-5 text-[#5A8DB8]" />
-                  </div>
-                  <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-[#5A8DB8]">Certifications</h3>
+                 
+                  <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-gray-800 ">Certifications</h3>
                 </div>
                 {isEditMode && (
                   <div className="flex gap-1 xs:gap-2">
@@ -983,7 +935,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                       className="p-0 h-auto text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
                       onClick={() => handleOpenCertDialog()}
                     >
-                      <Plus className="w-4 h-4 xs:w-5 xs:h-5" />
+                      <Plus size={18} className=" mr-1" />
+                      
                     </Button>
                   </div>
                 )}
@@ -999,7 +952,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 ) : (
                   <div className="text-center py-8 xs:py-10 sm:py-12 bg-gradient-to-br from-white/95 to-gray-50/80 rounded-xl sm:rounded-2xl border border-[#5A8DB8]/15">
                     <div className="p-4 xs:p-5 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#5A8DB8]/5 inline-block mb-4 xs:mb-5">
-                      <Award className="w-8 h-8 xs:w-10 xs:h-10 text-[#5A8DB8] mx-auto" />
+                      <div className="h-8 w-8 xs:w-10 xs:h-10 text-[#5A8DB8] mx-auto" />
                     </div>
                     <p className="text-gray-600 text-sm xs:text-base sm:text-lg font-medium mb-4 xs:mb-5">No certifications added yet</p>
                     {isEditMode && (
@@ -1009,8 +962,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                         className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-colors duration-300 border-[#5A8DB8]/30 text-sm xs:text-base font-medium"
                         onClick={() => handleOpenCertDialog()}
                       >
-                        <Plus className="w-4 h-4 xs:w-5 xs:h-5 mr-2" />
-                        Add Your First Certification
+                        <Pencil size={18} className="text-[#5A8DB8] mr-1" />
+                        
                       </Button>
                     )}
                   </div>
@@ -1021,27 +974,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             </div>
           </div>
         </div>
-                  {/* Horizontal Divider */}
-                  <div className="relative w-full max-w-lg mx-auto">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#5A8DB8]/20"></div>
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-white px-4 py-2 rounded-full border border-[#5A8DB8]/20 shadow-sm">
-              <div className="w-3 h-3 xs:w-4 xs:h-4 bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] rounded-full"></div>
-            </span>
-          </div>
-        </div>
 
         {/* Profile Edit Dialog */}
         <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
           <DialogContent className="w-[95vw] max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-300">
             <DialogHeader className="space-y-3 px-4 sm:px-6">
               <div className="flex items-center justify-between">
-                <DialogTitle className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-[#5A8DB8]/10">
-                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#5A8DB8]" />
-                  </div>
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
+                 
                   Edit Profile Information
                 </DialogTitle>
               </div>
@@ -1050,8 +990,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             <form onSubmit={handleProfileSubmit} className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="first_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                    <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Label htmlFor="first_name" className="text-sm font-medium text-black flex items-center gap-2">
+                    <div className="h-3 w-3 sm:w-4 sm:h-4" />
                     First Name
                   </Label>
                   <Input
@@ -1059,14 +999,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     name="first_name"
                     value={profileForm.first_name}
                     onChange={handleProfileChange}
-                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base text-black"
                     required
                     disabled={isProfileUpdating}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="last_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                    <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Label htmlFor="last_name" className="text-sm font-medium text-black flex items-center gap-2">
+                    <div className="h-3 w-3 sm:w-4 sm:h-4" />
                     Last Name
                   </Label>
                   <Input
@@ -1074,15 +1014,15 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     name="last_name"
                     value={profileForm.last_name}
                     onChange={handleProfileChange}
-                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base text-black"
                     required
                     disabled={isProfileUpdating}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="bio" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                  <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Label htmlFor="bio" className="text-sm font-medium text-black flex items-center gap-2">
+                  <div className="h-3 w-3 sm:w-4 sm:h-4" />
                   Bio
                 </Label>
                 <Textarea
@@ -1090,7 +1030,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   name="bio"
                   value={profileForm.bio}
                   onChange={handleProfileChange}
-                  className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base min-h-[80px] sm:min-h-[100px]"
+                  className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base min-h-[80px] sm:min-h-[100px] text-black"
                   disabled={isProfileUpdating}
                 />
               </div>
@@ -1116,7 +1056,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     </>
                   ) : (
                     <>
-                      <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <div className="h-3 w-3 sm:w-4 sm:h-4" />
                       Save Changes
                     </>
                   )}
@@ -1131,10 +1071,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           <DialogContent className="w-[95vw] max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-300">
             <DialogHeader className="space-y-3 px-4 sm:px-6">
               <div className="flex items-center justify-between">
-                <DialogTitle className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-[#5A8DB8]/10">
-                    <Image className="w-4 h-4 sm:w-5 sm:h-5 text-[#5A8DB8]" />
-                  </div>
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
+               
                   Update Profile Image
                 </DialogTitle>
               </div>
@@ -1161,7 +1099,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   </div>
                 ) : (
                   <div className="w-40 h-40 mx-auto bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10 rounded-xl flex items-center justify-center mb-4">
-                    <span className="text-[#5A8DB8]">No image selected</span>
+                    <span className="text-black">No image selected</span>
                   </div>
                 )}
                 <Button
@@ -1173,7 +1111,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 >
                   {isImageUploading ? 'Uploading...' : 'Choose Image'}
                 </Button>
-                <p className="text-sm text-[#5A8DB8]/70">
+                <p className="text-sm text-black">
                   Recommended: Square image, max 5MB
                 </p>
               </div>
@@ -1199,7 +1137,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     </>
                   ) : (
                     <>
-                      <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <div className="h-3 w-3 sm:w-4 sm:h-4" />
                       Upload Image
                     </>
                   )}
@@ -1220,10 +1158,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           <DialogContent className="w-[95vw] max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-300">
             <DialogHeader className="space-y-3 px-4 sm:px-6">
               <div className="flex items-center justify-between">
-                <DialogTitle className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-[#5A8DB8]/10">
-                    <Video className="w-4 h-4 sm:w-5 sm:h-5 text-[#5A8DB8]" />
-                  </div>
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
+               
                   Update Video Introduction
                 </DialogTitle>
               </div>
@@ -1240,18 +1176,18 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   disabled={isVideoUpdating}
                 />
                 {selectedVideo ? (
-                  <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
-                    <FileVideo className="w-5 h-5" />
+                  <div className="text-sm text-black mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
+                    <div className="h-5 w-5" />
                     {selectedVideo.name}
                   </div>
                 ) : profileData.video_intro_url ? (
-                  <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
-                    <FileVideo className="w-5 h-5" />
+                  <div className="text-sm text-black mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
+                    <div className="h-5 w-5" />
                     Current video will be replaced
                   </div>
                 ) : (
-                  <div className="text-sm text-[#5A8DB8] mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
-                    <FileVideo className="w-5 h-5" />
+                  <div className="text-sm text-black mb-4 flex items-center justify-center gap-2 bg-white/60 p-4 rounded-xl shadow-sm">
+                    <div className="h-5 w-5" />
                     No video selected
                   </div>
                 )}
@@ -1264,18 +1200,18 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 >
                   {isVideoUpdating ? 'Uploading...' : 'Choose Video'}
                 </Button>
-                <p className="text-sm text-[#5A8DB8]/70">
+                <p className="text-sm text-black">
                   Recommended: MP4 format, max 100MB
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="video_description" className="text-sm font-medium text-[#3C5979]">Description</Label>
+                <Label htmlFor="video_description" className="text-sm font-medium text-black">Description</Label>
                 <Textarea
                   id="video_description"
                   value={videoForm.video_description}
                   onChange={handleVideoDescriptionChange}
                   placeholder="Add a description for your video..."
-                  className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base min-h-[80px] sm:min-h-[100px]"
+                  className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base min-h-[80px] sm:min-h-[100px] text-black"
                   disabled={isVideoUpdating}
                 />
               </div>
@@ -1301,7 +1237,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     </>
                   ) : (
                     <>
-                      <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <div className="h-3 w-3 sm:w-4 sm:h-4" />
                       Save Changes
                     </>
                   )}
@@ -1316,10 +1252,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           <DialogContent className="w-[95vw] max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-300 max-h-[90vh]">
             <DialogHeader className="space-y-3 px-4 sm:px-6">
               <div className="flex items-center justify-between">
-                <DialogTitle className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-[#5A8DB8]/10">
-                    <Award className="w-4 h-4 sm:w-5 sm:h-5 text-[#5A8DB8]" />
-                  </div>
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
+                
                   {isAddingNewCert ? 'Add New Certification' : 'Edit Certification'}
                 </DialogTitle>
               </div>
@@ -1328,8 +1262,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             <form onSubmit={handleCertSubmit} className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6 overflow-y-auto max-h-[calc(90vh-8rem)] pr-1">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="certifications_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                    <Award className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Label htmlFor="certifications_name" className="text-sm font-medium text-black flex items-center gap-2">
+                    <div className="h-3 w-3 sm:w-4 sm:h-4" />
                     Certification Name
                   </Label>
                   <Input
@@ -1337,15 +1271,15 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     name="certifications_name"
                     value={certForm.certifications_name}
                     onChange={handleCertChange}
-                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base text-black"
                     required
                     disabled={isCertUpdating}
                     placeholder="Enter certification name"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="certifications_issuer" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                    <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Label htmlFor="certifications_issuer" className="text-sm font-medium text-black flex items-center gap-2">
+                    <div className="h-3 w-3 sm:w-4 sm:h-4" />
                     Issuing Organization
                   </Label>
                   <Input
@@ -1353,7 +1287,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     name="certifications_issuer"
                     value={certForm.certifications_issuer}
                     onChange={handleCertChange}
-                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base text-black"
                     required
                     disabled={isCertUpdating}
                     placeholder="Enter organization name"
@@ -1362,8 +1296,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="certifications_issued_date" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Label htmlFor="certifications_issued_date" className="text-sm font-medium text-black flex items-center gap-2">
+                    <div className="h-3 w-3 sm:w-4 sm:h-4" />
                     Issue Date
                   </Label>
                   <Input
@@ -1372,14 +1306,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     type="date"
                     value={certForm.certifications_issued_date}
                     onChange={handleCertChange}
-                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base text-black"
                     required
                     disabled={isCertUpdating}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="certifications_expiration_date" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Label htmlFor="certifications_expiration_date" className="text-sm font-medium text-black flex items-center gap-2">
+                    <div className="h-3 w-3 sm:w-4 sm:h-4" />
                     Expiration Date 
                   </Label>
                   <Input
@@ -1388,14 +1322,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     type="date"
                     value={certForm.certifications_expiration_date}
                     onChange={handleCertChange}
-                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                    className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base text-black"
                     disabled={isCertUpdating}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="certifications_id" className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                  <Hash className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Label htmlFor="certifications_id" className="text-sm font-medium text-black flex items-center gap-2">
+                  <div className="h-3 w-3 sm:w-4 sm:h-4" />
                   Certification ID
                 </Label>
                 <Input
@@ -1403,7 +1337,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   name="certifications_id"
                   value={certForm.certifications_id}
                   onChange={handleCertChange}
-                  className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base"
+                  className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/30 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 text-sm sm:text-base text-black"
                   required
                   disabled={isCertUpdating}
                   placeholder="Enter certification ID"
@@ -1419,8 +1353,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   disabled={isCertUpdating}
                 />
                 {selectedCertImage ? (
-                  <div className="text-sm text-[#5A8DB8] mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
-                    <Image className="w-4 h-4" />
+                  <div className="text-sm text-black mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
+                    <div className="h-4 w-4" />
                     {selectedCertImage.name}
                   </div>
                 ) : certForm.certifications_image_url ? (
@@ -1431,11 +1365,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                       className="w-32 h-32 mx-auto object-cover rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <p className="text-sm text-[#5A8DB8] mt-2">Current image will be replaced</p>
+                    <p className="text-sm text-black mt-2">Current image will be replaced</p>
                   </div>
                 ) : (
-                  <div className="text-sm text-[#5A8DB8] mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
-                    <Image className="w-4 h-4" />
+                  <div className="text-sm text-black mb-3 flex items-center justify-center gap-2 bg-white/60 p-3 rounded-xl shadow-sm">
+                    <div className="h-4 w-4" />
                     No image selected
                   </div>
                 )}
@@ -1448,7 +1382,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 >
                   {isCertUpdating ? 'Uploading...' : 'Choose Image'}
                 </Button>
-                <p className="text-xs text-[#5A8DB8]/70">
+                <p className="text-xs text-black">
                   Recommended: Square image, max 5MB
                 </p>
               </div>
@@ -1474,7 +1408,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     </>
                   ) : (
                     <>
-                      <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <div className="h-3 w-3 sm:w-4 sm:h-4" />
                       {isAddingNewCert ? 'Add Certification' : 'Save Changes'}
                     </>
                   )}

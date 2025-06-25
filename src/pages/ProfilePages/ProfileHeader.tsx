@@ -337,11 +337,11 @@ const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
 const calculateRatingDistribution = (reviews: Array<{ rating: number }> = []) => {
   const totalReviews = reviews.length;
   if (totalReviews === 0) return [
-    { label: "5-star", value: 0, color: "from-green-400 to-emerald-500" },
-    { label: "4-star", value: 0, color: "from-blue-400 to-indigo-500" },
-    { label: "3-star", value: 0, color: "from-yellow-400 to-orange-500" },
-    { label: "2-star", value: 0, color: "from-orange-400 to-red-500" },
-    { label: "1-star", value: 0, color: "from-red-400 to-pink-500" },
+    { label: "5-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
+    { label: "4-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
+    { label: "3-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
+    { label: "2-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
+    { label: "1-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
   ];
 
   // Initialize counts for 5-1 stars (in reverse order)
@@ -359,11 +359,11 @@ const calculateRatingDistribution = (reviews: Array<{ rating: number }> = []) =>
     label: `${5 - index}-star`,
     value: Math.round((count / totalReviews) * 100),
     color: [
-      "from-green-400 to-emerald-500",
-      "from-blue-400 to-indigo-500",
-      "from-yellow-400 to-orange-500",
-      "from-orange-400 to-red-500",
-      "from-red-400 to-pink-500"
+      "from-[#5A8DB8] to-[#70a4d8]",
+      "from-[#5A8DB8] to-[#70a4d8]",
+      "from-[#5A8DB8] to-[#70a4d8]",
+      "from-[#5A8DB8] to-[#70a4d8]",
+      "from-[#5A8DB8] to-[#70a4d8]"
     ][index]
   }));
 };
@@ -428,168 +428,154 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
 
   return (
     <>
-      <div className="relative min-h-screen bg-gradient-to-br from-[#5A8DB8]/5 via-white to-[#3C5979]/5 rounded-xl sm:rounded-2xl lg:rounded-3xl">
-       
-{/* Main Content */}
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-12 ">
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
-            <div className="xl:col-span-9 space-y-4 sm:space-y-5 md:space-y-6 h-fit">
-              <div className="bg-white/95 backdrop-blur-sm rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:shadow-2xl h-full">
-                <div className="relative h-24 sm:h-32 md:h-40 lg:h-48 ">
-                  <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
-                  <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 md:h-24 lg:h-32 bg-gradient-to-t from-white/95 to-transparent"></div>
-                </div>
-{/* Profile Image and Name Section */}
-                <div className="relative px-3 sm:px-4 md:px-6 lg:px-8 -mt-12 sm:-mt-16 md:-mt-20 lg:-mt-24">
-                  <div className="flex flex-col sm:flex-row items-center sm:items-end gap-3 sm:gap-4 md:gap-6">
-                    <div className="relative group">
-                      <div className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 lg:h-32 lg:w-32 rounded-xl sm:rounded-2xl bg-white p-1 shadow-xl transition-all duration-300 group-hover:shadow-2xl">
-                        <div className="w-full h-full rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center">
-                          <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-                            {profileData.first_name?.[0]}{profileData.last_name?.[0]}
-                          </span>
-                        </div>
-                      </div>
-                 
-                    </div>
-{/* Name and Share Section */}
-                    <div className="flex-1 min-w-0 text-center sm:text-left">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
-                        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-[#3C5979]">
-                          {profileData.first_name} {profileData.last_name}
-                        </h1>
-                        <div className="flex items-center justify-center sm:justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="rounded-full border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 transition-all duration-300 hover:scale-105"
-                            onClick={copyToClipboard}
-                          >
-                            <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                            Copy URL
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="rounded-full border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 transition-all duration-300 hover:scale-105"
-                            onClick={() => setIsShareDialogOpen(true)}
-                          >
-                            <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                            Share
-                          </Button>
-                        </div>
-                      </div>
-                      {profileData.bio && (
-                        <p className="mt-2 text-gray-600 text-xs sm:text-sm md:text-base line-clamp-2 sm:line-clamp-3 max-w-full">
-                          {profileData.bio}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-{/* Verification Section */}
-                  <div className="mt-4 sm:mt-6 md:mt-8 p-3 sm:p-4 md:p-6 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 rounded-xl sm:rounded-2xl">
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-3 sm:gap-4">
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="relative">
-                          <div className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
-                            <span className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-white">
-                              {profileData.verification_details ? calculateVerificationPercentage(profileData.verification_details) : 0}%
-                            </span>
-                          </div>
-                          <div className="absolute -bottom-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 rounded-full bg-white border-2 border-[#5A8DB8] flex items-center justify-center">
-                            <span className="text-[#5A8DB8] text-xs sm:text-sm">✓</span>
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900">Verification Status</h3>
-                          <p className="text-gray-600 text-xs sm:text-sm">Complete your profile verification</p>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap justify-center sm:justify-end gap-1.5 sm:gap-2">
-                        {profileData.verification_details?.government_id.verified && (
-                          <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-[#5A8DB8]/10 text-[#3C5979] border border-[#5A8DB8]/20">
-                            ✓ Government ID
-                          </span>
-                        )}
-                        {profileData.verification_details?.address_proof.verified && (
-                          <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-[#5A8DB8]/10 text-[#3C5979] border border-[#5A8DB8]/20">
-                            ✓ Address
-                          </span>
-                        )}
-                        {profileData.verification_details?.mobile.verified && (
-                          <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-[#5A8DB8]/10 text-[#3C5979] border border-[#5A8DB8]/20">
-                            ✓ Mobile
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      {/* Main Content */}
+      <div className="relative max-w-7xl mx-auto  ">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left Column: Name/Bio + Verification */}
+          <div className="flex-1 min-w-0">
+            {/* Name and Bio Section */}
+            <div className="mb-4">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900">
+                {profileData.first_name} {profileData.last_name}
+              </h1>
+              {profileData.bio && (
+                <p className="mt-2 text-gray-700 text-sm sm:text-base md:text-lg">
+                  {profileData.bio}
+                </p>
+              )}
             </div>
-{/* Rating Section */}
-            <div className="xl:col-span-3 h-fit">
-              <div className="bg-white/95 backdrop-blur-sm  rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-xl border border-white/20 p-2 sm:p-3 md:p-4 lg:p-5 sticky top-4 sm:top-6 md:top-8 transition-all duration-300 hover:shadow-2xl">
-                <div className="space-y-2 sm:space-y-3">
-                  <div className="text-center">
-                    <div className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] shadow-lg mb-2 sm:mb-3 transition-all duration-300 hover:scale-105">
-                      <span className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
-                        {profileData.rating?.toFixed(1) || "5.0"}
+            {/* Verification Section */}
+            <div className="mb-6">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 bg-white rounded-lg border border-gray-200 flex items-center justify-center shadow-sm">
+                      <span className="text-lg font-bold text-gray-900">
+                        {profileData.verification_details ? calculateVerificationPercentage(profileData.verification_details) : 0}%
                       </span>
                     </div>
-                    <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-1">
-                      {[1, 2, 3, 4, 5].map((star) => {
-                        const rating = profileData.rating || 0;
-                        const isFilled = star <= rating;
-                        const isHalfFilled = star > rating && star - rating < 1;
-                        
-                        return (
-                          <Star 
-                            key={star} 
-                            className={`h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all duration-300 ${
-                              isFilled 
-                                ? 'fill-yellow-400 text-yellow-400' 
-                                : isHalfFilled 
-                                ? 'fill-yellow-200 text-yellow-400' 
-                                : 'fill-gray-200 text-gray-300'
-                            }`} 
-                          />
-                        );
-                      })}
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-1">Profile Verified</h3>
+                      <p className="text-gray-600 text-xs sm:text-sm">Complete your profile verification</p>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-600">{profileData.reviews?.length || 0} reviews</p>
                   </div>
-
-                  <div className="space-y-1 sm:space-y-2">
-                    {calculateRatingDistribution(profileData.reviews).map((rating, index) => (
-                      <div key={index} className="flex items-center gap-1 sm:gap-2">
-                        <span className="text-xs sm:text-sm text-gray-600 min-w-[25px] sm:min-w-[30px] md:min-w-[35px]">{rating.label}</span>
-                        <div className="flex-1 h-1 sm:h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full bg-gradient-to-r ${rating.color} transition-all duration-500`}
-                            style={{ width: `${rating.value}%` }}
-                          />
-                        </div>
-                        <span className="text-xs sm:text-sm text-gray-600 min-w-[15px] sm:min-w-[20px] md:min-w-[25px]">{rating.value}%</span>
-                      </div>
-                    ))}
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    {profileData.verification_details?.government_id.verified && (
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-white text-gray-700 border border-gray-200 shadow-sm">
+                        ✓ Government ID
+                      </span>
+                    )}
+                    {profileData.verification_details?.address_proof.verified && (
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-white text-gray-700 border border-gray-200 shadow-sm">
+                        ✓ Address
+                      </span>
+                    )}
+                    {profileData.verification_details?.mobile.verified && (
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-white text-gray-700 border border-gray-200 shadow-sm">
+                        ✓ Mobile
+                      </span>
+                    )}
                   </div>
-
                 </div>
               </div>
             </div>
+
+            {/* Horizontal divider */}
+            <div className="border-t border-black my-6 sm:my-8"></div>
+
+            {/* Public profile & URL section */}
+            <div className="mb-6">
+              <label className="block text-3xl font-bold text-[#222] mb-2">
+                Public profile & URL
+              </label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={profileData.profile_url || 'https://www.mytrustworld.com/profile-d-ae111378'}
+                  className="flex-1 px-3 py-2 rounded border border-gray-300 bg-gray-50 text-sm sm:text-base font-mono text-gray-700"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="sm:w-auto w-full flex-shrink-0 flex items-center justify-center"
+                  onClick={copyToClipboard}
+                >
+                  <Copy className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
+                  <span className="hidden sm:inline">Copy URL</span>
+                  <span className="sm:hidden">Copy</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="sm:w-auto w-full flex-shrink-0 flex items-center justify-center"
+                  onClick={() => setIsShareDialogOpen(true)}
+                >
+                  <Share2 className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
+                  <span className="hidden sm:inline">Share</span>
+                  <span className="sm:hidden">Share</span>
+                </Button>
+              </div>
+            </div>
+            <div className="border-t border-black my-6 sm:my-8 mb-4"></div>
           </div>
-          
-          {/* Review Carousel Section - Full Width */}
-          <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-16">
-            <ReviewCarousel reviews={profileData.reviews?.map(review => ({
-              id: review.id,
-              name: review.reviewer_name,
-              rating: review.rating,
-              content: review.comment,
-              timestamp: review.created_at
-            }))} />
+
+          {/* Right Column: Rating Section */}
+          <div className="w-full lg:w-80 flex-shrink-0">
+            <div className="space-y-2 sm:space-y-3">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-xl sm:rounded-2xl text-gray-900">
+                  <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                    {profileData.rating?.toFixed(1) || "5.0"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-1">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const rating = profileData.rating || 0;
+                    const isFilled = star <= rating;
+                    const isHalfFilled = star > rating && star - rating < 1;
+                    return (
+                      <Star
+                        key={star}
+                        className={`h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all duration-300 ${
+                          isFilled
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : isHalfFilled
+                            ? 'fill-yellow-200 text-yellow-400'
+                            : 'fill-gray-200 text-gray-300'
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+                <p className="text-xs sm:text-sm text-gray-600">{profileData.reviews?.length || 0} reviews</p>
+              </div>
+              <div className="space-y-1 sm:space-y-2">
+                {calculateRatingDistribution(profileData.reviews).map((rating, index) => (
+                  <div key={index} className="flex items-center gap-1 sm:gap-2">
+                    <span className="text-xs sm:text-sm text-gray-600 min-w-[25px] sm:min-w-[30px] md:min-w-[35px]">{rating.label}</span>
+                    <div className="flex-1 h-1 sm:h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full bg-gradient-to-r ${rating.color} transition-all duration-500`}
+                        style={{ width: `${rating.value}%` }}
+                      />
+                    </div>
+                    <span className="text-xs sm:text-sm text-gray-600 min-w-[15px] sm:min-w-[20px] md:min-w-[25px]">{rating.value}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
+        </div>
+        {/* Review Carousel Section - Full Width */}
+        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-16">
+          <ReviewCarousel reviews={profileData.reviews?.map(review => ({
+            id: review.id,
+            name: review.reviewer_name,
+            rating: review.rating,
+            content: review.comment,
+            timestamp: review.created_at
+          }))} />
         </div>
       </div>
 

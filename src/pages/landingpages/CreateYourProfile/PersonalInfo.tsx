@@ -9,7 +9,6 @@ import { createUserProfile } from "../../../store/Services/CreateProfileService"
 import toast from "react-hot-toast";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
-import { User, Phone, ArrowLeft, ArrowRight, UserCircle, MessageSquare, Sparkles } from 'lucide-react';
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 1;
@@ -146,11 +145,10 @@ const PersonalInfo: React.FC = () => {
       {/* Step Progress */}
       <div className="mb-10 w-full max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
+          <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+          <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
             {progressPercent}% Complete
           </span>
         </div>
@@ -170,14 +168,12 @@ const PersonalInfo: React.FC = () => {
       >
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
-              <UserCircle className="h-7 w-7 text-white" />
-            </div>
+           
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+              <h1 className="text-2xl sm:text-3xl font-bold text-black">
                 Personal Information
               </h1>
-              <p className="text-sm text-[#5A8DB8]/70 mt-1">Tell us about yourself</p>
+              <p className="text-sm text-black/70 mt-1">Tell us about yourself</p>
             </div>
           </div>
         </div>
@@ -185,8 +181,7 @@ const PersonalInfo: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-4">
             <div className="relative group">
-              <label htmlFor="first_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                <User className="w-4 h-4" />
+              <label htmlFor="first_name" className="text-sm font-medium text-black mb-2">
                 First Name
               </label>
               <div className="relative">
@@ -196,17 +191,15 @@ const PersonalInfo: React.FC = () => {
                   placeholder="Enter your first name"
                   value={form.first_name}
                   onChange={handleChange}
-                  className="pl-10 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40"
+                  className="pl-4 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40"
                   required
                 />
-                <User className="w-5 h-5 text-[#5A8DB8]/40 absolute left-3 top-1/2 -translate-y-1/2 group-hover:text-[#5A8DB8]/60 transition-colors" />
               </div>
             </div>
           </div>
           <div className="space-y-4">
             <div className="relative group">
-              <label htmlFor="last_name" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-                <User className="w-4 h-4" />
+              <label htmlFor="last_name" className="text-sm font-medium text-black mb-2">
                 Last Name
               </label>
               <div className="relative">
@@ -216,10 +209,9 @@ const PersonalInfo: React.FC = () => {
                   placeholder="Enter your last name"
                   value={form.last_name}
                   onChange={handleChange}
-                  className="pl-10 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40"
+                  className="pl-4 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40"
                   required
                 />
-                <User className="w-5 h-5 text-[#5A8DB8]/40 absolute left-3 top-1/2 -translate-y-1/2 group-hover:text-[#5A8DB8]/60 transition-colors" />
               </div>
             </div>
           </div>
@@ -227,8 +219,7 @@ const PersonalInfo: React.FC = () => {
 
         <div className="space-y-4">
           <div className="relative group">
-            <label htmlFor="mobile" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-              <Phone className="w-4 h-4" />
+            <label htmlFor="mobile" className="text-sm font-medium text-black mb-2">
               Phone Number
             </label>
             <div className="relative">
@@ -236,7 +227,7 @@ const PersonalInfo: React.FC = () => {
                 country={'us'}
                 value={form.mobile}
                 onChange={handlePhoneChange}
-                inputClass="pl-10 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40 w-full"
+                inputClass="pl-4 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40 w-full"
                 buttonClass="border-2 border-[#5A8DB8]/20 bg-white rounded-l-xl group-hover:border-[#5A8DB8]/40"
                 containerClass="w-full"
                 inputProps={{
@@ -251,8 +242,7 @@ const PersonalInfo: React.FC = () => {
 
         <div className="space-y-4">
           <div className="relative group">
-            <label htmlFor="bio" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-              <MessageSquare className="w-4 h-4" />
+            <label htmlFor="bio" className="text-sm font-medium text-black mb-2">
               Bio
             </label>
             <div className="relative">
@@ -262,17 +252,15 @@ const PersonalInfo: React.FC = () => {
                 placeholder="Tell us about yourself..."
                 value={form.bio}
                 onChange={handleChange}
-                className="pl-10 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[120px] group-hover:border-[#5A8DB8]/40"
+                className="pl-4 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[120px] group-hover:border-[#5A8DB8]/40"
               />
-              <MessageSquare className="w-5 h-5 text-[#5A8DB8]/40 absolute left-3 top-3 group-hover:text-[#5A8DB8]/60 transition-colors" />
             </div>
           </div>
         </div>
 
         {error && (
           <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
-            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
+            <p className="text-sm text-black flex items-center gap-2">
               {error.message}
             </p>
           </div>
@@ -283,14 +271,13 @@ const PersonalInfo: React.FC = () => {
           <Button
             type="button"
             variant="outline"
-            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
+            className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => {
               sessionStorage.setItem('fromPreviousStep', 'true');
               navigate(-1);
             }}
             disabled={loading}
           >
-            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
@@ -310,7 +297,6 @@ const PersonalInfo: React.FC = () => {
             ) : (
               <>
                 Save and Continue
-                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>

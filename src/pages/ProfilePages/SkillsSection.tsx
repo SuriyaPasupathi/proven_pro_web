@@ -1,4 +1,4 @@
-import {  Loader2, Wrench, Plus, X, Pencil, Trash2, Sparkles, Award, Star, CheckCircle2 } from 'lucide-react';
+import {  Loader2, Plus, X, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -17,7 +17,6 @@ import {
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { fetchSkills } from '../../store/Services/DropDownService';
-import { motion } from 'framer-motion';
 
 interface Skill {
   id: number;
@@ -307,51 +306,33 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="relative bg-gradient-to-br from-white via-[#5A8DB8]/5 to-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg"
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 via-[#3C5979]/5 to-[#5A8DB8]/5 rounded-2xl"></div>
+    <div className="relative ">
+      <div className="absolute inset-0 "></div>
       
       <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 sm:gap-0">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex items-center gap-3 sm:gap-4"
-        >
-          <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-2.5 sm:p-3 rounded-xl shadow-lg">
-            <Wrench className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-          </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <h2 className="text-xl xs:text-4xl font-bold text-black">
             Skills
           </h2>
-        </motion.div>
+        </div>
         
         {isEditMode && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="flex gap-2"
-          >
+          <div className="flex gap-2">
             <Button 
               variant="ghost" 
-              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-2.5 sm:p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-black hover:text-black p-2.5 sm:p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => setIsDialogOpen(true)}
             >
               <Pencil className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
             <Button 
               variant="ghost" 
-              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-2.5 sm:p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-black hover:text-black p-2.5 sm:p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => setIsAddDialogOpen(true)}
             >
               <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
-          </motion.div>
+          </div>
         )}
       </div>
 
@@ -360,10 +341,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
-                <Award className="w-6 h-6 text-white" />
-              </div>
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl font-semibold text-black">
                 Edit Skills
               </DialogTitle>
             </div>
@@ -371,39 +349,37 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                <Star className="w-4 h-4 text-[#5A8DB8]" />
+              <label className="text-sm font-medium text-black">
                 Skills Description
               </label>
               <Textarea
                 value={form.skills_description}
                 onChange={(e) => setForm(prev => ({ ...prev, skills_description: e.target.value }))}
                 placeholder="Describe your skills and expertise..."
-                className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 min-h-[120px] rounded-xl"
+                className="bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 min-h-[120px] rounded-xl text-black"
               />
             </div>
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#5A8DB8]" />
+                <label className="text-sm font-medium text-black">
                   Technical Skills
                 </label>
                 <Button
                   type="button"
                   onClick={() => setIsTechnicalSkillsOpen(true)}
-                  className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
+                  className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black rounded-xl"
                 >
                   {form.technical_skills.length > 0 ? form.technical_skills.join(", ") : "Select technical skills"}
                 </Button>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.technical_skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-[#5A8DB8] px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
+                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
                       <span>{skill}</span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-4 w-4 text-[#5A8DB8] hover:text-red-600 hover:bg-transparent"
+                        className="h-4 w-4 text-black hover:text-red-600 hover:bg-transparent"
                         onClick={() => handleDeleteClick(skill, 'technical_skills')}
                         disabled={isLoading}
                       >
@@ -415,25 +391,24 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                  <Star className="w-4 h-4 text-[#5A8DB8]" />
+                <label className="text-sm font-medium text-black">
                   Soft Skills
                 </label>
                 <Button
                   type="button"
                   onClick={() => setIsSoftSkillsOpen(true)}
-                  className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
+                  className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black rounded-xl"
                 >
                   {form.soft_skills.length > 0 ? form.soft_skills.join(", ") : "Select soft skills"}
                 </Button>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.soft_skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-[#5A8DB8] px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
+                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
                       <span>{skill}</span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-4 w-4 text-[#5A8DB8] hover:text-red-600 hover:bg-transparent"
+                        className="h-4 w-4 text-black hover:text-red-600 hover:bg-transparent"
                         onClick={() => handleDeleteClick(skill, 'soft_skills')}
                         disabled={isLoading}
                       >
@@ -451,7 +426,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isLoading}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+                className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
               >
                 Cancel
               </Button>
@@ -482,10 +457,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
-                <Plus className="w-6 h-6 text-white" />
-              </div>
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl font-semibold text-black">
                 Add New Skills
               </DialogTitle>
             </div>
@@ -493,28 +465,26 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
           
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#5A8DB8]" />
+              <label className="text-sm font-medium text-black">
                 Technical Skills
               </label>
               <Button
                 type="button"
                 onClick={() => setIsTechnicalSkillsOpen(true)}
-                className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
+                className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black rounded-xl"
               >
                 {form.technical_skills.length > 0 ? form.technical_skills.join(", ") : "Select technical skills"}
               </Button>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                <Star className="w-4 h-4 text-[#5A8DB8]" />
+              <label className="text-sm font-medium text-black">
                 Soft Skills
               </label>
               <Button
                 type="button"
                 onClick={() => setIsSoftSkillsOpen(true)}
-                className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979] rounded-xl"
+                className="w-full justify-start bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black rounded-xl"
               >
                 {form.soft_skills.length > 0 ? form.soft_skills.join(", ") : "Select soft skills"}
               </Button>
@@ -525,7 +495,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 type="button"
                 variant="outline"
                 onClick={() => setIsAddDialogOpen(false)}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+                className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
               >
                 Cancel
               </Button>
@@ -560,10 +530,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl font-semibold text-black">
                 Select Technical Skills
               </DialogTitle>
             </div>
@@ -583,7 +550,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                     className={`w-full justify-start ${
                       form.technical_skills.includes(skill.name)
                         ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
-                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979]'
+                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black'
                     } rounded-xl`}
                     onClick={() => handleAddSkill(skill, 'technical_skills')}
                   >
@@ -598,7 +565,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
               type="button"
               variant="outline"
               onClick={() => setIsTechnicalSkillsOpen(false)}
-              className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+              className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
             >
               Cancel
             </Button>
@@ -619,10 +586,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
-                <Star className="w-6 h-6 text-white" />
-              </div>
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+              <DialogTitle className="text-2xl font-semibold text-black">
                 Select Soft Skills
               </DialogTitle>
             </div>
@@ -642,7 +606,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                     className={`w-full justify-start ${
                       form.soft_skills.includes(skill.name)
                         ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
-                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-[#3C5979]'
+                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black'
                     } rounded-xl`}
                     onClick={() => handleAddSkill(skill, 'soft_skills')}
                   >
@@ -657,7 +621,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
               type="button"
               variant="outline"
               onClick={() => setIsSoftSkillsOpen(false)}
-              className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
+              className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
             >
               Cancel
             </Button>
@@ -673,49 +637,33 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         </DialogContent>
       </Dialog>
 
-      {form.skills_description && (
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-xl p-4 sm:p-6 border border-[#5A8DB8]/10 mb-4 sm:mb-6"
-        >
-          <p className="text-[#5A8DB8] font-bold text-base sm:text-lg">Skills Description: <span className="text-gray-600 font-semibold">{form.skills_description}</span></p>
-        </motion.div>
-      )}
-
       <div className="space-y-4 sm:space-y-6">
         <div>
-          <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-[#5A8DB8]">
-            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-1.5 sm:p-2 rounded-lg shadow-sm">
-              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-            </div>
+          <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-black">
             Technical Skills
           </h3>
           <div className="flex flex-wrap gap-2">
             {form.technical_skills.length > 0 ? (
               form.technical_skills
                 .map((skill, index) => (
-                  <motion.div 
+                  <div 
                     key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
                     className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[#5A8DB8]">{skill}</span>
+                      <span className="text-sm font-medium text-black">{skill}</span>
                     </div>
                     {isEditMode && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 text-[#5A8DB8] hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
+                        className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
                         onClick={() => handleDeleteClick(skill, 'technical_skills')}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                  </motion.div>
+                  </div>
                 ))
             ) : (
               <p className="text-gray-500">No technical skills added yet</p>
@@ -724,37 +672,31 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         </div>
 
         <div>
-          <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-[#5A8DB8]">
-            <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-1.5 sm:p-2 rounded-lg shadow-sm">
-              <Star className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-            </div>
+          <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-black">
             Soft Skills
           </h3>
           <div className="flex flex-wrap gap-2">
             {form.soft_skills.length > 0 ? (
               form.soft_skills
                 .map((skill, index) => (
-                  <motion.div 
+                  <div 
                     key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
                     className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[#5A8DB8]">{skill}</span>
+                      <span className="text-sm font-medium text-black">{skill}</span>
                     </div>
                     {isEditMode && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 text-[#5A8DB8] hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
+                        className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
                         onClick={() => handleDeleteClick(skill, 'soft_skills')}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                  </motion.div>
+                  </div>
                 ))
             ) : (
               <p className="text-gray-500">No soft skills added yet</p>
@@ -762,28 +704,6 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
           </div>
         </div>
       </div>
-      
-      {/* {(form.technical_skills.length > 1 || form.soft_skills.length > 1) && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6"
-        >
-          <Button 
-            variant="ghost" 
-            className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-xl px-4 py-2"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            <span className="mr-2">{isExpanded ? 'Show less' : 'Show all skills'}</span>
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </Button>
-        </motion.div>
-      )} */}
 
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
@@ -796,7 +716,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
         description={`Are you sure you want to remove "${skillToDelete?.skill}" from your ${skillToDelete?.type === 'technical_skills' ? 'technical' : 'soft'} skills?`}
         isLoading={isDeleteLoading}
       />
-    </motion.div>
+    </div>
   );
 };
 

@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import { AppDispatch, RootState } from "../../../store/store";
 import toast from "react-hot-toast";
-import { ArrowLeft, ArrowRight, Sparkles, Video, Upload, FileText, Loader2 } from "lucide-react";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 8;
@@ -98,11 +97,10 @@ const VideoIntro: React.FC = () => {
       {/* Step Progress */}
       <div className="mb-10 w-full max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
+          <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+          <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
             {progressPercent}% Complete
           </span>
         </div>
@@ -120,14 +118,11 @@ const VideoIntro: React.FC = () => {
         className="w-full max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex flex-col gap-8"
       >
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
-            <Video className="h-7 w-7 text-white" />
-          </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">
               Video Introduction
             </h1>
-            <p className="text-sm text-[#5A8DB8]/70 mt-1">Add a personal touch to your profile</p>
+            <p className="text-sm text-black/70 mt-1">Add a personal touch to your profile</p>
           </div>
         </div>
 
@@ -150,21 +145,21 @@ const VideoIntro: React.FC = () => {
             onChange={handleVideoChange}
           />
           <div className="h-20 w-20 rounded-full bg-[#5A8DB8]/10 flex items-center justify-center mb-6">
-            <Upload className="h-10 w-10 text-[#5A8DB8]" />
+            <div className="text-[#5A8DB8] text-3xl font-bold">+</div>
           </div>
           <Button
             type="button"
             variant="outline"
-            className="mb-4 bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979] transition-all duration-300 rounded-xl px-6 py-2"
+            className="mb-4 bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black transition-all duration-300 rounded-xl px-6 py-2"
             onClick={handleUploadClick}
           >
             Upload Video
           </Button>
-          <p className="text-[#5A8DB8]/70 text-sm text-center max-w-md">
+          <p className="text-black/70 text-sm text-center max-w-md">
             Upload a short video introduction (max 100MB, MP4 preferred)
           </p>
           {form.video_intro && (
-            <div className="mt-4 text-sm text-[#3C5979] bg-[#5A8DB8]/10 px-4 py-2 rounded-full break-all max-w-full text-center font-medium">
+            <div className="mt-4 text-sm text-black bg-[#5A8DB8]/10 px-4 py-2 rounded-full break-all max-w-full text-center font-medium">
               {form.video_intro.name}
             </div>
           )}
@@ -172,8 +167,7 @@ const VideoIntro: React.FC = () => {
 
         {/* Description */}
         <div>
-          <label htmlFor="video_description" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-            <FileText className="w-4 h-4" />
+          <label htmlFor="video_description" className="text-sm font-medium text-black mb-2">
             Video Description
           </label>
           <Textarea
@@ -189,8 +183,7 @@ const VideoIntro: React.FC = () => {
         {/* Error Message */}
         {error && (
           <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
-            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
-              <Video className="w-4 h-4" />
+            <p className="text-sm text-black flex items-center gap-2">
               {error.message}
             </p>
           </div>
@@ -201,11 +194,10 @@ const VideoIntro: React.FC = () => {
           <Button
             type="button"
             variant="outline"
-            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
+            className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading}
           >
-            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
@@ -215,13 +207,12 @@ const VideoIntro: React.FC = () => {
           >
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                 Creating Profile...
               </>
             ) : (
               <>
                 Complete
-                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>

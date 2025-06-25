@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
-import { X, ArrowLeft, ArrowRight, Sparkles, Briefcase, FileText, Link2, Image as ImageIcon, Upload } from "lucide-react";
 
 const TOTAL_STEPS = 8;
 const CURRENT_STEP = 6;
@@ -149,11 +148,10 @@ const Portfolio: React.FC = () => {
       {/* Step Progress */}
       <div className="mb-10 w-full max-w-5xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
+          <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+          <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
             {progressPercent}% Complete
           </span>
         </div>
@@ -171,22 +169,18 @@ const Portfolio: React.FC = () => {
         className="w-full max-w-5xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex flex-col gap-8"
       >
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
-            <Briefcase className="h-7 w-7 text-white" />
-          </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">
               Portfolio
             </h1>
-            <p className="text-sm text-[#5A8DB8]/70 mt-1">Showcase your best work</p>
+            <p className="text-sm text-black/70 mt-1">Showcase your best work</p>
           </div>
         </div>
 
         <div className="space-y-6">
           {/* Project Title */}
           <div>
-            <label htmlFor="project_title" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-              <Briefcase className="w-4 h-4" />
+            <label htmlFor="project_title" className="text-sm font-medium text-black mb-2">
               Project Title
             </label>
             <Input
@@ -202,8 +196,7 @@ const Portfolio: React.FC = () => {
 
           {/* Project Description */}
           <div>
-            <label htmlFor="project_description" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-              <FileText className="w-4 h-4" />
+            <label htmlFor="project_description" className="text-sm font-medium text-black mb-2">
               Project Description
             </label>
             <Textarea
@@ -219,8 +212,7 @@ const Portfolio: React.FC = () => {
 
           {/* Project URL */}
           <div>
-            <label htmlFor="project_url" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-              <Link2 className="w-4 h-4" />
+            <label htmlFor="project_url" className="text-sm font-medium text-black mb-2">
               Project URL
             </label>
             <Input
@@ -255,17 +247,17 @@ const Portfolio: React.FC = () => {
                 multiple
               />
               <div className="h-16 w-16 rounded-full bg-[#5A8DB8]/10 flex items-center justify-center mb-4">
-                <Upload className="h-8 w-8 text-[#5A8DB8]" />
+                <div className="text-[#5A8DB8] text-2xl font-bold">+</div>
               </div>
               <Button
                 type="button"
                 variant="outline"
-                className="mb-3 bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979] transition-all duration-300 rounded-xl"
+                className="mb-3 bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black transition-all duration-300 rounded-xl"
                 onClick={handleUploadClick}
               >
                 Upload Project Images
               </Button>
-              <p className="text-[#5A8DB8]/70 text-sm">
+              <p className="text-black/70 text-sm">
                 Drag and drop images here or click to upload (max 5MB each)
               </p>
             </div>
@@ -287,7 +279,7 @@ const Portfolio: React.FC = () => {
                       onClick={() => removeImage(index)}
                       className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm text-red-500 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-50 hover:text-red-600 shadow-lg"
                     >
-                      <X size={16} />
+                      ×
                     </button>
                   </div>
                 ))}
@@ -299,8 +291,7 @@ const Portfolio: React.FC = () => {
         {/* Error Message */}
         {error && (
           <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
-            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
-              <ImageIcon className="w-4 h-4" />
+            <p className="text-sm text-black flex items-center gap-2">
               {error.message}
             </p>
           </div>
@@ -311,11 +302,10 @@ const Portfolio: React.FC = () => {
           <Button
             type="button"
             variant="outline"
-            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
+            className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading}
           >
-            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
@@ -331,7 +321,6 @@ const Portfolio: React.FC = () => {
             ) : (
               <>
                 Save and Continue
-                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>

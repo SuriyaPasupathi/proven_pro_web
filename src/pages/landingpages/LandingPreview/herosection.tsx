@@ -58,7 +58,7 @@ export default function Hero() {
         {/* Right: Image mockup */}
         <div className="w-full md:w-1/2 flex justify-center items-center">
           <div className="relative group w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[400px] xl:max-w-[440px]">
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+            <div className="absolute -inset-1  opacity-25 transition duration-300"></div>
             <img
               src={image}
               alt="Profile Cards"

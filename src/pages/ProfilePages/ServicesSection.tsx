@@ -1,4 +1,4 @@
-import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp, FileText, DollarSign, Sparkles, Calendar, Star, Award, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, Pencil, Plus, Loader2, Trash2, ChevronUp } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 import { useEditMode } from '../../context/EditModeContext';
@@ -20,7 +20,6 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fetchServices } from '../../store/Services/DropDownService';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface ServiceForm {
   services_categories: string;
@@ -328,38 +327,21 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="relative bg-gradient-to-br from-white via-[#5A8DB8]/5 to-white rounded-2xl p-6 xs:p-8 shadow-lg"
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 via-[#3C5979]/5 to-[#5A8DB8]/5 rounded-2xl"></div>
+    <div className="relative ">
+      <div className=""></div>
       
       <div className="relative flex justify-between items-center mb-8">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex items-center gap-4"
-        >
-          <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl shadow-lg">
-            <Sparkles className="h-6 w-6 text-white" />
-          </div>
-          <h2 className="text-2xl xs:text-3xl font-bold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl xs:text-4xl font-bold">
             Services
           </h2>
-        </motion.div>
+        </div>
         
         {isEditMode && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-          >
+          <div>
             <Button 
               variant="ghost" 
-              className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+            className="bg-white/80 backdrop-blur-sm hover:bg-white text-[#5A8DB8] hover:text-[#3C5979] p-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
               onClick={() => {
                 setEditingService(null);
                 setForm({
@@ -373,17 +355,16 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
             >
               <Plus className="w-5 h-5" />
             </Button>
-          </motion.div>
+          </div>
         )}
       </div>
+
+
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] p-3 rounded-xl">
-                <Award className="w-6 h-6 text-white" />
-              </div>
               <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
                 {editingService ? 'Edit Service' : 'Add Service'}
               </DialogTitle>
@@ -392,8 +373,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                <Star className="w-4 h-4 text-[#5A8DB8]" />
+              <label className="text-sm font-medium text-[#3C5979]">
                 Service Categories
               </label>
               <Select
@@ -414,8 +394,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#5A8DB8]" />
+              <label className="text-sm font-medium text-[#3C5979]">
                 Service Description
               </label>
               <Textarea
@@ -430,8 +409,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-[#5A8DB8]" />
+                <label className="text-sm font-medium text-[#3C5979]">
                   Rate Range
                 </label>
                 <Input
@@ -444,8 +422,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#3C5979] flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#5A8DB8]" />
+                <label className="text-sm font-medium text-[#3C5979]">
                   Availability
                 </label>
                 <Input
@@ -481,7 +458,6 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-4 h-4 mr-2" />
                     {editingService ? 'Save Changes' : 'Add Service'}
                   </>
                 )}
@@ -492,101 +468,70 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       </Dialog>
 
       <div className="relative space-y-4">
-        <AnimatePresence>
-          {localServices.length === 0 ? (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-white/80 backdrop-blur-sm rounded-xl p-8 border border-[#5A8DB8]/20 text-center"
-            >
-              <div className="flex flex-col items-center gap-3">
-                <div className="bg-gradient-to-br from-[#5A8DB8]/10 to-[#3C5979]/10 p-3 rounded-full">
-                  <Sparkles className="w-6 h-6 text-[#5A8DB8]" />
-                </div>
-                <p className="text-gray-600">No services added yet.</p>
-              </div>
-            </motion.div>
-          ) : (
-            localServices
-              .slice(0, isExpanded ? undefined : 2)
-              .map((service, index) => (
-                <motion.div 
-                  key={service.id || index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-[#5A8DB8]/20 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="flex justify-between items-start gap-6">
-                    <div className="space-y-4 flex-grow">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-gradient-to-br from-[#5A8DB8]/10 to-[#3C5979]/10 p-2 rounded-lg">
-                          <Star className="w-5 h-5 text-[#5A8DB8]" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-[#5A8DB8]">
-                          {service.services_categories}
-                        </h3>
+        {localServices.length === 0 ? (
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-8 border border-[#5A8DB8]/20 text-center">
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-gray-600">No services added yet.</p>
+            </div>
+          </div>
+        ) : (
+          localServices
+            .slice(0, isExpanded ? undefined : 2)
+            .map((service, index) => (
+              <div 
+                key={service.id || index}
+                className=""
+              >
+                <div className="flex justify-between items-start gap-6">
+                  <div className="space-y-4 flex-grow">
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-lg font-semibold ">
+                        Service Category : {service.services_categories}
+                      </h3>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <p className="text-gray-700">
+                        {service.services_description}
+                      </p>
+                    </div>
+                    <div className="flex flex-col xs:flex-row xs:gap-6 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-600 font-semibold">Rate-range : {service.rate_range} $</span>
                       </div>
-                      <div className="flex items-start gap-3">
-                        <div className="bg-gradient-to-br from-[#5A8DB8]/10 to-[#3C5979]/10 p-2 rounded-lg mt-1">
-                          <FileText className="w-5 h-5 text-[#5A8DB8]" />
-                        </div>
-                        <p className="text-gray-700">
-                          {service.services_description}
-                        </p>
-                      </div>
-                      <div className="flex flex-col xs:flex-row xs:gap-6 text-sm">
-                        <div className="flex items-center gap-2">
-                          <div className="bg-gradient-to-br from-[#5A8DB8]/10 to-[#3C5979]/10 p-1.5 rounded-lg">
-                            <DollarSign className="w-4 h-4 text-[#5A8DB8]" />
-                          </div>
-                          <span className="text-gray-600">{service.rate_range} $</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="bg-gradient-to-br from-[#5A8DB8]/10 to-[#3C5979]/10 p-1.5 rounded-lg">
-                            <Calendar className="w-4 h-4 text-[#5A8DB8]" />
-                          </div>
-                          <span className="text-gray-600">{service.availability}</span>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-600 font-semibold">Availability : {service.availability}</span>
                       </div>
                     </div>
-                    {isEditMode && (
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-9 w-9 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 rounded-xl"
-                          onClick={() => handleEdit(service)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-9 w-9 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
-                          onClick={() => handleDeleteClick(service)}
-                          disabled={isLoading}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    )}
                   </div>
-                </motion.div>
-              ))
-          )}
-        </AnimatePresence>
+                  {isEditMode && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 rounded-xl"
+                        onClick={() => handleEdit(service)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                        onClick={() => handleDeleteClick(service)}
+                        disabled={isLoading}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+        )}
       </div>
       
       {localServices.length > 2 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6"
-        >
+        <div className="mt-6">
           <Button 
             variant="ghost" 
             className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-xl px-4 py-2"
@@ -599,7 +544,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
               <ChevronDown className="h-4 w-4" />
             )}
           </Button>
-        </motion.div>
+        </div>
       )}
 
       <DeleteConfirmationDialog
@@ -613,7 +558,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         description={`Are you sure you want to delete the service "${serviceToDelete?.services_categories}"? This action cannot be undone.`}
         isLoading={isDeleteLoading}
       />
-    </motion.div>
+    </div>
   );
 };
 

@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
 import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import { fetchSkills } from "../../../store/Services/DropDownService";
-import { Loader2, ArrowLeft, ArrowRight, Sparkles, Wrench, Code2, Users, FileText } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   Dialog,
@@ -136,11 +135,10 @@ const ToolSkills: React.FC = () => {
       {/* Step Progress */}
       <div className="mb-10 w-full max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#3C5979] flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#5A8DB8]" />
+          <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
             Step {CURRENT_STEP} of {TOTAL_STEPS}
           </h2>
-          <span className="text-[#5A8DB8]/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+          <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
             {Math.round((CURRENT_STEP / TOTAL_STEPS) * 100)}% Complete
           </span>
         </div>
@@ -154,33 +152,29 @@ const ToolSkills: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex flex-col gap-8">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center shadow-lg">
-            <Wrench className="h-7 w-7 text-white" />
-          </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#3C5979]">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black">
               Tools & Skills
             </h1>
-            <p className="text-sm text-[#5A8DB8]/70 mt-1">Showcase your expertise and capabilities</p>
+            <p className="text-sm text-black/70 mt-1">Showcase your expertise and capabilities</p>
           </div>
         </div>
 
         <div className="space-y-6">
           <div>
-            <label htmlFor="primary_tools" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-              <Wrench className="w-4 h-4" />
+            <label htmlFor="primary_tools" className="text-sm font-medium text-black mb-2">
               Primary Tools
             </label>
             <Button
               type="button"
               onClick={() => setIsToolsOpen(true)}
-              className="w-full justify-start bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979] transition-all duration-300 rounded-xl"
+              className="w-full justify-start bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black transition-all duration-300 rounded-xl"
             >
               {form.primary_tools.length > 0 ? form.primary_tools.map(tool => tool.name).join(", ") : "Select tools"}
             </Button>
             <div className="mt-3 flex flex-wrap gap-2">
               {form.primary_tools.map((tool) => (
-                <div key={tool.id} className="flex items-center gap-1 bg-[#5A8DB8]/10 text-[#3C5979] px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
+                <div key={tool.id} className="flex items-center gap-1 bg-[#5A8DB8]/10 text-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
                   <span>{tool.name}</span>
                   <button
                     type="button"
@@ -195,20 +189,19 @@ const ToolSkills: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="technical_skills" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-              <Code2 className="w-4 h-4" />
+            <label htmlFor="technical_skills" className="text-sm font-medium text-black mb-2">
               Technical Skills
             </label>
             <Button
               type="button"
               onClick={() => setIsSkillsOpen(true)}
-              className="w-full justify-start bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979] transition-all duration-300 rounded-xl"
+              className="w-full justify-start bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black transition-all duration-300 rounded-xl"
             >
               {form.technical_skills.length > 0 ? form.technical_skills.map(skill => skill.name).join(", ") : "Select technical skills"}
             </Button>
             <div className="mt-3 flex flex-wrap gap-2">
               {form.technical_skills.map((skill) => (
-                <div key={skill.id} className="flex items-center gap-1 bg-[#5A8DB8]/10 text-[#3C5979] px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
+                <div key={skill.id} className="flex items-center gap-1 bg-[#5A8DB8]/10 text-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
                   <span>{skill.name}</span>
                   <button
                     type="button"
@@ -223,20 +216,19 @@ const ToolSkills: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="soft_skills" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-              <Users className="w-4 h-4" />
+            <label htmlFor="soft_skills" className="text-sm font-medium text-black mb-2">
               Soft Skills
             </label>
             <Button
               type="button"
               onClick={() => setIsSoftSkillsOpen(true)}
-              className="w-full justify-start bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979] transition-all duration-300 rounded-xl"
+              className="w-full justify-start bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black transition-all duration-300 rounded-xl"
             >
               {form.soft_skills.length > 0 ? form.soft_skills.map(skill => skill.name).join(", ") : "Select soft skills"}
             </Button>
             <div className="mt-3 flex flex-wrap gap-2">
               {form.soft_skills.map((skill) => (
-                <div key={skill.id} className="flex items-center gap-1 bg-[#5A8DB8]/10 text-[#3C5979] px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
+                <div key={skill.id} className="flex items-center gap-1 bg-[#5A8DB8]/10 text-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
                   <span>{skill.name}</span>
                   <button
                     type="button"
@@ -251,8 +243,7 @@ const ToolSkills: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="skills_description" className="text-sm font-medium text-[#3C5979] flex items-center gap-2 mb-2">
-              <FileText className="w-4 h-4" />
+            <label htmlFor="skills_description" className="text-sm font-medium text-black mb-2">
               Skills Description
             </label>
             <Textarea
@@ -269,8 +260,7 @@ const ToolSkills: React.FC = () => {
 
         {error && (
           <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
-            <p className="text-sm text-[#5A8DB8] flex items-center gap-2">
-              <Wrench className="w-4 h-4" />
+            <p className="text-sm text-black flex items-center gap-2">
               {error.message}
             </p>
           </div>
@@ -280,11 +270,10 @@ const ToolSkills: React.FC = () => {
           <Button
             type="button"
             variant="outline"
-            className="border-2 border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
+            className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
             onClick={() => navigate(-1)}
             disabled={loading}
           >
-            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Button
@@ -300,7 +289,6 @@ const ToolSkills: React.FC = () => {
             ) : (
               <>
                 Save and Continue
-                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </Button>
@@ -311,15 +299,14 @@ const ToolSkills: React.FC = () => {
       <Dialog open={isToolsOpen} onOpenChange={setIsToolsOpen}>
         <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-sm">
           <DialogHeader>
-            <DialogTitle className="text-[#3C5979] flex items-center gap-2">
-              <Wrench className="w-5 h-5 text-[#5A8DB8]" />
+            <DialogTitle className="text-black">
               Select Tools
             </DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-3">
             {dropdownLoading ? (
               <div className="col-span-2 flex justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-[#5A8DB8]" />
+                <div className="h-8 w-8 animate-spin text-[#5A8DB8] border-2 border-[#5A8DB8]/20 border-t-[#5A8DB8] rounded-full" />
               </div>
             ) : (
               getSkillsArray(dropdownSkills).map((tool: Skill) => (
@@ -330,7 +317,7 @@ const ToolSkills: React.FC = () => {
                   className={`w-full justify-start rounded-xl transition-all duration-300 ${
                     form.primary_tools.some(t => t.id === tool.id)
                       ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white"
-                      : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979]"
+                      : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black"
                   }`}
                   onClick={() => handleAddItem(tool, 'primary_tools')}
                 >
@@ -346,15 +333,14 @@ const ToolSkills: React.FC = () => {
       <Dialog open={isSkillsOpen} onOpenChange={setIsSkillsOpen}>
         <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-sm">
           <DialogHeader>
-            <DialogTitle className="text-[#3C5979] flex items-center gap-2">
-              <Code2 className="w-5 h-5 text-[#5A8DB8]" />
+            <DialogTitle className="text-black">
               Select Technical Skills
             </DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-3">
             {dropdownLoading ? (
               <div className="col-span-2 flex justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-[#5A8DB8]" />
+                <div className="h-8 w-8 animate-spin text-[#5A8DB8] border-2 border-[#5A8DB8]/20 border-t-[#5A8DB8] rounded-full" />
               </div>
             ) : (
               getSkillsArray(dropdownSkills).map((skill: Skill) => (
@@ -365,7 +351,7 @@ const ToolSkills: React.FC = () => {
                   className={`w-full justify-start rounded-xl transition-all duration-300 ${
                     form.technical_skills.some(s => s.id === skill.id)
                       ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white"
-                      : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979]"
+                      : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black"
                   }`}
                   onClick={() => handleAddItem(skill, 'technical_skills')}
                 >
@@ -381,15 +367,14 @@ const ToolSkills: React.FC = () => {
       <Dialog open={isSoftSkillsOpen} onOpenChange={setIsSoftSkillsOpen}>
         <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-sm">
           <DialogHeader>
-            <DialogTitle className="text-[#3C5979] flex items-center gap-2">
-              <Users className="w-5 h-5 text-[#5A8DB8]" />
+            <DialogTitle className="text-black">
               Select Soft Skills
             </DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-3">
             {dropdownLoading ? (
               <div className="col-span-2 flex justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-[#5A8DB8]" />
+                <div className="h-8 w-8 animate-spin text-[#5A8DB8] border-2 border-[#5A8DB8]/20 border-t-[#5A8DB8] rounded-full" />
               </div>
             ) : (
               getSkillsArray(dropdownSkills).map((skill: Skill) => (
@@ -400,7 +385,7 @@ const ToolSkills: React.FC = () => {
                   className={`w-full justify-start rounded-xl transition-all duration-300 ${
                     form.soft_skills.some(s => s.id === skill.id)
                       ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white"
-                      : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-[#3C5979]"
+                      : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black"
                   }`}
                   onClick={() => handleAddItem(skill, 'soft_skills')}
                 >

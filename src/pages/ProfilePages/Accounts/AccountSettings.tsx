@@ -123,7 +123,7 @@ const AccountSettings: React.FC = () => {
               Account Settings
             </span>
           </h1>
-          <p className="text-sm sm:text-base md:text-lg text-[#5A8DB8]/80 font-medium">
+          <p className="text-sm sm:text-base md:text-lg text-black font-medium">
             Manage your account preferences and security settings
           </p>
         </div>
@@ -136,13 +136,13 @@ const AccountSettings: React.FC = () => {
                 <div className="h-10 w-10 rounded-xl bg-[#5A8DB8]/10 flex items-center justify-center">
                   <Mail className="h-5 w-5 text-[#5A8DB8]" />
                 </div>
-                <h2 className="text-xl font-semibold text-[#3C5979]">Email Address</h2>
+                <h2 className="text-xl font-semibold text-black">Email Address</h2>
               </div>
               <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
                 <DialogTrigger asChild>
                   <Button 
                     variant="outline"
-                    className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300"
+                    className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300"
                     onClick={() => setShowEmailDialog(true)}
                   >
                     Change Email
@@ -154,13 +154,13 @@ const AccountSettings: React.FC = () => {
                       <div className="h-10 w-10 rounded-xl bg-[#5A8DB8]/10 flex items-center justify-center">
                         <Mail className="h-5 w-5 text-[#5A8DB8]" />
                       </div>
-                      <DialogTitle className="text-xl font-semibold text-[#3C5979]">Change Email</DialogTitle>
+                      <DialogTitle className="text-xl font-semibold text-black">Change Email</DialogTitle>
                     </div>
                     <div className="h-1 w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
                   </DialogHeader>
                   <form onSubmit={handleEmailChange} className="space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="new-email" className="text-sm font-medium text-[#3C5979]">New Email</Label>
+                      <Label htmlFor="new-email" className="text-sm font-medium text-black">New Email</Label>
                       <div className="relative">
                         <Input
                           id="new-email"
@@ -215,8 +215,8 @@ const AccountSettings: React.FC = () => {
                 </DialogContent>
               </Dialog>
             </div>
-            <div className="text-base text-[#5A8DB8]/80">
-              Your email address is <span className="font-semibold text-[#3C5979]">{email}</span>
+            <div className="text-base text-black/80">
+              Your email address is <span className="font-semibold text-black">{email}</span>
             </div>
           </div>
 
@@ -226,12 +226,12 @@ const AccountSettings: React.FC = () => {
               <div className="h-10 w-10 rounded-xl bg-[#5A8DB8]/10 flex items-center justify-center">
                 <Lock className="h-5 w-5 text-[#5A8DB8]" />
               </div>
-              <h2 className="text-xl font-semibold text-[#3C5979]">Password</h2>
+              <h2 className="text-xl font-semibold text-black">Password</h2>
             </div>
             <form onSubmit={handlePasswordChange} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="current-password" className="text-sm font-medium text-[#3C5979]">Current Password</Label>
+                  <Label htmlFor="current-password" className="text-sm font-medium text-black">Current Password</Label>
                   <div className="relative">
                     <Input
                       id="current-password"
@@ -253,7 +253,7 @@ const AccountSettings: React.FC = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="new-password" className="text-sm font-medium text-[#3C5979]">New Password</Label>
+                  <Label htmlFor="new-password" className="text-sm font-medium text-black">New Password</Label>
                   <div className="relative">
                     <Input
                       id="new-password"
@@ -317,13 +317,13 @@ const AccountSettings: React.FC = () => {
               <div className="h-10 w-10 rounded-xl bg-[#5A8DB8]/10 flex items-center justify-center">
                 <Shield className="h-5 w-5 text-[#5A8DB8]" />
               </div>
-              <DialogTitle className="text-xl font-semibold text-[#3C5979]">Verify OTP</DialogTitle>
+              <DialogTitle className="text-xl font-semibold text-black">Verify OTP</DialogTitle>
             </div>
             <div className="h-1 w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
           </DialogHeader>
           <form onSubmit={handleOtpVerification} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="otp" className="text-sm font-medium text-[#3C5979]">Enter OTP</Label>
+              <Label htmlFor="otp" className="text-sm font-medium text-black">Enter OTP</Label>
               <div className="relative">
                 <Input
                   id="otp"
@@ -338,7 +338,7 @@ const AccountSettings: React.FC = () => {
                 <Shield className="h-5 w-5 text-[#5A8DB8]/40 absolute left-3 top-1/2 -translate-y-1/2" />
               </div>
               {otpSent && (
-                <div className="text-sm text-[#5A8DB8]/70 bg-[#5A8DB8]/5 p-3 rounded-lg border border-[#5A8DB8]/10">
+                <div className="text-sm text-black/70 bg-[#5A8DB8]/5 p-3 rounded-lg border border-[#5A8DB8]/10">
                   OTP has been sent to {newEmail}
                 </div>
               )}
@@ -353,7 +353,7 @@ const AccountSettings: React.FC = () => {
                 type="button"
                 variant="outline"
                 onClick={handleResendOtp}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300 flex items-center gap-2"
+                className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300 flex items-center gap-2"
                 disabled={otpVerificationLoading}
               >
                 <RefreshCw className="h-4 w-4" />
@@ -381,7 +381,7 @@ const AccountSettings: React.FC = () => {
                   <Button 
                     type="button" 
                     variant="outline" 
-                    className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:text-[#5A8DB8] transition-all duration-300"
+                    className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300"
                   >
                     Cancel
                   </Button>

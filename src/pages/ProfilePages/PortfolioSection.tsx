@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Pencil, X, Trash2, Plus, ChevronUp, ChevronDown, Briefcase, FileText, Link, Image } from 'lucide-react';
+import { Pencil, X, Trash2, Plus, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -441,17 +441,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
     return (
       <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
         <div className="flex justify-between items-center mb-4 xs:mb-6">
-          <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
-            <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
-              <Briefcase className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
-            </span>
+          <h2 className="text-xl xs:text-2xl font-bold text-black">
             Portfolio
           </h2>
           {isEditMode && (
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
-                className="p-1 xs:p-1.5 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
+                className="p-1 xs:p-1.5 h-auto text-black hover:text-black hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
                 onClick={() => {
                   setEditingItem(null);
                   setIsDialogOpen(true);
@@ -472,17 +469,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
   return (
     <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
       <div className="flex justify-between items-center mb-4 xs:mb-6">
-        <h2 className="text-xl xs:text-2xl font-bold text-[#5A8DB8] flex items-center gap-2">
-          <span className="bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] text-white p-1.5 xs:p-2 rounded-lg shadow-sm">
-            <Briefcase className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6" />
-          </span>
+        <h2 className="text-xl xs:text-4xl font-bold text-black">
           Portfolio
         </h2>
         {isEditMode && (
           <div className="flex gap-2">
             <Button 
               variant="ghost" 
-              className="p-1 xs:p-1.5 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
+              className="p-1 xs:p-1.5 h-auto text-black hover:text-black hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
               onClick={() => {
                 setEditingItem(null);
                 setIsDialogOpen(true);
@@ -548,7 +542,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   <Button
                     variant="ghost"
-                    className="p-2 h-auto bg-white/90 hover:bg-white text-[#3C5979] hover:text-[#3C5979] rounded-full shadow-md"
+                    className="p-2 h-auto bg-white/90 hover:bg-white text-black hover:text-black rounded-full shadow-md"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleEdit(item);
@@ -576,7 +570,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
       {projectItems.length > 3 && (
         <Button 
           variant="link" 
-          className="mt-4 xs:mt-6 text-[#5A8DB8] hover:text-[#3C5979] flex items-center p-0 group transition-all duration-200"
+          className="mt-4 xs:mt-6 text-black hover:text-black flex items-center p-0 group transition-all duration-200"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <span className="text-sm group-hover:underline">{isExpanded ? 'Show less' : 'Show all projects'}</span>
@@ -590,26 +584,39 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
 
       {selectedItem !== null && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setSelectedItem(null)}>
-          <div className="bg-white rounded-lg overflow-hidden max-w-3xl w-full max-h-[80vh]" onClick={(e) => e.stopPropagation()}>
-            <div className="relative">
-              <img 
-                src={getFullImageUrl(projectItems[selectedItem].project_image_url || projectItems[selectedItem].project_image)} 
-                alt={projectItems[selectedItem].project_title}
-                className="w-full h-auto max-h-[60vh] object-contain"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = PLACEHOLDER_IMAGE;
-                }}
-              />
+          <div className="bg-white rounded-lg overflow-hidden max-w-3xl w-full max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Header with close button */}
+            <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-white">
+              <h3 className="text-xl font-semibold text-black">{projectItems[selectedItem].project_title}</h3>
+              <button 
+                className="h-8 w-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
+                onClick={() => setSelectedItem(null)}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            
+            {/* Scrollable content area */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="relative">
+                <img 
+                  src={getFullImageUrl(projectItems[selectedItem].project_image_url || projectItems[selectedItem].project_image)} 
+                  alt={projectItems[selectedItem].project_title}
+                  className="w-full h-auto max-h-[50vh] object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = PLACEHOLDER_IMAGE;
+                  }}
+                />
+              </div>
               <div className="p-4 xs:p-6">
-                <h3 className="text-xl xs:text-2xl font-semibold mb-2">{projectItems[selectedItem].project_title}</h3>
-                <p className="text-gray-600 mb-4">{projectItems[selectedItem].project_description}</p>
+                <p className="text-gray-600 mb-4 whitespace-pre-wrap">{projectItems[selectedItem].project_description}</p>
                 {projectItems[selectedItem].project_url && (
                   <a 
                     href={projectItems[selectedItem].project_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#5A8DB8] hover:text-[#3C5979] flex items-center gap-2"
+                    className="inline-flex items-center gap-2 text-[#5A8DB8] hover:text-[#3C5979] font-medium transition-colors duration-200"
                   >
                     View Project
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -618,12 +625,6 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                   </a>
                 )}
               </div>
-              <button 
-                className="absolute top-2 right-2 h-8 w-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
-                onClick={() => setSelectedItem(null)}
-              >
-                <X className="h-4 w-4" />
-              </button>
             </div>
           </div>
         </div>
@@ -634,10 +635,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
           <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
           <DialogHeader className="space-y-4 relative">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl font-semibold bg-gradient-to-r from-[#3C5979] to-[#5A8DB8] bg-clip-text text-transparent flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#70a4d8]/10">
-                  <Briefcase className="w-5 h-5 text-[#5A8DB8]" />
-                </div>
+              <DialogTitle className="text-2xl font-semibold text-black">
                 {editingItem ? 'Edit Project' : 'Add Project'}
               </DialogTitle>
             </div>
@@ -645,8 +643,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-6 relative">
             <div className="space-y-2 group">
-              <label htmlFor="project_title" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                <FileText className="w-4 h-4" />
+              <label htmlFor="project_title" className="font-medium mb-1.5 text-sm text-black">
                 Project Title
               </label>
               <Input
@@ -655,14 +652,13 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 placeholder="Enter project name"
                 value={form.project_title}
                 onChange={handleChange}
-                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md text-black"
                 required
               />
             </div>
 
             <div className="space-y-2 group">
-              <label htmlFor="project_description" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                <FileText className="w-4 h-4" />
+              <label htmlFor="project_description" className="font-medium mb-1.5 text-sm text-black">
                 Project Description
               </label>
               <Textarea
@@ -671,14 +667,13 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 placeholder="Describe your project..."
                 value={form.project_description}
                 onChange={handleChange}
-                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 min-h-[120px] rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 min-h-[120px] rounded-xl transition-all duration-300 shadow-sm hover:shadow-md text-black"
                 required
               />
             </div>
 
             <div className="space-y-2 group">
-              <label htmlFor="project_url" className="font-medium mb-1.5 text-sm text-[#3C5979] group-hover:text-[#5A8DB8] transition-colors flex items-center gap-2">
-                <Link className="w-4 h-4" />
+              <label htmlFor="project_url" className="font-medium mb-1.5 text-sm text-black">
                 Project URL
               </label>
               <Input
@@ -687,7 +682,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 placeholder="https://..."
                 value={form.project_url}
                 onChange={handleChange}
-                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+                className="bg-white/60 backdrop-blur-sm border border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md text-black"
                 required
               />
             </div>
@@ -706,10 +701,9 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="mb-2 border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl flex items-center gap-2"
+                  className="mb-2 border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl flex items-center gap-2"
                   onClick={handleUploadClick}
                 >
-                  <Image className="w-4 h-4" />
                   Upload Project Images
                 </Button>
                 <p className="text-sm text-gray-500">
@@ -745,7 +739,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                className="border-[#5A8DB8]/20 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
+                className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 transition-all duration-300 rounded-xl"
               >
                 Cancel
               </Button>
