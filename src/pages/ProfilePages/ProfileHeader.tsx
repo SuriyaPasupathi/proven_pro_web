@@ -337,11 +337,11 @@ const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
 const calculateRatingDistribution = (reviews: Array<{ rating: number }> = []) => {
   const totalReviews = reviews.length;
   if (totalReviews === 0) return [
-    { label: "5-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
-    { label: "4-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
-    { label: "3-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
-    { label: "2-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
-    { label: "1-star", value: 0, color: "from-[#5A8DB8] to-[#70a4d8]" },
+    { label: "5-star", value: 0, color: "from-[#FFCF3F] to-[#FFCF3F]" },
+    { label: "4-star", value: 0, color: "from-[#FF5050] to-[#FF5050]" },
+    { label: "3-star", value: 0, color: "from-[#D93973] to-[#D93973]" },
+    { label: "2-star", value: 0, color: "from-[#5800B0] to-[#5800B0]" },
+    { label: "1-star", value: 0, color: "from-[#6A686C] to-[#6A686C]" },
   ];
 
   // Initialize counts for 5-1 stars (in reverse order)
@@ -359,13 +359,52 @@ const calculateRatingDistribution = (reviews: Array<{ rating: number }> = []) =>
     label: `${5 - index}-star`,
     value: Math.round((count / totalReviews) * 100),
     color: [
-      "from-[#5A8DB8] to-[#70a4d8]",
-      "from-[#5A8DB8] to-[#70a4d8]",
-      "from-[#5A8DB8] to-[#70a4d8]",
-      "from-[#5A8DB8] to-[#70a4d8]",
-      "from-[#5A8DB8] to-[#70a4d8]"
+      "from-[#FFCF3F] to-[#FFCF3F]", // 5-star (Exceptional)
+      "from-[#FF5050] to-[#FF5050]", // 4-star (Very Good)
+      "from-[#D93973] to-[#D93973]", // 3-star (Good)
+      "from-[#5800B0] to-[#5800B0]", // 2-star (Fair)
+      "from-[#6A686C] to-[#6A686C]"  // 1-star (Poor)
     ][index]
   }));
+};
+
+// Function to get star color based on rating
+const getStarColor = (rating: number): string => {
+  if (rating >= 5.0) return '#FFCF3F'; // 5 stars (Exceptional)
+  if (rating >= 4.5) return '#FF7F0A'; // 4.5 stars (Excellent)
+  if (rating >= 4.0) return '#FF5050'; // 4 stars (Very Good)
+  if (rating >= 3.5) return '#FF0000'; // 3.5 stars (Good to Very Good)
+  if (rating >= 3.0) return '#D93973'; // 3 stars (Good)
+  if (rating >= 2.5) return '#7F00FF'; // 2.5 stars (Fair to Good)
+  if (rating >= 2.0) return '#5800B0'; // 2 stars (Fair)
+  if (rating >= 1.5) return '#A6A5A7'; // 1.5 stars (Poor to Fair)
+  if (rating >= 1.0) return '#6A686C'; // 1 star (Poor)
+  return '#E5E7EB'; // Default gray for 0 stars
+};
+
+// Function to get star fill based on individual star position and overall rating
+const getStarFill = (starPosition: number, overallRating: number): { fill: string; color: string } => {
+  const rating = overallRating || 0;
+  
+  if (starPosition <= rating) {
+    // Fully filled star
+    return {
+      fill: getStarColor(rating),
+      color: getStarColor(rating)
+    };
+  } else if (starPosition > rating && starPosition - rating < 1) {
+    // Partially filled star (half star)
+    return {
+      fill: getStarColor(rating),
+      color: getStarColor(rating)
+    };
+  } else {
+    // Empty star
+    return {
+      fill: '#E5E7EB',
+      color: '#D1D5DB'
+    };
+  }
 };
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
@@ -532,23 +571,39 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
                 <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-1">
                   {[1, 2, 3, 4, 5].map((star) => {
                     const rating = profileData.rating || 0;
+                    const starFill = getStarFill(star, rating);
                     const isFilled = star <= rating;
                     const isHalfFilled = star > rating && star - rating < 1;
+                    
                     return (
                       <Star
                         key={star}
-                        className={`h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all duration-300 ${
-                          isFilled
-                            ? 'fill-yellow-400 text-yellow-400'
-                            : isHalfFilled
-                            ? 'fill-yellow-200 text-yellow-400'
-                            : 'fill-gray-200 text-gray-300'
-                        }`}
+                        className={`h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all duration-300`}
+                        style={{
+                          fill: isFilled ? starFill.fill : isHalfFilled ? starFill.fill : starFill.fill,
+                          color: isFilled ? starFill.color : isHalfFilled ? starFill.color : starFill.color
+                        }}
                       />
                     );
                   })}
                 </div>
-                <p className="text-xs sm:text-sm text-gray-600">{profileData.reviews?.length || 0} reviews</p>
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">{profileData.reviews?.length || 0} reviews</p>
+                {/* Rating Label */}
+                <div className="text-xs sm:text-sm font-medium" style={{ color: getStarColor(profileData.rating || 0) }}>
+                  {(() => {
+                    const rating = profileData.rating || 0;
+                    if (rating >= 5.0) return 'Exceptional';
+                    if (rating >= 4.5) return 'Excellent';
+                    if (rating >= 4.0) return 'Very Good';
+                    if (rating >= 3.5) return 'Good to Very Good';
+                    if (rating >= 3.0) return 'Good';
+                    if (rating >= 2.5) return 'Fair to Good';
+                    if (rating >= 2.0) return 'Fair';
+                    if (rating >= 1.5) return 'Poor to Fair';
+                    if (rating >= 1.0) return 'Poor';
+                    return 'No Rating';
+                  })()}
+                </div>
               </div>
               <div className="space-y-1 sm:space-y-2">
                 {calculateRatingDistribution(profileData.reviews).map((rating, index) => (

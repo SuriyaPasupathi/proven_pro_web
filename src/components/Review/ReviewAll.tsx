@@ -56,20 +56,20 @@ const ReviewAll: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f0f0f3]">
       <Header />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-4 sm:py-6 md:py-8 lg:py-12 w-11/12">
         {/* Top bar: sort left, search right, single row */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 sm:mb-12 gap-4 sm:gap-0 w-full">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 gap-3 sm:gap-4 md:gap-6 w-full">
           {/* Sort dropdown (left) */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-xs text-gray-500 font-medium mr-2">Sort by:</span>
+          <div className="flex items-center gap-2 w-full sm:w-auto order-2 sm:order-1">
+            <span className="text-xs sm:text-sm text-gray-500 font-medium mr-2 whitespace-nowrap">Sort by:</span>
             <div className="relative">
               <button
                 onClick={() => setShowSort(!showSort)}
-                className="px-3 py-1.5 bg-white border border-gray-200 rounded shadow-sm text-sm text-gray-700 flex items-center gap-2 min-w-[90px] focus:outline-none"
+                className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-white border border-gray-200 rounded shadow-sm text-xs sm:text-sm text-gray-700 flex items-center gap-1 sm:gap-2 min-w-[80px] sm:min-w-[90px] md:min-w-[100px] focus:outline-none focus:ring-2 focus:ring-[#5A8DB8] focus:ring-opacity-50"
               >
                 {sortOptions.find(opt => opt.value === sortBy)?.label}
                 <svg
-                  className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${showSort ? 'rotate-180' : ''}`}
+                  className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-500 transition-transform duration-300 ${showSort ? 'rotate-180' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -78,7 +78,7 @@ const ReviewAll: React.FC = () => {
                 </svg>
               </button>
               {showSort && (
-                <div className="absolute left-0 mt-1 w-32 bg-white rounded shadow-lg border border-gray-200 z-10">
+                <div className="absolute left-0 mt-1 w-28 sm:w-32 md:w-36 bg-white rounded shadow-lg border border-gray-200 z-10">
                   {sortOptions.map((option) => (
                     <button
                       key={option.value}
@@ -86,7 +86,7 @@ const ReviewAll: React.FC = () => {
                         setSortBy(option.value);
                         setShowSort(false);
                       }}
-                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${sortBy === option.value ? 'text-[#5A8DB8] font-semibold' : 'text-gray-700'}`}
+                      className={`block w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm hover:bg-gray-100 transition-colors duration-150 ${sortBy === option.value ? 'text-[#5A8DB8] font-semibold' : 'text-gray-700'}`}
                     >
                       {option.label}
                     </button>
@@ -96,17 +96,17 @@ const ReviewAll: React.FC = () => {
             </div>
           </div>
           {/* Search bar (right) */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <div className="relative w-full sm:w-72">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto justify-end order-1 sm:order-2">
+            <div className="relative w-full sm:w-64 md:w-72 lg:w-80">
               <input
                 type="text"
                 placeholder="Search by name"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#5A8DB8]"
+                className="w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2.5 bg-white border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#5A8DB8] focus:ring-opacity-50 transition-all duration-200"
               />
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -119,22 +119,22 @@ const ReviewAll: React.FC = () => {
                 />
               </svg>
             </div>
-            <a href="#" className="ml-2 text-xs text-[#5A8DB8] font-medium hover:underline whitespace-nowrap">Search with filters</a>
+            <a href="#" className="text-xs sm:text-sm text-[#5A8DB8] font-medium hover:underline whitespace-nowrap self-end sm:self-auto">Search with filters</a>
           </div>
         </div>
 
         {searchLoading ? (
-          <div className="flex flex-col items-center justify-center py-12 sm:py-16">
+          <div className="flex flex-col items-center justify-center py-8 sm:py-12 md:py-16 lg:py-20">
             <div className="relative">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-gray-200 rounded-full"></div>
-              <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-[#5A8DB8] border-t-transparent rounded-full animate-spin absolute top-0"></div>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 border-4 border-gray-200 rounded-full"></div>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 border-4 border-[#5A8DB8] border-t-transparent rounded-full animate-spin absolute top-0"></div>
             </div>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-gray-600 font-medium">Loading freelancers...</p>
+            <p className="mt-3 sm:mt-4 md:mt-6 text-sm sm:text-base md:text-lg text-gray-600 font-medium">Loading freelancers...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 sm:py-16 bg-[#f0f0f3] rounded-2xl shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff]">
+          <div className="text-center py-8 sm:py-12 md:py-16 lg:py-20 bg-[#f0f0f3] rounded-xl sm:rounded-2xl shadow-[8px_8px_16px_#d1d1d1,-8px_-8px_16px_#ffffff] mx-2 sm:mx-0">
             <svg
-              className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4"
+              className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-gray-400 mx-auto mb-3 sm:mb-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -146,32 +146,23 @@ const ReviewAll: React.FC = () => {
                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p className="text-lg sm:text-xl text-gray-600 font-medium">No freelancers found</p>
-            <p className="mt-2 text-sm sm:text-base text-gray-500">Try adjusting your search criteria</p>
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 font-medium">No freelancers found</p>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm md:text-base text-gray-500">Try adjusting your search criteria</p>
           </div>
         ) : (
-          <div className="space-y-6 sm:space-y-12">
-            {filtered.map((freelancer, index) => (
-              <div
-                key={freelancer.id}
-                className={`relative transform transition-all duration-500 hover:scale-[1.02] ${
-                  index % 2 === 0 
-                    ? 'ml-0' 
-                    : 'ml-0 sm:ml-12'
-                }`}
-              >
+          <div className="space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 xl:space-y-12">
+            {filtered.map((freelancer, idx) => (
+              <React.Fragment key={freelancer.id}>
                 <div className="relative">
-                  <div className="absolute -top-3 -left-3 sm:-top-4 sm:-left-4 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-[#f0f0f3] flex items-center justify-center text-[#5A8DB8] text-sm sm:text-base font-bold shadow-[4px_4px_8px_#d1d1d1,-4px_-4px_8px_#ffffff]">
-                    {index + 1}
-                  </div>
-                  <div className="p-4 sm:p-8">
-                    <FreelancerCard
-                      freelancer={freelancer}
-                      totalReviews={freelancer.totalReviews}
-                    />
-                  </div>
+                  <FreelancerCard
+                    freelancer={freelancer}
+                    totalReviews={freelancer.totalReviews}
+                  />
                 </div>
-              </div>
+                {idx !== filtered.length - 1 && (
+                  <hr className="border-t border-gray-300 mx-2 sm:mx-0" />
+                )}
+              </React.Fragment>
             ))}
           </div>
         )}
