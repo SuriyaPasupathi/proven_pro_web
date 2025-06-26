@@ -29,7 +29,6 @@ interface FormData {
   skills_description: string;
 }
 
-const TOTAL_STEPS = 8;
 const CURRENT_STEP = 5;
 
 const ToolSkills: React.FC = () => {

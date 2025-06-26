@@ -17,13 +17,6 @@ interface ProfileError {
   code?: string;
 }
 
-interface CreateProfileState {
-  loading: boolean;
-  error: ProfileError | null;
-  success: boolean;
-  profileData: any | null;
-}
-
 const VideoIntro: React.FC = () => {
   const [form, setForm] = useState({
     video_intro: null as File | null,

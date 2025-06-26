@@ -3,7 +3,7 @@ import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-import { createUserProfile, checkProfileStatus } from "../../../store/Services/CreateProfileService";
+import { createUserProfile } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
 import StepAccessControl from "../../../components/StepAccessControl";
 import { getTotalSteps, getStepProgress, getNextAvailableStep, SubscriptionType } from "../../../utils/subscriptionUtils";

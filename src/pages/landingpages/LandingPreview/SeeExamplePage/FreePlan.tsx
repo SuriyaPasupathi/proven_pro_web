@@ -25,6 +25,7 @@ const FreePlan: React.FC = () => {
   const handleSubscribe = async () => {
     try {
       const result = await dispatch(subscribeToPlan('free')).unwrap();
+      console.log(result);
       toast.success("Successfully subscribed to Free Plan!");
       navigate("/create-profile/personal-info");
     } catch (error: any) {
