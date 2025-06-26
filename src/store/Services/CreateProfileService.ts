@@ -487,6 +487,8 @@ export const verifyMobileOTP = createAsyncThunk(
   async (payload: { otp: string; user_id: string }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
+      console.log('Verifying OTP with payload:', payload);
+      
       const response = await axios.post(
         `${baseUrl}verify-mobile-otp/?user_id=${payload.user_id}`,
         { otp: payload.otp },
@@ -499,6 +501,11 @@ export const verifyMobileOTP = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error('Mobile OTP verification error:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Error response data:', error.response?.data);
+        console.error('Error status:', error.response?.status);
+        console.error('Error headers:', error.response?.headers);
+      }
       const profileError = handleProfileError(error);
       return rejectWithValue(profileError);
     }

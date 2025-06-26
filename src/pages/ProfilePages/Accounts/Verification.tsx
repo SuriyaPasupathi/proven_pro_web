@@ -194,9 +194,12 @@ const Verification = () => {
       return;
     }
 
+    // Ensure phone number has "+" prefix
+    const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
+
     try {
       const result = await dispatch(requestMobileVerification({
-        mobile: phoneNumber,
+        mobile: formattedPhoneNumber,
         user_id: profileId
       })).unwrap();
       setIsOtpDialogOpen(true);
@@ -283,9 +286,12 @@ const Verification = () => {
       return;
     }
 
+    // Ensure phone number has "+" prefix
+    const formattedPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
+
     try {
       const result = await dispatch(requestMobileVerification({
-        mobile: phoneNumber,
+        mobile: formattedPhoneNumber,
         user_id: profileId
       })).unwrap();
       setCountdown(60);

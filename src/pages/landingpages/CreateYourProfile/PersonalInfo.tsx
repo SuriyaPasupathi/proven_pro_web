@@ -98,8 +98,8 @@ const PersonalInfo: React.FC = () => {
         return;
       }
 
-      // Format phone number (remove any non-digit characters)
-      const formattedPhone = form.mobile ? form.mobile.replace(/\D/g, '') : '';
+      // Format phone number (preserve the "+" prefix)
+      const formattedPhone = form.mobile ? (form.mobile.startsWith('+') ? form.mobile : `+${form.mobile}`) : '';
 
       const profileData = {
         subscription_type: subscriptionType as SubscriptionType,
@@ -248,15 +248,24 @@ const PersonalInfo: React.FC = () => {
                   />
                 </div>
 
-              
-
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
-                >
-                  {loading ? "Saving..." : "Save & Continue"}
-                </Button>
+                <div className="flex justify-end gap-4 mt-8">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
+                    onClick={() => navigate(-1)}
+                    disabled={loading}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
+                  >
+                    {loading ? "Saving..." : "Save & Continue"}
+                  </Button>
+                </div>
               </form>
             </div>
           </div>

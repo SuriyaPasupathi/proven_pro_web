@@ -144,6 +144,16 @@ export const resendOTP = createAsyncThunk(
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         console.error('OTP resend error details:', error.response.data);
+        
+        // Handle cooldown response from backend
+        if (error.response.status === 429 && error.response.data.cooldown_remaining) {
+          return rejectWithValue({
+            message: error.response.data.error,
+            status: 429,
+            code: 'COOLDOWN',
+            cooldown_remaining: error.response.data.cooldown_remaining
+          });
+        }
       }
       const authError = handleAuthError(error);
       return rejectWithValue(authError);

@@ -13,6 +13,9 @@ interface RegisterState {
   verificationSent: boolean;
   verified: boolean;
   email: string | null;
+  otpTimer: number; // Countdown timer in seconds
+  otpExpired: boolean; // Whether OTP has expired
+  resendCooldown: number; // Cooldown for resend in seconds
 }
 
 const initialState: RegisterState = {
@@ -21,6 +24,9 @@ const initialState: RegisterState = {
   verificationSent: false,
   verified: false,
   email: null,
+  otpTimer: 300, // 5 minutes = 300 seconds
+  otpExpired: false,
+  resendCooldown: 0,
 };
 
 const registerSlice = createSlice({
@@ -36,9 +42,32 @@ const registerSlice = createSlice({
       state.verificationSent = false;
       state.verified = false;
       state.email = null;
+      state.otpTimer = 300;
+      state.otpExpired = false;
+      state.resendCooldown = 0;
     },
     setEmail: (state, action) => {
       state.email = action.payload;
+    },
+    decrementTimer: (state) => {
+      if (state.otpTimer > 0) {
+        state.otpTimer -= 1;
+        if (state.otpTimer === 0) {
+          state.otpExpired = true;
+        }
+      }
+    },
+    resetTimer: (state) => {
+      state.otpTimer = 300; // Reset to 5 minutes
+      state.otpExpired = false;
+    },
+    setResendCooldown: (state, action) => {
+      state.resendCooldown = action.payload;
+    },
+    decrementResendCooldown: (state) => {
+      if (state.resendCooldown > 0) {
+        state.resendCooldown -= 1;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -54,6 +83,8 @@ const registerSlice = createSlice({
         state.verificationSent = true;
         state.error = null;
         state.email = action.payload.email;
+        state.otpTimer = 300; // Start 5-minute timer
+        state.otpExpired = false;
         // Store email in localStorage as backup
         if (action.payload.email) {
           localStorage.setItem('registrationEmail', action.payload.email);
@@ -73,6 +104,8 @@ const registerSlice = createSlice({
         state.loading = false;
         state.verified = true;
         state.error = null;
+        state.otpTimer = 0;
+        state.otpExpired = false;
       })
       .addCase(verifyOTP.rejected, (state, action) => {
         state.loading = false;
@@ -86,13 +119,30 @@ const registerSlice = createSlice({
       .addCase(resendOTP.fulfilled, (state) => {
         state.loading = false;
         state.error = null;
+        state.otpTimer = 300; // Reset timer to 5 minutes
+        state.otpExpired = false;
+        state.resendCooldown = 30; // Set 30-second cooldown for resend
       })
       .addCase(resendOTP.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as AuthError;
+        const error = action.payload as AuthError & { cooldown_remaining?: number };
+        state.error = error;
+        
+        // Set cooldown from backend response if available
+        if (error.code === 'COOLDOWN' && error.cooldown_remaining) {
+          state.resendCooldown = error.cooldown_remaining;
+        }
       });
   },
 });
 
-export const { clearError, resetState, setEmail } = registerSlice.actions;
+export const { 
+  clearError, 
+  resetState, 
+  setEmail, 
+  decrementTimer, 
+  resetTimer, 
+  setResendCooldown, 
+  decrementResendCooldown 
+} = registerSlice.actions;
 export default registerSlice.reducer;

@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Mail } from "lucide-react";
+import { Mail, Clock, RefreshCw } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import { toast } from "react-hot-toast";
 import { verifyOTP, resendOTP } from "@/store/Services/RegisterService";
+import { useOTPTimer } from "@/hooks/useOTPTimer";
 
 const CODE_LENGTH = 6;
 
@@ -14,7 +15,21 @@ const CheckEmailCode: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const dispatch = useAppDispatch();
-  const { email, loading, error, verified } = useAppSelector((state) => state.register);
+  const { 
+    email, 
+    loading, 
+    error, 
+    verified 
+  } = useAppSelector((state) => state.register);
+
+  // Use the custom OTP timer hook
+  const {
+    otpTimer,
+    otpExpired,
+    resendCooldown,
+    formatTime,
+    isCooldownActive
+  } = useOTPTimer();
 
   // Get email from URL params as fallback
   const emailFromUrl = searchParams.get('email');
@@ -22,11 +37,19 @@ const CheckEmailCode: React.FC = () => {
   const finalEmail = email || emailFromUrl || emailFromStorage;
 
   useEffect(() => {
-    console.log('CheckEmailCode mounted - Redux state:', { email, loading, error, verified });
+    console.log('CheckEmailCode mounted - Redux state:', { 
+      email, 
+      loading, 
+      error, 
+      verified, 
+      otpTimer, 
+      otpExpired, 
+      resendCooldown 
+    });
     console.log('Email from URL params:', emailFromUrl);
     console.log('Email from localStorage:', emailFromStorage);
     console.log('Final email to use:', finalEmail);
-  }, [email, loading, error, verified, emailFromUrl, emailFromStorage, finalEmail]);
+  }, [email, loading, error, verified, otpTimer, otpExpired, resendCooldown, emailFromUrl, emailFromStorage, finalEmail]);
 
   useEffect(() => {
     if (verified) {
@@ -41,6 +64,15 @@ const CheckEmailCode: React.FC = () => {
       toast.error(error.message);
     }
   }, [error]);
+
+  // Show expiry warning when OTP expires
+  useEffect(() => {
+    if (otpExpired) {
+      toast.error('OTP has expired. Please request a new one.', {
+        duration: 5000,
+      });
+    }
+  }, [otpExpired]);
 
   const handleChange = (value: string, idx: number) => {
     if (!/^[0-9]?$/.test(value)) return;
@@ -75,7 +107,13 @@ const CheckEmailCode: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted');
-    console.log('Current state:', { email: finalEmail, code: code.join(''), loading, verified });
+    console.log('Current state:', { email: finalEmail, code: code.join(''), loading, verified, otpExpired });
+    
+    // Check if OTP has expired
+    if (otpExpired) {
+      toast.error("OTP has expired. Please request a new verification code.");
+      return;
+    }
     
     const otp = code.join("");
     if (otp.length !== CODE_LENGTH) {
@@ -106,6 +144,12 @@ const CheckEmailCode: React.FC = () => {
   };
 
   const handleResend = async () => {
+    // Check cooldown
+    if (isCooldownActive) {
+      toast.error(`Please wait ${resendCooldown} seconds before requesting a new code.`);
+      return;
+    }
+
     if (!finalEmail) {
       toast.error("Email not found");
       return;
@@ -124,7 +168,13 @@ const CheckEmailCode: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Resend error:', error);
-      toast.error(error.message || 'Failed to resend code. Please try again.');
+      
+      // Handle cooldown error specifically
+      if (error.code === 'COOLDOWN' && error.cooldown_remaining) {
+        toast.error(`Please wait ${error.cooldown_remaining} seconds before requesting a new code.`);
+      } else {
+        toast.error(error.message || 'Failed to resend code. Please try again.');
+      }
     }
   };
 
@@ -139,6 +189,24 @@ const CheckEmailCode: React.FC = () => {
           We sent a verification code to<br />
           <span className="text-gray-900 font-medium">{finalEmail}</span>
         </p>
+
+        {/* Timer Display */}
+        <div className="w-full mb-4 flex items-center justify-center">
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+            otpExpired 
+              ? 'bg-red-50 text-red-600 border border-red-200' 
+              : 'bg-blue-50 text-blue-600 border border-blue-200'
+          }`}>
+            <Clock className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              {otpExpired 
+                ? 'OTP Expired' 
+                : `Expires in ${formatTime(otpTimer)}`
+              }
+            </span>
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
           <div className="flex gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
             {code.map((digit, idx) => (
@@ -152,36 +220,60 @@ const CheckEmailCode: React.FC = () => {
                 onChange={e => handleChange(e.target.value, idx)}
                 onKeyDown={e => handleKeyDown(e, idx)}
                 onPaste={handlePaste}
-                className="w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-16 text-2xl sm:text-3xl text-center border-2 border-[#6C63FF] rounded-lg focus:outline-none focus:border-[#3C5979] transition"
+                className={`w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-16 text-2xl sm:text-3xl text-center border-2 rounded-lg focus:outline-none transition ${
+                  otpExpired 
+                    ? 'border-red-300 bg-red-50 text-red-600' 
+                    : 'border-[#6C63FF] focus:border-[#3C5979]'
+                }`}
                 style={{ boxShadow: "0 2px 6px 0 rgba(108,99,255,0.05)" }}
                 autoFocus={idx === 0}
-                disabled={loading}
+                disabled={loading || otpExpired}
               />
             ))}
           </div>
           <Button
             type="submit"
-            className="w-full bg-[#3C5979] hover:bg-[#2f4560] mb-3 sm:mb-4 text-sm sm:text-base"
-            disabled={loading}
+            className={`w-full mb-3 sm:mb-4 text-sm sm:text-base ${
+              otpExpired 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-[#3C5979] hover:bg-[#2f4560]'
+            }`}
+            disabled={loading || otpExpired}
             onClick={() => console.log('Button clicked')}
           >
-            {loading ? "Verifying..." : "Verify email"}
+            {loading ? "Verifying..." : otpExpired ? "OTP Expired" : "Verify email"}
           </Button>
         </form>
-        <p className="text-xs sm:text-sm text-gray-700 mb-4 sm:mb-6 text-center">
-          Didn&apos;t receive the code?{" "}
-          <button
-            type="button"
-            className="text-[#6C63FF] font-medium hover:underline"
-            onClick={handleResend}
-            disabled={loading}
-          >
-            {loading ? "Sending..." : "Click to resend"}
-          </button>
-        </p>
+
+        {/* Resend Section */}
+        <div className="w-full text-center">
+          <p className="text-xs sm:text-sm text-gray-700 mb-2">
+            Didn&apos;t receive the code?
+          </p>
+          {isCooldownActive ? (
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+              <RefreshCw className="w-4 h-4 animate-spin" />
+              <span>Resend available in {resendCooldown}s</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className={`text-sm font-medium transition-all duration-300 ${
+                otpExpired 
+                  ? 'text-[#6C63FF] hover:underline' 
+                  : 'text-[#6C63FF] hover:underline'
+              }`}
+              onClick={handleResend}
+              disabled={loading}
+            >
+              {loading ? "Sending..." : "Click to resend"}
+            </button>
+          )}
+        </div>
+
         <button
           type="button"
-          className="flex items-center text-xs sm:text-sm text-gray-700 hover:underline"
+          className="flex items-center text-xs sm:text-sm text-gray-700 hover:underline mt-4"
           onClick={() => navigate("/login")}
           disabled={loading}
         >
