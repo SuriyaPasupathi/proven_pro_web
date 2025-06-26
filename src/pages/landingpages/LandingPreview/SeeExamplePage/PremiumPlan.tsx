@@ -11,6 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../store/store";
+import { subscribeToPlan } from "../../../../store/Services/CreateProfileService";
 
 const planFeatures = [
   "Profile Name and Image",
@@ -41,6 +44,9 @@ type PaymentFormData = z.infer<typeof paymentSchema>;
 
 const PremiumPlan: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { subscriptionLoading } = useSelector((state: RootState) => state.createProfile);
+  
   const {
     register,
     handleSubmit,
@@ -51,12 +57,17 @@ const PremiumPlan: React.FC = () => {
 
   const onSubmit = async (data: PaymentFormData) => {
     try {
-      // Simulate API call with form data
+      // First subscribe to the plan
+      await dispatch(subscribeToPlan('premium')).unwrap();
+      
+      // Simulate payment processing
       await new Promise((resolve) => setTimeout(resolve, 1500));
       console.log('Payment data:', data);
-      toast.success("Payment successful!");
-    } catch (error) {
-      toast.error("Payment failed. Please try again.");
+      
+      toast.success("Payment successful! Subscribed to Premium Plan.");
+      navigate("/create-profile/personal-info");
+    } catch (error: any) {
+      toast.error(error.message || "Payment failed. Please try again.");
     }
   };
 
@@ -170,9 +181,9 @@ const PremiumPlan: React.FC = () => {
                 <Button
                   type="submit"
                   className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-800 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || subscriptionLoading}
                 >
-                  {isSubmitting ? "Processing..." : `Complete Payment ($${PLAN_PRICE}.00)`}
+                  {isSubmitting || subscriptionLoading ? "Processing..." : `Complete Payment ($${PLAN_PRICE}.00)`}
                 </Button>
               </form>
             </CardContent>

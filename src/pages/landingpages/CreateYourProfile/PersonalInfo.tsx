@@ -9,8 +9,9 @@ import { createUserProfile } from "../../../store/Services/CreateProfileService"
 import toast from "react-hot-toast";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import StepAccessControl from "../../../components/StepAccessControl";
+import { getTotalSteps, getStepProgress, getNextAvailableStep, SubscriptionType } from "../../../utils/subscriptionUtils";
 
-const TOTAL_STEPS = 8;
 const CURRENT_STEP = 1;
 
 interface PersonalInfoForm {
@@ -24,6 +25,22 @@ interface PersonalInfoForm {
 }
 
 const PersonalInfo: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { profileData, loading } = useSelector((state: RootState) => state.createProfile);
+  
+  const subscriptionType = profileData?.subscription_type || 'free';
+  const totalSteps = getTotalSteps(subscriptionType as SubscriptionType);
+  const progressPercent = getStepProgress(CURRENT_STEP, subscriptionType as SubscriptionType);
+
+  // Debug logging
+  console.log('PersonalInfo Debug:', {
+    subscriptionType,
+    totalSteps,
+    progressPercent,
+    profileData
+  });
+
   const [form, setForm] = useState<PersonalInfoForm>({
     first_name: "",
     last_name: "",
@@ -34,52 +51,32 @@ const PersonalInfo: React.FC = () => {
     profile_url: "",
   });
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState & { createProfile: { loading: boolean; error: any } }) => state.createProfile);
-
-  // Load saved data from localStorage on component mount
   useEffect(() => {
-    const savedData = localStorage.getItem('personalInfo');
-    const isFromPreviousStep = sessionStorage.getItem('fromPreviousStep');
-    
-    if (savedData && isFromPreviousStep) {
-      setForm(JSON.parse(savedData));
-      // Clear the flag after loading
-      sessionStorage.removeItem('fromPreviousStep');
+    // Pre-fill form with existing data if available
+    if (profileData) {
+      setForm({
+        first_name: profileData.first_name || "",
+        last_name: profileData.last_name || "",
+        mobile: profileData.mobile || "",
+        countryCode: (profileData as any).countryCode || "",
+        bio: profileData.bio || "",
+        rating: profileData.rating ? String(profileData.rating) : "",
+        profile_url: profileData.profile_url || "",
+      });
     }
-  }, []);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const newForm = { ...form, [e.target.name]: e.target.value };
-    setForm(newForm);
-    // Save to localStorage whenever form changes
-    localStorage.setItem('personalInfo', JSON.stringify(newForm));
-  };
-
-  const handlePhoneChange = (value: string, data: any) => {
-    const newForm = { 
-      ...form, 
-      mobile: value,
-      countryCode: data.countryCode
-    };
-    setForm(newForm);
-    localStorage.setItem('personalInfo', JSON.stringify(newForm));
-  };
+  }, [profileData]);
 
   const validateForm = () => {
     if (!form.first_name.trim()) {
-      toast.error('First name is required');
+      toast.error("First name is required");
       return false;
     }
     if (!form.last_name.trim()) {
-      toast.error('Last name is required');
+      toast.error("Last name is required");
       return false;
     }
     if (!form.mobile.trim()) {
-      toast.error('Phone number is required');
+      toast.error("Mobile number is required");
       return false;
     }
     return true;
@@ -105,14 +102,13 @@ const PersonalInfo: React.FC = () => {
       const formattedPhone = form.mobile ? form.mobile.replace(/\D/g, '') : '';
 
       const profileData = {
-        subscription_type: "premium" as const,
+        subscription_type: subscriptionType as SubscriptionType,
         first_name: form.first_name ? form.first_name.trim() : '',
         last_name: form.last_name ? form.last_name.trim() : '',
         mobile: formattedPhone,
         countryCode: form.countryCode,
         bio: form.bio ? form.bio.trim() : undefined,
-        rating: form.rating ? form.rating.trim() : undefined,
-        profile_url: form.profile_url ? form.profile_url.trim() : undefined
+       
       };
 
       console.log('Submitting profile data:', profileData);
@@ -123,7 +119,18 @@ const PersonalInfo: React.FC = () => {
       
       if (result) {
         toast.success("Personal information saved successfully!");
-        navigate("/create-profile/profile-img");
+        
+        // Navigate to the next available step
+        const nextStep = getNextAvailableStep(CURRENT_STEP, subscriptionType as SubscriptionType);
+        if (nextStep) {
+          navigate(nextStep.path);
+        } else {
+          // If no next step, navigate to profile page
+          const profileId = result.data?.id || localStorage.getItem('userProfileId');
+          if (profileId) {
+            navigate(`/profile/${profileId}`);
+          }
+        }
       }
     } catch (err) {
       console.error('Submission error:', err);
@@ -138,171 +145,124 @@ const PersonalInfo: React.FC = () => {
     }
   };
 
-  const progressPercent = Math.round((CURRENT_STEP / TOTAL_STEPS) * 100);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-[#F8FBFF] px-4 sm:px-6 md:px-8 py-8 flex flex-col">
-      {/* Step Progress */}
-      <div className="mb-10 w-full max-w-4xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
-            Step {CURRENT_STEP} of {TOTAL_STEPS}
-          </h2>
-          <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
-            {progressPercent}% Complete
-          </span>
+    <StepAccessControl currentStep={CURRENT_STEP}>
+      <div className="min-h-screen bg-gradient-to-br from-white to-[#F8FBFF] px-4 sm:px-6 md:px-8 py-8 flex flex-col">
+        {/* Step Progress */}
+        <div className="mb-10 w-full max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+            <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
+              Step {CURRENT_STEP} of {totalSteps}
+            </h2>
+            <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+              {progressPercent}% Complete
+            </span>
+          </div>
+          <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+            <div
+              className="h-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full transition-all duration-500"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
         </div>
-        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
-          <div
-            className="h-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full transition-all duration-500"
-            style={{ width: `${progressPercent}%` }}
-          />
+
+        {/* Form */}
+        <div className="flex-grow flex flex-col items-center justify-center">
+          <div className="w-full max-w-2xl mx-auto">
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-[#5A8DB8]/20 p-6 sm:p-8">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl sm:text-3xl font-bold text-[#5A8DB8] mb-2">
+                  Personal Information
+                </h1>
+                <p className="text-gray-600">
+                  Let's start by getting to know you better
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="first_name" className="text-sm font-medium text-gray-700">
+                      First Name *
+                    </label>
+                    <Input
+                      id="first_name"
+                      type="text"
+                      value={form.first_name}
+                      onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+                      placeholder="Enter your first name"
+                      className="border-gray-200 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="last_name" className="text-sm font-medium text-gray-700">
+                      Last Name *
+                    </label>
+                    <Input
+                      id="last_name"
+                      type="text"
+                      value={form.last_name}
+                      onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+                      placeholder="Enter your last name"
+                      className="border-gray-200 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="mobile" className="text-sm font-medium text-gray-700">
+                    Mobile Number *
+                  </label>
+                  <PhoneInput
+                    country={'us'}
+                    value={form.mobile}
+                    onChange={(phone, country: any) => {
+                      setForm({ 
+                        ...form, 
+                        mobile: phone,
+                        countryCode: String(country.dialCode || "")
+                      });
+                    }}
+                    inputClass="w-full h-10 px-3 py-2 border border-gray-200 rounded-md focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20"
+                    containerClass="w-full"
+                    inputProps={{
+                      required: true
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="bio" className="text-sm font-medium text-gray-700">
+                    Bio
+                  </label>
+                  <Textarea
+                    id="bio"
+                    value={form.bio}
+                    onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                    placeholder="Tell us about yourself..."
+                    className="border-gray-200 focus:border-[#5A8DB8] focus:ring-[#5A8DB8]/20 min-h-[100px]"
+                    rows={4}
+                  />
+                </div>
+
+              
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
+                >
+                  {loading ? "Saving..." : "Save & Continue"}
+                </Button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-4xl mx-auto flex flex-col gap-10 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg"
-        noValidate
-      >
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-           
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-black">
-                Personal Information
-              </h1>
-              <p className="text-sm text-black/70 mt-1">Tell us about yourself</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <div className="relative group">
-              <label htmlFor="first_name" className="text-sm font-medium text-black mb-2">
-                First Name
-              </label>
-              <div className="relative">
-                <Input
-                  id="first_name"
-                  name="first_name"
-                  placeholder="Enter your first name"
-                  value={form.first_name}
-                  onChange={handleChange}
-                  className="pl-4 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div className="relative group">
-              <label htmlFor="last_name" className="text-sm font-medium text-black mb-2">
-                Last Name
-              </label>
-              <div className="relative">
-                <Input
-                  id="last_name"
-                  name="last_name"
-                  placeholder="Enter your last name"
-                  value={form.last_name}
-                  onChange={handleChange}
-                  className="pl-4 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="relative group">
-            <label htmlFor="mobile" className="text-sm font-medium text-black mb-2">
-              Phone Number
-            </label>
-            <div className="relative">
-              <PhoneInput
-                country={'us'}
-                value={form.mobile}
-                onChange={handlePhoneChange}
-                inputClass="pl-4 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 group-hover:border-[#5A8DB8]/40 w-full"
-                buttonClass="border-2 border-[#5A8DB8]/20 bg-white rounded-l-xl group-hover:border-[#5A8DB8]/40"
-                containerClass="w-full"
-                inputProps={{
-                  name: 'mobile',
-                  required: true,
-                  id: 'mobile'
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="relative group">
-            <label htmlFor="bio" className="text-sm font-medium text-black mb-2">
-              Bio
-            </label>
-            <div className="relative">
-              <Textarea
-                id="bio"
-                name="bio"
-                placeholder="Tell us about yourself..."
-                value={form.bio}
-                onChange={handleChange}
-                className="pl-4 pr-4 py-3 bg-white border-2 border-[#5A8DB8]/20 focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-xl transition-all duration-300 min-h-[120px] group-hover:border-[#5A8DB8]/40"
-              />
-            </div>
-          </div>
-        </div>
-
-        {error && (
-          <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
-            <p className="text-sm text-black flex items-center gap-2">
-              {error.message}
-            </p>
-          </div>
-        )}
-
-        {/* Button Group */}
-        <div className="flex justify-end gap-4 mt-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
-            onClick={() => {
-              sessionStorage.setItem('fromPreviousStep', 'true');
-              navigate(-1);
-            }}
-            disabled={loading}
-          >
-            Back
-          </Button>
-          <Button
-            type="submit"
-            className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
-            disabled={loading}
-            onClick={(e) => {
-              e.preventDefault();
-              handleSubmit(e);
-            }}
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                Save and Continue
-              </>
-            )}
-          </Button>
-        </div>
-      </form>
-    </div>
+    </StepAccessControl>
   );
 };
 

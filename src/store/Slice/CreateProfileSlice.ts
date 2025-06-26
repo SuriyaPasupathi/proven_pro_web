@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, getProfileReviewsPublic, deleteItem, searchUsers, verifyShareToken } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, getProfileReviewsPublic, deleteItem, searchUsers, verifyShareToken, subscribeToPlan } from '../Services/CreateProfileService';
 import { ProfileData } from '../../types/profile';
 
 interface ProfileError {
@@ -64,6 +64,8 @@ interface CreateProfileState {
   }>;
   searchLoading: boolean;
   searchError: ProfileError | null;
+  subscriptionLoading: boolean;
+  subscriptionSuccess: boolean;
 }
 
 const initialState: CreateProfileState = {
@@ -72,7 +74,7 @@ const initialState: CreateProfileState = {
   success: false,
   profileData: {
     id: '',
-    subscription_type: 'premium',
+    subscription_type: 'free',
   },
   hasProfile: false,
   profileStatusLoading: false,
@@ -89,6 +91,8 @@ const initialState: CreateProfileState = {
   searchResults: [],
   searchLoading: false,
   searchError: null,
+  subscriptionLoading: false,
+  subscriptionSuccess: false,
 };
 
 const createProfileSlice = createSlice({
@@ -102,7 +106,7 @@ const createProfileSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.success = false;
-      state.profileData = { subscription_type: 'premium' };
+      state.profileData = { subscription_type: 'free' };
     },
     updateProfileData: (state, action) => {
       state.profileData = {
@@ -163,7 +167,7 @@ const createProfileSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.loading = false;
-        state.profileData = { subscription_type: 'premium' };
+        state.profileData = { subscription_type: 'free' };
         state.error = null;
       })
       .addCase(logout.rejected, (state, action) => {
@@ -406,6 +410,27 @@ const createProfileSlice = createSlice({
       })
       .addCase(verifyShareToken.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(subscribeToPlan.pending, (state) => {
+        state.subscriptionLoading = true;
+        state.error = null;
+        state.subscriptionSuccess = false;
+      })
+      .addCase(subscribeToPlan.fulfilled, (state, action) => {
+        console.log('subscribeToPlan.fulfilled - action.payload:', action.payload);
+        state.subscriptionLoading = false;
+        state.subscriptionSuccess = true;
+        state.error = null;
+        state.profileData = {
+          ...state.profileData,
+          subscription_type: action.payload.subscription_type
+        };
+        console.log('Updated profileData:', state.profileData);
+      })
+      .addCase(subscribeToPlan.rejected, (state, action) => {
+        state.subscriptionLoading = false;
+        state.subscriptionSuccess = false;
         state.error = action.payload as ProfileError;
       });
   },

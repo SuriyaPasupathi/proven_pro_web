@@ -1,24 +1,54 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-import { createUserProfile } from "../../../store/Services/CreateProfileService";
+import { createUserProfile, checkProfileStatus } from "../../../store/Services/CreateProfileService";
 import toast from "react-hot-toast";
+import StepAccessControl from "../../../components/StepAccessControl";
+import { getTotalSteps, getStepProgress, getNextAvailableStep, SubscriptionType } from "../../../utils/subscriptionUtils";
 
-const TOTAL_STEPS = 8;
 const CURRENT_STEP = 2;
 
+interface ProfileImgForm {
+  profile_pic: File | null;
+  profile_pic_url: string;
+}
+
 const ProfileImg: React.FC = () => {
-  const [form, setForm] = useState({
-    profile_pic: null as File | null,
-    profile_pic_url: "",
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState & { createProfile: { loading: boolean; error: any } }) => state.createProfile);
+  const { profileData, loading } = useSelector((state: RootState) => state.createProfile);
+  
+  const subscriptionType = profileData?.subscription_type || 'free';
+  const totalSteps = getTotalSteps(subscriptionType as SubscriptionType);
+  const progressPercent = getStepProgress(CURRENT_STEP, subscriptionType as SubscriptionType);
+
+  // Debug logging
+  console.log('ProfileImg Debug:', {
+    subscriptionType,
+    totalSteps,
+    progressPercent,
+    profileData
+  });
+
+  const [form, setForm] = useState<ProfileImgForm>({
+    profile_pic: null,
+    profile_pic_url: "",
+  });
+
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Pre-fill form with existing data if available
+    if (profileData?.profile_pic_url) {
+      setForm(prev => ({
+        ...prev,
+        profile_pic_url: profileData.profile_pic_url || ""
+      }));
+    }
+  }, [profileData]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -99,7 +129,7 @@ const ProfileImg: React.FC = () => {
       }
 
       const formData = new FormData();
-      formData.append('subscription_type', 'premium');
+      formData.append('subscription_type', subscriptionType);
       formData.append('profile_pic', form.profile_pic);
 
       const result = await dispatch(createUserProfile(formData)).unwrap();
@@ -112,8 +142,26 @@ const ProfileImg: React.FC = () => {
 
         toast.success("Profile image saved successfully!");
         
-        // Navigate to the next step
-        navigate("/create-profile/services-offer");
+        // Navigate to the next available step
+        const nextStep = getNextAvailableStep(CURRENT_STEP, subscriptionType as SubscriptionType);
+        
+        console.log('ProfileImg Navigation Debug:', {
+          currentStep: CURRENT_STEP,
+          subscriptionType,
+          nextStep,
+          nextStepPath: nextStep?.path
+        });
+        
+        if (nextStep) {
+          navigate(nextStep.path);
+        } else {
+          // If no next step, navigate to profile page
+          const profileId = result.data?.id || localStorage.getItem('userProfileId');
+          console.log('No next step available, navigating to profile:', profileId);
+          if (profileId) {
+            navigate(`/profile/${profileId}`);
+          }
+        }
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
@@ -121,138 +169,133 @@ const ProfileImg: React.FC = () => {
     }
   };
 
-  const progressPercent = Math.round((CURRENT_STEP / TOTAL_STEPS) * 100);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-[#F8FBFF] px-4 sm:px-6 md:px-8 py-8 flex flex-col">
-      {/* Progress Bar */}
-      <div className="w-full max-w-4xl mx-auto mb-10">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-          <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
-            Step {CURRENT_STEP} of {TOTAL_STEPS}
-          </h2>
-          <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
-            {progressPercent}% Complete
-          </span>
+    <StepAccessControl currentStep={CURRENT_STEP}>
+      <div className="min-h-screen bg-gradient-to-br from-white to-[#F8FBFF] px-4 sm:px-6 md:px-8 py-8 flex flex-col">
+        {/* Step Progress */}
+        <div className="mb-10 w-full max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+            <h2 className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
+              Step {CURRENT_STEP} of {totalSteps}
+            </h2>
+            <span className="text-black/80 text-sm font-medium bg-[#5A8DB8]/5 px-3 py-1 rounded-full">
+              {progressPercent}% Complete
+            </span>
+          </div>
+          <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+            <div
+              className="h-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full transition-all duration-500"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
         </div>
-        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
-          <div
-            className="h-full bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-full transition-all duration-500"
-            style={{ width: `${progressPercent}%` }}
-          />
+
+        {/* Form */}
+        <div className="flex-grow flex flex-col items-center justify-center">
+          <div className="w-full max-w-2xl mx-auto">
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-[#5A8DB8]/20 p-6 sm:p-8">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl sm:text-3xl font-bold text-[#5A8DB8] mb-2">
+                  Profile Image
+                </h1>
+                <p className="text-gray-600">
+                  Upload a professional photo to make your profile stand out
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
+                      isDragging
+                        ? 'border-[#5A8DB8] bg-[#5A8DB8]/5'
+                        : 'border-gray-300 hover:border-[#5A8DB8] hover:bg-gray-50'
+                    }`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                  >
+                    {form.profile_pic_url ? (
+                      <div className="space-y-4">
+                        <img
+                          src={form.profile_pic_url}
+                          alt="Profile preview"
+                          className="w-32 h-32 mx-auto rounded-full object-cover border-4 border-[#5A8DB8]/20"
+                        />
+                        <p className="text-sm text-gray-600">
+                          Image uploaded successfully
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleUploadClick}
+                          className="text-[#5A8DB8] border-[#5A8DB8] hover:bg-[#5A8DB8] hover:text-white"
+                        >
+                          Change Image
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="w-32 h-32 mx-auto rounded-full bg-gray-100 flex items-center justify-center">
+                          <svg
+                            className="w-12 h-12 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-lg font-medium text-gray-700 mb-2">
+                            Upload Profile Image
+                          </p>
+                          <p className="text-sm text-gray-500 mb-4">
+                            Drag and drop an image here, or click to select
+                          </p>
+                          <Button
+                            type="button"
+                            onClick={handleUploadClick}
+                            className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white"
+                          >
+                            Choose File
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+
+                  <div className="text-xs text-gray-500 text-center">
+                    Supported formats: JPG, PNG, GIF. Max size: 5MB
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loading || !form.profile_pic}
+                  className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? "Saving..." : "Save & Continue"}
+                </Button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Image Upload Section */}
-      <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg flex flex-col gap-8">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black">
-              Profile Image
-            </h1>
-            <p className="text-sm text-black/70 mt-1">Upload your profile picture</p>
-          </div>
-        </div>
-
-        <div 
-          className={`border-2 border-dashed rounded-xl flex flex-col items-center justify-center py-12 px-4 sm:px-8 transition-all duration-300 ${
-            isDragging 
-              ? 'border-[#5A8DB8] bg-[#5A8DB8]/5' 
-              : 'border-[#5A8DB8]/30 hover:border-[#5A8DB8]/50 hover:bg-[#5A8DB8]/5'
-          }`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <div className="flex flex-col items-center">
-            {form.profile_pic_url ? (
-              <div className="relative group">
-                <img
-                  src={form.profile_pic_url}
-                  alt="Profile Preview"
-                  className="w-32 h-32 sm:w-36 sm:h-36 rounded-full object-cover mb-4 shadow-lg transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="text-white hover:text-white hover:bg-white/20"
-                    onClick={handleUploadClick}
-                  >
-                    Change Image
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-[#5A8DB8]/10 rounded-full w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center mb-4 group hover:bg-[#5A8DB8]/20 transition-colors duration-300">
-                <div className="text-[#5A8DB8]/40 group-hover:text-[#5A8DB8]/60 transition-colors text-4xl font-bold">+</div>
-              </div>
-            )}
-
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleImageChange}
-              name="profile_pic"
-            />
-
-            <Button
-              type="button"
-              className="mt-2 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] hover:from-[#3C5979] hover:to-[#5A8DB8] text-white shadow-lg hover:shadow-xl transition-all duration-300"
-              onClick={handleUploadClick}
-            >
-              Upload Image
-            </Button>
-
-            <p className="text-black/70 text-sm mt-4 text-center max-w-sm">
-              Recommended: Square image, at least 400x400 pixels for best results.
-              <br />
-              Drag and drop your image here or click to browse
-            </p>
-          </div>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="bg-[#EAF3FA] p-4 rounded-xl border-2 border-[#5A8DB8]/20">
-            <p className="text-sm text-black flex items-center gap-2">
-              {error.message}
-            </p>
-          </div>
-        )}
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-end gap-4 mt-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition flex items-center gap-2 px-6 py-2 rounded-xl"
-            onClick={() => navigate(-1)}
-            disabled={loading}
-          >
-            Back
-          </Button>
-          <Button
-            type="submit"
-            className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                Save and Continue
-              </>
-            )}
-          </Button>
-        </div>
-      </form>
-    </div>
+    </StepAccessControl>
   );
 };
 

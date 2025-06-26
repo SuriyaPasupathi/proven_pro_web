@@ -19,6 +19,7 @@ import FullPageLoader from '@/components/ui/full-page-loader';
 import axios from 'axios';
 import { ProfileData } from '../../types/profile';
 import { useEditMode } from '../../context/EditModeContext';
+import SectionLock from '../../components/SectionLock';
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -154,38 +155,45 @@ const App: React.FC = () => {
 
               <div className="space-y-6 sm:space-y-8 md:space-y-12 mt-4 sm:mt-6 md:mt-8 mb-8 sm:mb-10">
                 {/* <ReviewCarousel reviews={transformedReviews} /> */}
-                
+                <SectionLock requiredPlan="standard" title="Standard Features">
                 <ServicesSection 
                   categories={profile.categories}
                   services_categories={profile.services_categories}
                   services_description={profile.services_description}
-                  rate_range={profile.rate_range}
-                  availability={profile.availability}
-                />
+                    rate_range={profile.rate_range}
+                    availability={profile.availability}
+                  />
+                </SectionLock>
                 {/* Horizontal divider */}
                 <div className="border-t border-black"></div>
                 
-                <ExperienceSection experiences={profile.work_experiences} />
+                <SectionLock requiredPlan="standard" title="Standard Features">
+                  <ExperienceSection experiences={profile.work_experiences} />
+                </SectionLock>
                 
+                   {/* Horizontal divider */}
+                   <div className="border-t border-black"></div>
+                
+                <SectionLock requiredPlan="standard" title="Standard Features">
                 <SkillsSection 
                   technical_skills={profile.technical_skills}
                   soft_skills={profile.soft_skills}
                   skills_description={profile.skills_description}
                 />
-                
+                </SectionLock>
                 {/* Horizontal divider */}
                 <div className="border-t border-black"></div>
-                
+                <SectionLock requiredPlan="standard" title="Standard Features">
                 <ToolsSection primary_tools={profile.primary_tools} />
-                
+                </SectionLock>
                 {/* Horizontal divider */}
                 <div className="border-t border-black"></div>
-                
-                <PortfolioSection 
-                  projects={profile.portfolio}
-                  portfolio={profile.portfolio}
-                />
-
+                <SectionLock requiredPlan="premium" title="Premium Features">
+                  <PortfolioSection 
+                    projects={profile.portfolio}
+                    portfolio={profile.portfolio}
+                  />
+                </SectionLock>
                 {/* Horizontal divider */}
                 <div className="border-t border-black"></div>
               </div>

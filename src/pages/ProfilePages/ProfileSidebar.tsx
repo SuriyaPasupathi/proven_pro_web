@@ -19,6 +19,7 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { Label } from "@/components/ui/label";
 import { Pencil, Plus, Trash2 } from 'lucide-react';
+import SectionLock from '../../components/SectionLock';
 
 // Get the base URL from environment variable
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
@@ -789,7 +790,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     <>
       <div className="relative ">
         {/* Profile Image */}
-        <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto">
+        <div className="relative w-full mb-10 max-w-xs sm:max-w-sm md:max-w-md mx-auto">
           <div className="absolute inset-0 "></div>
           <div className="relative w-full mx-auto">
            
@@ -870,110 +871,106 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         </div>
 
         {/* Video Introduction */}
-        {(profileData.video_intro || profileData.video_intro_url) && (
+        <SectionLock requiredPlan="premium" title="Premium Features">
+          {(profileData.video_intro || profileData.video_intro_url) && (
+            <div className="relative w-full  max-w-lg mx-auto">
+              <div className="absolute inset-0 bg-white xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
+              <div className="relative w-full mx-auto">
+                <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+                  <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-6">
+                    <div className="flex items-center gap-1 xs:gap-2">
+                      <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-gray-800">Video Introduction (Optional)</h3>
+                    </div>
+                    {isEditMode && (
+                      <div className="flex gap-1 xs:gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
+                          onClick={handleOpenVideoDialog}
+                        >
+                          <Pencil size={18} className=" mr-1" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-3 xs:space-y-4 sm:space-y-6">
+                    <div className="relative bg-gray-100 rounded-lg xs:rounded-xl aspect-video overflow-x-auto group hover:shadow-md transition-shadow duration-300">
+                      <video 
+                        src={getFullImageUrl(profileData.video_intro_url || profileData.video_intro)}
+                        className="w-full h-auto max-h-60 sm:max-h-80 object-cover transition-transform duration-500 group-hover:scale-105"
+                        controls
+                        preload="metadata"
+                        controlsList="nodownload"
+                        playsInline
+                      />
+                    </div>
+                    {profileData.video_description && (
+                      <div className="bg-gradient-to-br from-white to-gray-50/50 p-3 xs:p-4 rounded-lg xs:rounded-xl border border-[#5A8DB8]/10">
+                        <p className="text-xs xs:text-sm text-gray-700">{profileData.video_description}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </SectionLock>
+        
+
+        {/* Certifications */}
+        <SectionLock requiredPlan="premium" title="Premium Features">
           <div className="relative w-full max-w-lg mx-auto">
             <div className="absolute inset-0 bg-white xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
             <div className="relative w-full mx-auto">
               <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
                 <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-6">
                   <div className="flex items-center gap-1 xs:gap-2">
-                  
-                    <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-gray-800">Video Introduction (Optional)</h3>
+                    <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-gray-800 ">Certifications</h3>
                   </div>
                   {isEditMode && (
                     <div className="flex gap-1 xs:gap-2">
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
-                        onClick={handleOpenVideoDialog}
-                      >
-                        <Pencil size={18} className=" mr-1" />
-                      </Button>
-                    
-                    </div>
-                  )}
-                </div>
-                
-                <div className="space-y-3 xs:space-y-4 sm:space-y-6">
-                  <div className="relative bg-gray-100 rounded-lg xs:rounded-xl aspect-video overflow-x-auto group hover:shadow-md transition-shadow duration-300">
-                    <video 
-                      src={getFullImageUrl(profileData.video_intro_url || profileData.video_intro)}
-                      className="w-full h-auto max-h-60 sm:max-h-80 object-cover transition-transform duration-500 group-hover:scale-105"
-                      controls
-                      preload="metadata"
-                      controlsList="nodownload"
-                      playsInline
-                    />
-                  </div>
-                  {profileData.video_description && (
-                    <div className="bg-gradient-to-br from-white to-gray-50/50 p-3 xs:p-4 rounded-lg xs:rounded-xl border border-[#5A8DB8]/10">
-                      <p className="text-xs xs:text-sm text-gray-700">{profileData.video_description}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Certifications */}
-        <div className="relative w-full max-w-lg mx-auto">
-          <div className="absolute inset-0 bg-white xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
-          <div className="relative w-full mx-auto">
-            <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
-              <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-6">
-                <div className="flex items-center gap-1 xs:gap-2">
-                 
-                  <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-gray-800 ">Certifications</h3>
-                </div>
-                {isEditMode && (
-                  <div className="flex gap-1 xs:gap-2">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="p-0 h-auto text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
-                      onClick={() => handleOpenCertDialog()}
-                    >
-                      <Plus size={18} className=" mr-1" />
-                      
-                    </Button>
-                  </div>
-                )}
-              </div>
-              
-              <div className="space-y-3 xs:space-y-4 sm:space-y-6">
-                {profileData.certifications && profileData.certifications.length > 0 ? (
-                  profileData.certifications.map((cert, index) => (
-                    <div key={index} className="relative group">
-                      {renderCertification(cert, index)}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 xs:py-10 sm:py-12 bg-gradient-to-br from-white/95 to-gray-50/80 rounded-xl sm:rounded-2xl border border-[#5A8DB8]/15">
-                    <div className="p-4 xs:p-5 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#5A8DB8]/5 inline-block mb-4 xs:mb-5">
-                      <div className="h-8 w-8 xs:w-10 xs:h-10 text-[#5A8DB8] mx-auto" />
-                    </div>
-                    <p className="text-gray-600 text-sm xs:text-base sm:text-lg font-medium mb-4 xs:mb-5">No certifications added yet</p>
-                    {isEditMode && (
-                      <Button 
-                        variant="outline"
-                        size="sm"
-                        className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-colors duration-300 border-[#5A8DB8]/30 text-sm xs:text-base font-medium"
+                        className="p-0 h-auto text-[#3C5979] hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
                         onClick={() => handleOpenCertDialog()}
                       >
-                        <Pencil size={18} className="text-[#5A8DB8] mr-1" />
-                        
+                        <Plus size={18} className=" mr-1" />
                       </Button>
-                    )}
-                  </div>
-                )}
-
-      
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-3 xs:space-y-4 sm:space-y-6">
+                  {profileData.certifications && profileData.certifications.length > 0 ? (
+                    profileData.certifications.map((cert, index) => (
+                      <div key={index} className="relative group">
+                        {renderCertification(cert, index)}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 xs:py-10 sm:py-12 bg-gradient-to-br from-white/95 to-gray-50/80 rounded-xl sm:rounded-2xl border border-[#5A8DB8]/15">
+                      <div className="p-4 xs:p-5 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#5A8DB8]/5 inline-block mb-4 xs:mb-5">
+                        <div className="h-8 w-8 xs:w-10 xs:h-10 text-[#5A8DB8] mx-auto" />
+                      </div>
+                      <p className="text-gray-600 text-sm xs:text-base sm:text-lg font-medium mb-4 xs:mb-5">No certifications added yet</p>
+                      {isEditMode && (
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-colors duration-300 border-[#5A8DB8]/30 text-sm xs:text-base font-medium"
+                          onClick={() => handleOpenCertDialog()}
+                        >
+                          <Pencil size={18} className="text-[#5A8DB8] mr-1" />
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </SectionLock>
 
         {/* Profile Edit Dialog */}
         <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>

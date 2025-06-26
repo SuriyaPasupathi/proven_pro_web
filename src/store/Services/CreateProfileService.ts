@@ -903,3 +903,32 @@ export const verifyShareToken = createAsyncThunk(
     }
   }
 );
+
+export const subscribeToPlan = createAsyncThunk(
+  'profile/subscribeToPlan',
+  async (plan: 'free' | 'standard' | 'premium', { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await axios.post(
+        `${baseUrl}subscribe/`,
+        { plan },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error('Subscription error:', error);
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);

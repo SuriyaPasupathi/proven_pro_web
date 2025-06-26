@@ -3,6 +3,11 @@ import { FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Header from '../../../../components/layout/header';
 import Footer from '../Footer';
+import { Button } from "@/components/ui/button";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../store/store";
+import { subscribeToPlan } from "../../../../store/Services/CreateProfileService";
+import { toast } from "sonner";
 
 const planFeatures = [
   "Profile Name and Image",
@@ -14,6 +19,18 @@ const planFeatures = [
 
 const FreePlan: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { subscriptionLoading } = useSelector((state: RootState) => state.createProfile);
+
+  const handleSubscribe = async () => {
+    try {
+      const result = await dispatch(subscribeToPlan('free')).unwrap();
+      toast.success("Successfully subscribed to Free Plan!");
+      navigate("/create-profile/personal-info");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to subscribe to plan");
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
@@ -27,43 +44,49 @@ const FreePlan: React.FC = () => {
             Get started with our basic plan and create your professional profile
           </p>
         </div>
-        <div className="bg-white rounded-2xl shadow-lg border-2 border-transparent p-6 sm:p-8 w-full max-w-xl mb-8 transform hover:scale-[1.02] transition-all duration-300"
-          style={{
-            background: 'linear-gradient(white, white) padding-box, linear-gradient(45deg, #5A8DB8, #3C5979) border-box',
-          }}>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-[#5A8DB8]">Basic Plan</h2>
-              <div className="text-3xl font-extrabold text-[#222] mt-1">Free</div>
+
+        <div className="w-full max-w-2xl mx-auto">
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-[#5A8DB8]/20 p-8 transition-all duration-300 hover:shadow-2xl">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-[#5A8DB8] mb-2">Basic Plan</h2>
+              <div className="text-4xl font-extrabold text-[#222] mb-2">
+                <span className="text-2xl align-top">USD</span> 0
+                <span className="text-base font-semibold text-gray-600">/semiannually</span>
+              </div>
+              <p className="text-gray-600">Perfect for getting started</p>
             </div>
-            <div className="bg-gradient-to-r from-blue-50 to-[#E6F0FA] px-4 py-2 rounded-full shadow-sm">
-              <span className="text-[#5A8DB8] font-semibold">Most Popular</span>
+
+            <div className="mb-8">
+              <h3 className="mb-4 font-semibold text-lg text-[#5A8DB8]">Basic Features:</h3>
+              <ul className="space-y-3 text-gray-700 text-base">
+                {planFeatures.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3 hover:translate-x-1 transition-transform group">
+                    <FaCheckCircle className="text-green-500 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                    <span className="group-hover:text-[#5A8DB8] transition-colors">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="space-y-4">
+              <Button
+                onClick={handleSubscribe}
+                disabled={subscriptionLoading}
+                className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
+              >
+                {subscriptionLoading ? "Processing..." : "Start Creating Profile"}
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => navigate('/plans')}
+                className="w-full border-[#5A8DB8] text-[#5A8DB8] hover:bg-[#E6F0FA] hover:text-[#5A8DB8] transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+              >
+                Go Back to Pricing
+              </Button>
             </div>
           </div>
-          <div className="border-t border-gray-100 pt-6">
-            <h3 className="font-semibold text-[#5A8DB8] mb-4">Basic Features:</h3>
-            <ul className="space-y-4 text-gray-700 text-base mb-8">
-              {planFeatures.map((feature) => (
-                <li key={feature} className="flex items-center gap-3 hover:translate-x-1 transition-transform group">
-                  <FaCheckCircle className="text-green-500 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                  <span className="group-hover:text-[#5A8DB8] transition-colors">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <button
-            className="w-full bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 rounded-lg font-semibold py-3 px-4 text-sm sm:text-base"
-            onClick={() => navigate('/create-profile/personal-info')}
-          >
-            Confirm Basic Plan & Create Profile
-          </button>
         </div>
-        <button
-          className="mt-4 border-2 border-[#5A8DB8] text-[#5A8DB8] px-6 py-2.5 rounded-lg hover:bg-[#E6F0FA] hover:text-[#5A8DB8] transition-all duration-300 font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5"
-          onClick={() => navigate('/plans')}
-        >
-          Go Back to Pricing
-        </button>
       </main>
       <Footer />
     </div>
