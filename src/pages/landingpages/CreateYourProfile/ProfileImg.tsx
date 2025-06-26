@@ -48,6 +48,10 @@ const ProfileImg: React.FC = () => {
         profile_pic_url: profileData.profile_pic_url || ""
       }));
     }
+    // TEMP FIX: Auto-refresh if not free plan to force correct stepper
+    // if (profileData?.subscription_type && profileData.subscription_type !== 'free') {
+    //   window.location.reload();
+    // }
   }, [profileData]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

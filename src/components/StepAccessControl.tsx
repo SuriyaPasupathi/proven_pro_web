@@ -17,13 +17,13 @@ const StepAccessControl: React.FC<StepAccessControlProps> = ({ currentStep, chil
   const { profileData } = useSelector((state: RootState) => state.createProfile);
   const subscriptionType = profileData?.subscription_type || 'free';
 
-  // Debug logging
-  console.log('StepAccessControl Debug:', {
-    currentStep,
-    subscriptionType,
-    profileData,
-    isStepAvailable: isStepAvailable(currentStep, subscriptionType as SubscriptionType)
-  });
+  // // Debug logging
+  // console.log('StepAccessControl Debug:', {
+  //   currentStep,
+  //   subscriptionType,
+  //   profileData,
+  //   isStepAvailable: isStepAvailable(currentStep, subscriptionType as SubscriptionType)
+  // });
 
   // Check if the current step is available for the user's subscription
   if (!isStepAvailable(currentStep, subscriptionType as SubscriptionType)) {

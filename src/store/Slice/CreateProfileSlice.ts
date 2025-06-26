@@ -74,7 +74,7 @@ const initialState: CreateProfileState = {
   success: false,
   profileData: {
     id: '',
-    subscription_type: 'free',
+    subscription_type: 'free' ,
   },
   hasProfile: false,
   profileStatusLoading: false,
@@ -139,7 +139,10 @@ const createProfileSlice = createSlice({
       .addCase(createUserProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.profileData = action.payload;
+        state.profileData = {
+          ...state.profileData,
+          ...action.payload,
+        };
         state.error = null;
       })
       .addCase(createUserProfile.rejected, (state, action) => {
@@ -154,7 +157,10 @@ const createProfileSlice = createSlice({
       .addCase(getProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.profileData = action.payload;
+        state.profileData = {
+          ...state.profileData,
+          ...action.payload,
+        };
         state.verificationDetails = action.payload.verification_details || null;
       })
       .addCase(getProfile.rejected, (state, action) => {
@@ -405,7 +411,10 @@ const createProfileSlice = createSlice({
       .addCase(verifyShareToken.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.profileData = action.payload.profile;
+        state.profileData = {
+          ...state.profileData,
+          ...action.payload.profile,
+        };
         state.verificationDetails = action.payload.profile.verification_details || null;
       })
       .addCase(verifyShareToken.rejected, (state, action) => {
