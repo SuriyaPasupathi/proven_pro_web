@@ -418,7 +418,6 @@ const createProfileSlice = createSlice({
         state.subscriptionSuccess = false;
       })
       .addCase(subscribeToPlan.fulfilled, (state, action) => {
-        console.log('subscribeToPlan.fulfilled - action.payload:', action.payload);
         state.subscriptionLoading = false;
         state.subscriptionSuccess = true;
         state.error = null;
@@ -426,7 +425,6 @@ const createProfileSlice = createSlice({
           ...state.profileData,
           subscription_type: action.payload.subscription_type
         };
-        console.log('Updated profileData:', state.profileData);
       })
       .addCase(subscribeToPlan.rejected, (state, action) => {
         state.subscriptionLoading = false;

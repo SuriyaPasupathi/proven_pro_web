@@ -29,7 +29,7 @@ const PersonalInfo: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { profileData, loading } = useSelector((state: RootState) => state.createProfile);
   
-  const subscriptionType = profileData?.subscription_type || 'free';
+  const subscriptionType = profileData?.subscription_type;
   const totalSteps = getTotalSteps(subscriptionType as SubscriptionType);
   const progressPercent = getStepProgress(CURRENT_STEP, subscriptionType as SubscriptionType);
 

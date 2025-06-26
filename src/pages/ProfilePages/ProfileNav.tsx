@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search,ChevronDown, Menu, X } from 'lucide-react';
+import { Search,ChevronDown, Menu, X, Crown, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AccountDropdown from './AccountDropdown';
@@ -12,6 +12,7 @@ import { logout } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
 import { useEditMode } from '../../context/EditModeContext';
 import ReviewDialog from '@/pages/ProfilePages/ReviewDialog';
+import { SubscriptionType } from '../../utils/subscriptionUtils';
 
 
 interface NavbarProps {
@@ -23,11 +24,63 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const [isUpgradeMenuOpen, setIsUpgradeMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const upgradeMenuRef = useRef<HTMLDivElement>(null);
   const { profileData } = useSelector((state: RootState) => state.createProfile);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { setIsEditMode } = useEditMode();
+
+  const currentSubscription = profileData?.subscription_type || 'free';
+
+  // Get upgrade options based on current subscription
+  const getUpgradeOptions = () => {
+    switch (currentSubscription) {
+      case 'free':
+        return [
+          {
+            name: 'Standard',
+            price: 'USD 10/semiannually',
+            subscriptionType: 'standard' as SubscriptionType,
+            description: 'Enhanced profile with services, experience & skills',
+            features: ['Services & Categories', 'Work Experience', 'Tools & Skills'],
+            icon: <Sparkles className="h-4 w-4 text-blue-600" />,
+            color: 'blue',
+            path: '/standard-plan'
+          },
+          {
+            name: 'Premium',
+            price: 'USD 20/semiannually',
+            subscriptionType: 'premium' as SubscriptionType,
+            description: 'Complete profile with portfolio & video intro',
+            features: ['All Standard features', 'Portfolio', 'Licenses & Certifications', 'Video Introduction'],
+            icon: <Crown className="h-4 w-4 text-yellow-600" />,
+            color: 'yellow',
+            path: '/premium-plan'
+          }
+        ];
+      case 'standard':
+        return [
+          {
+            name: 'Premium',
+            price: 'USD 20/semiannually',
+            subscriptionType: 'premium' as SubscriptionType,
+            description: 'Complete profile with portfolio & video intro',
+            features: ['Portfolio', 'Licenses & Certifications', 'Video Introduction'],
+            icon: <Crown className="h-4 w-4 text-yellow-600" />,
+            color: 'yellow',
+            path: '/premium-plan'
+          }
+        ];
+      case 'premium':
+        return []; // No upgrades available for premium
+      default:
+        return [];
+    }
+  };
+
+  const upgradeOptions = getUpgradeOptions();
 
   const handleLogout = async () => {
     try {
@@ -76,6 +129,9 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsAccountOpen(false);
+      }
+      if (upgradeMenuRef.current && !upgradeMenuRef.current.contains(event.target as Node)) {
+        setIsUpgradeMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -153,6 +209,91 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
           </button>
           {/* <NotificationSheet /> */}
+
+          {/* Dynamic Upgrade Button */}
+          {currentSubscription !== 'premium' && upgradeOptions.length > 0 && (
+            <div className="relative" ref={upgradeMenuRef}>
+              <Button
+                variant="ghost"
+                className="relative px-3 py-2 focus:outline-none group bg-gradient-to-r from-[#5A8DB8]/10 to-[#3C5979]/10 hover:from-[#5A8DB8]/20 hover:to-[#3C5979]/20 transition-all duration-300 rounded-lg"
+                onClick={() => setIsUpgradeMenuOpen(!isUpgradeMenuOpen)}
+              >
+                <span className="relative z-10 text-black font-medium flex items-center gap-2">
+                  {currentSubscription === 'free' && <Sparkles className="h-4 w-4 text-blue-600" />}
+                  {currentSubscription === 'standard' && <Crown className="h-4 w-4 text-yellow-600" />}
+                  Upgrade
+                  <ChevronDown className="h-4 w-4 text-gray-600 transition-transform duration-200" style={{ transform: isUpgradeMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                </span>
+              </Button>
+              
+              {isUpgradeMenuOpen && (
+                <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200/50 backdrop-blur-sm z-50">
+                  <div className="p-4">
+                    <div className="mb-3">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">Upgrade Your Plan</h3>
+                      <p className="text-xs text-gray-600">Unlock more features and opportunities</p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {upgradeOptions.map((option) => (
+                        <div
+                          key={option.subscriptionType}
+                          className={`p-3 rounded-lg border transition-all duration-200 hover:shadow-md cursor-pointer ${
+                            option.color === 'yellow' 
+                              ? 'border-yellow-200 bg-yellow-50/50 hover:bg-yellow-50' 
+                              : 'border-blue-200 bg-blue-50/50 hover:bg-blue-50'
+                          }`}
+                          onClick={() => {
+                            navigate(option.path);
+                            setIsUpgradeMenuOpen(false);
+                          }}
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              {option.icon}
+                              <span className="font-semibold text-gray-900">{option.name}</span>
+                            </div>
+                            <span className="text-sm font-medium text-gray-700">{option.price}</span>
+                          </div>
+                          
+                          <p className="text-xs text-gray-600 mb-2">{option.description}</p>
+                          
+                          <div className="space-y-1">
+                            {option.features.map((feature, featureIndex) => (
+                              <div key={featureIndex} className="flex items-center gap-2">
+                                <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                <span className="text-xs text-gray-700">{feature}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <button
+                        onClick={() => {
+                          navigate('/plans');
+                          setIsUpgradeMenuOpen(false);
+                        }}
+                        className="w-full text-xs text-gray-600 hover:text-gray-800 transition-colors duration-200"
+                      >
+                        View all plans →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Show current plan badge for premium users */}
+          {currentSubscription === 'premium' && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-lg border border-yellow-200/50">
+              <Crown className="h-4 w-4 text-yellow-600" />
+              <span className="text-sm font-medium text-gray-800">Premium</span>
+            </div>
+          )}
           
           {/* Account */}
           <div className="relative" ref={dropdownRef}>
@@ -269,6 +410,33 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                 <span className="relative z-10">Contact Us</span>
                 <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
               </Button>
+              
+              {/* Mobile Upgrade Section */}
+              {currentSubscription !== 'premium' && upgradeOptions.length > 0 && (
+                <div className="pt-2 border-t border-gray-200/50">
+                  <div className="px-4 py-2 mb-2">
+                    <div className="font-medium text-gray-900 mb-1">Upgrade Your Plan</div>
+                    <div className="text-sm text-gray-500">Unlock more features</div>
+                  </div>
+                  {upgradeOptions.map((option) => (
+                    <Button 
+                      key={option.subscriptionType}
+                      variant="ghost" 
+                      className="w-full justify-start text-black hover:text-[#3C5979] hover:bg-gray-50/80 transition-all duration-200 group"
+                      onClick={() => {
+                        navigate(option.path);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <span className="relative z-10 flex items-center gap-2">
+                        {option.icon}
+                        {option.name} - {option.price}
+                      </span>
+                      <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                    </Button>
+                  ))}
+                </div>
+              )}
               
               {/* Mobile Account Section */}
               <div className="pt-2 border-t border-gray-200/50">

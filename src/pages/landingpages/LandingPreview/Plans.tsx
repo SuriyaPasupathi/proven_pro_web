@@ -138,6 +138,7 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-7xl mx-auto relative z-10">
           {plans.map((plan) => {
             const availableSteps = getAvailableSteps(plan.subscriptionType);
+            // const totalSteps = availableSteps.length;
             
             return (
               <div
@@ -282,28 +283,11 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
                       const result = await dispatch(subscribeToPlan(plan.subscriptionType)).unwrap();
                       
                       console.log('Subscription result:', result);
-                      console.log('Subscription result type:', typeof result);
-                      console.log('Subscription result keys:', Object.keys(result));
                       
                       toast.success(`Successfully subscribed to ${plan.name} plan!`);
                       
-                      // Get the first available step for this subscription type
-                      const availableSteps = getAvailableSteps(plan.subscriptionType);
-                      const firstStep = availableSteps[0];
-                      
-                      console.log('Navigation debug:', {
-                        availableSteps,
-                        firstStep,
-                        firstStepPath: firstStep?.path
-                      });
-                      
-                      if (firstStep) {
-                        // Navigate to the first step of the selected plan
-                        navigate(firstStep.path);
-                      } else {
-                        // Fallback to personal info if no steps are available
-                        navigate("/create-profile/personal-info");
-                      }
+                      // Navigate to create profile
+                      navigate("/create-profile/personal-info");
                     } catch (error: any) {
                       console.error('Subscription error:', error);
                       toast.error(error.message || `Failed to subscribe to ${plan.name} plan`);
