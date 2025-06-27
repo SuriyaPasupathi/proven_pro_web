@@ -1,4 +1,4 @@
-import { ChevronDown, Loader2, ChevronUp, Plus, X, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, Loader2, ChevronUp, Plus,  Pencil, CheckCircle2, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -14,8 +14,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
-import { useDeleteItem } from '@/hooks/useDeleteItem';
 
 interface ToolsSectionProps {
   primary_tools?: string[] | string;
@@ -37,17 +35,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
-
-  // Add useDeleteItem hook
-  const {
-    isDeleteDialogOpen,
-    openDeleteDialog,
-    closeDeleteDialog,
-    isLoading: isDeleteLoading
-  } = useDeleteItem();
-
-  // State for tracking tool to delete
-  const [toolToDelete, setToolToDelete] = useState<string | null>(null);
 
   // Convert tools input to array
   const getToolsArray = (input: string[] | string): string[] => {
@@ -205,47 +192,16 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
     setIsDialogOpen(false);
   };
 
-  const handleDeleteClick = (tool: string) => {
-    setToolToDelete(tool);
-    openDeleteDialog();
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!toolToDelete || !reduxProfileData?.id) {
-      toast.error("Missing required data for deletion");
-      return;
-    }
-
-    try {
-      // Update the local state and Redux store first
-      const updatedTools = tools.filter(tool => tool !== toolToDelete);
-
-      const formData = new FormData();
-      formData.append('subscription_type', reduxProfileData.subscription_type || 'premium');
-      formData.append('primary_tools', JSON.stringify(updatedTools));
-
-      const result = await dispatch(updateProfile({
-        data: formData,
-        profileId: reduxProfileData.id
-      })).unwrap();
-      
-      if (result) {
-        setTools(updatedTools);
-        dispatch(updateProfileData({
-          ...reduxProfileData,
-          primary_tools: updatedTools
-        }));
-        toast.success("Tool removed successfully!");
-      }
-    } catch (error) {
-      toast.error("Failed to remove tool");
-    } finally {
-      closeDeleteDialog();
-      setToolToDelete(null);
+  const handleRemoveTool = (toolToRemove: string, isUpdate: boolean = false) => {
+    setTools(prev => prev.filter(tool => tool !== toolToRemove));
+    
+    // Only show toast for individual removals, not during updates
+    if (!isUpdate) {
+      toast.success(`${toolToRemove} removed successfully!`);
     }
   };
 
-  return (
+    return (
     <div className="relative ">
       <div className="absolute inset-0 "></div>
       
@@ -303,16 +259,11 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                 <div className="mt-2 flex flex-wrap gap-2">
                   {tools.map((tool, index) => (
                     <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
-                      <span>{tool}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-4 w-4 text-black hover:text-red-600 hover:bg-transparent"
-                        onClick={() => handleDeleteClick(tool)}
-                        disabled={isLoading}
-                      >
-                        <X className="h-3 w-3" />
+                      <span>{tool}
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200" onClick={() => handleRemoveTool(tool, true)} disabled={isLoading}>
+                        <X className="h-3.5 w-3.5" />
                       </Button>
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -484,16 +435,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-black">{tool}</span>
                     </div>
-                    {isEditMode && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
-                        onClick={() => handleDeleteClick(tool)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
                   </div>
                 ))
             ) : (
@@ -519,18 +460,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
           </Button>
         </div>
       )}
-
-      <DeleteConfirmationDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => {
-          closeDeleteDialog();
-          setToolToDelete(null);
-        }}
-        onConfirm={handleDeleteConfirm}
-        title="Delete Tool"
-        description={`Are you sure you want to remove "${toolToDelete}" from your tools?`}
-        isLoading={isDeleteLoading}
-      />
     </div>
   );
 };

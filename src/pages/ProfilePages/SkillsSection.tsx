@@ -1,4 +1,4 @@
-import {  Loader2, Plus, X, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
+import {  Loader2, Plus, Pencil, CheckCircle2, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -14,8 +14,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
-import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { fetchSkills } from '../../store/Services/DropDownService';
 
 interface Skill {
@@ -55,17 +53,6 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
     soft_skills: [],
     skills_description: ''
   });
-
-  // Add useDeleteItem hook
-  const {
-    isDeleteDialogOpen,
-    openDeleteDialog,
-    closeDeleteDialog,
-    isLoading: isDeleteLoading
-  } = useDeleteItem();
-
-  // State for tracking skill to delete
-  const [skillToDelete, setSkillToDelete] = useState<{ skill: string; type: 'technical_skills' | 'soft_skills' } | null>(null);
 
   // Initialize form when component mounts or props change
   useEffect(() => {
@@ -258,50 +245,15 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
     setIsDialogOpen(false);
   };
 
-  const handleDeleteClick = (skill: string, type: 'technical_skills' | 'soft_skills') => {
-    setSkillToDelete({ skill, type });
-    openDeleteDialog();
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!skillToDelete || !reduxProfileData?.id) {
-      toast.error("Missing required data for deletion");
-      return;
-    }
-
-    try {
-      // Update the local state and Redux store first
-      const updatedSkills = {
-        ...form,
-        [skillToDelete.type]: form[skillToDelete.type].filter(s => s !== skillToDelete.skill)
-      };
-
-      const formData = new FormData();
-      formData.append('subscription_type', reduxProfileData.subscription_type || 'premium');
-      formData.append('technical_skills', JSON.stringify(updatedSkills.technical_skills));
-      formData.append('soft_skills', JSON.stringify(updatedSkills.soft_skills));
-      formData.append('skills_description', updatedSkills.skills_description);
-
-      const result = await dispatch(updateProfile({
-        data: formData,
-        profileId: reduxProfileData.id
-      })).unwrap();
-      
-      if (result) {
-        setForm(updatedSkills);
-        dispatch(updateProfileData({
-          ...reduxProfileData,
-          technical_skills: updatedSkills.technical_skills,
-          soft_skills: updatedSkills.soft_skills,
-          skills_description: updatedSkills.skills_description
-        }));
-        toast.success("Skill removed successfully!");
-      }
-    } catch (error) {
-      toast.error("Failed to remove skill");
-    } finally {
-      closeDeleteDialog();
-      setSkillToDelete(null);
+  const handleRemoveSkill = (skillToRemove: string, field: 'technical_skills' | 'soft_skills', isUpdate: boolean = false) => {
+    setForm(prev => ({
+      ...prev,
+      [field]: prev[field].filter(skill => skill !== skillToRemove)
+    }));
+    
+    // Only show toast for individual removals, not during updates
+    if (!isUpdate) {
+      toast.success(`${skillToRemove} removed successfully!`);
     }
   };
 
@@ -375,16 +327,11 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.technical_skills.map((skill, index) => (
                     <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
-                      <span>{skill}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-4 w-4 text-black hover:text-red-600 hover:bg-transparent"
-                        onClick={() => handleDeleteClick(skill, 'technical_skills')}
-                        disabled={isLoading}
-                      >
-                        <X className="h-3 w-3" />
+                      <span>{skill}
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200" onClick={() => handleRemoveSkill(skill, 'technical_skills', true)} disabled={isLoading}>
+                        <X className="h-3.5 w-3.5" />
                       </Button>
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -404,16 +351,11 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.soft_skills.map((skill, index) => (
                     <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
-                      <span>{skill}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-4 w-4 text-black hover:text-red-600 hover:bg-transparent"
-                        onClick={() => handleDeleteClick(skill, 'soft_skills')}
-                        disabled={isLoading}
-                      >
-                        <X className="h-3 w-3" />
+                      <span>{skill}
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200" onClick={() => handleRemoveSkill(skill, 'soft_skills', true)} disabled={isLoading}>
+                        <X className="h-3.5 w-3.5" />
                       </Button>
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -653,16 +595,6 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-black">{skill}</span>
                     </div>
-                    {isEditMode && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
-                        onClick={() => handleDeleteClick(skill, 'technical_skills')}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
                   </div>
                 ))
             ) : (
@@ -686,16 +618,6 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-black">{skill}</span>
                     </div>
-                    {isEditMode && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
-                        onClick={() => handleDeleteClick(skill, 'soft_skills')}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
                   </div>
                 ))
             ) : (
@@ -704,18 +626,6 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
           </div>
         </div>
       </div>
-
-      <DeleteConfirmationDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => {
-          closeDeleteDialog();
-          setSkillToDelete(null);
-        }}
-        onConfirm={handleDeleteConfirm}
-        title="Delete Skill"
-        description={`Are you sure you want to remove "${skillToDelete?.skill}" from your ${skillToDelete?.type === 'technical_skills' ? 'technical' : 'soft'} skills?`}
-        isLoading={isDeleteLoading}
-      />
     </div>
   );
 };
