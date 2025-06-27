@@ -73,6 +73,11 @@ const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
 // Get auth token from localStorage
 const getAuthToken = () => {
   const token = localStorage.getItem('access_token');
+  console.log('getAuthToken called, token found:', !!token);
+  if (token) {
+    console.log('Token length:', token.length);
+    console.log('Token preview:', token.substring(0, 20) + '...');
+  }
   return token; // Return null if no token exists instead of throwing error
 };
 
@@ -915,8 +920,12 @@ export const subscribeToPlan = createAsyncThunk(
   'profile/subscribeToPlan',
   async (plan: 'free' | 'standard' | 'premium', { rejectWithValue }) => {
     try {
+      console.log('subscribeToPlan called with plan:', plan);
       const token = getAuthToken();
+      console.log('Token retrieved in subscribeToPlan:', !!token);
+      
       if (!token) {
+        console.error('No authentication token found in subscribeToPlan');
         throw new Error('No authentication token found');
       }
 
@@ -931,6 +940,7 @@ export const subscribeToPlan = createAsyncThunk(
         }
       );
 
+      console.log('Subscription API response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Subscription error:', error);

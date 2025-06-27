@@ -4,7 +4,9 @@ import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
 import { ProfileData } from '../../types/profile';
-import { logout } from '../../store/Services/CreateProfileService';
+import { logout as logoutAPI } from '../../store/Services/CreateProfileService';
+import { logout as logoutLogin } from '../../store/Slice/LoginSlice';
+import { logout as logoutAuth } from '../../store/Slice/authSlice';
 import { toast } from 'sonner';
 import { useEditMode } from '../../context/EditModeContext';
 
@@ -24,12 +26,17 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
       
       if (refreshToken) {
         try {
-          await dispatch(logout());
+          await dispatch(logoutAPI());
         } catch (apiError) {
           console.error('API logout failed:', apiError);
         }
       }
       
+      // Clear Redux state
+      dispatch(logoutLogin());
+      dispatch(logoutAuth());
+      
+      // Clear localStorage
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
@@ -43,6 +50,12 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ closeDropdown }) => {
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
+      
+      // Clear Redux state even if API call fails
+      dispatch(logoutLogin());
+      dispatch(logoutAuth());
+      
+      // Clear localStorage
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');

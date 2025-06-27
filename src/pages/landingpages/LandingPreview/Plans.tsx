@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../store/store";
 import { subscribeToPlan } from "../../../store/Services/CreateProfileService";
 import Header from "@/components/layout/header";
 import Footer from "./Footer";
-import { FaRocket, FaCheck, FaLock } from 'react-icons/fa';
+import { FaRocket, FaCheck,  } from 'react-icons/fa';
 import { getAvailableSteps, SubscriptionType } from "../../../utils/subscriptionUtils";
 import toast from "react-hot-toast";
 
@@ -80,34 +80,74 @@ const plans = [
 export default function Plans({ isInLandingPage = false }: PlansProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  
+  // Check authentication status from both slices
+  const { isAuthenticated: loginAuthenticated } = useSelector((state: RootState) => state.login);
+  const { isAuthenticated: authAuthenticated } = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = loginAuthenticated || authAuthenticated;
 
-  const getStepColor = (planColor: string) => {
-    switch (planColor) {
-      case "yellow":
-        return "bg-yellow-100 text-yellow-600";
-      case "blue":
-        return "bg-blue-100 text-blue-600";
-      case "green":
-        return "bg-green-100 text-green-600";
-      default:
-        return "bg-gray-100 text-gray-600";
+  // const getStepColor = (planColor: string) => {
+  //   switch (planColor) {
+  //     case "yellow":
+  //       return "bg-yellow-100 text-yellow-600";
+  //     case "blue":
+  //       return "bg-blue-100 text-blue-600";
+  //     case "green":
+  //       return "bg-green-100 text-green-600";
+  //     default:
+  //       return "bg-gray-100 text-gray-600";
+  //   }
+  // };
+
+  // const getStepIcon = (stepNumber: number, availableSteps: any[], planColor: string) => {
+  //   const isAvailable = availableSteps.some(step => step.step === stepNumber);
+  //   if (isAvailable) {
+  //     return (
+  //       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${getStepColor(planColor)}`}>
+  //         {stepNumber}
+  //       </div>
+  //     );
+  //   } else {
+  //     return (
+  //       <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold bg-gray-100 text-gray-400">
+  //         <FaLock className="w-3 h-3" />
+  //       </div>
+  //     );
+  //   }
+  // };
+
+  const handlePlanSelection = async (plan: any) => {
+    // If viewing from landing page, navigate to signup
+    if (isInLandingPage) {
+      navigate("/signup");
+      return;
     }
-  };
 
-  const getStepIcon = (stepNumber: number, availableSteps: any[], planColor: string) => {
-    const isAvailable = availableSteps.some(step => step.step === stepNumber);
-    if (isAvailable) {
-      return (
-        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${getStepColor(planColor)}`}>
-          {stepNumber}
-        </div>
-      );
-    } else {
-      return (
-        <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold bg-gray-100 text-gray-400">
-          <FaLock className="w-3 h-3" />
-        </div>
-      );
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast.error('Please log in to subscribe to a plan. You need to be logged in to access this feature.');
+      navigate("/login");
+      return;
+    }
+
+    try {
+      console.log('Plan selection debug:', {
+        planName: plan.name,
+        subscriptionType: plan.subscriptionType
+      });
+      
+      // Subscribe to the plan first
+      const result = await dispatch(subscribeToPlan(plan.subscriptionType)).unwrap();
+      
+      console.log('Subscription result:', result);
+      
+      toast.success(`Successfully subscribed to ${plan.name} plan!`);
+      
+      // Navigate to create profile
+      navigate("/create-profile/personal-info");
+    } catch (error: any) {
+      console.error('Subscription error:', error);
+      toast.error(error.message || `Failed to subscribe to ${plan.name} plan`);
     }
   };
 
@@ -138,6 +178,7 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-7xl mx-auto relative z-10">
           {plans.map((plan) => {
             const availableSteps = getAvailableSteps(plan.subscriptionType);
+            console.log('Available steps:', availableSteps);
             // const totalSteps = availableSteps.length;
             
             return (
@@ -204,8 +245,8 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
                   </div>
                 </div>
 
-                {/* Profile Creation Steps */}
-                <div className="mb-4 sm:mb-6">
+                {/* Profile Creation Steps - Hidden */}
+                {/* <div className="mb-4 sm:mb-6">
                   <div className="font-semibold text-xs sm:text-sm mb-3 text-gray-700">Profile Creation Steps:</div>
                   <div className="space-y-2">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((stepNumber) => {
@@ -241,7 +282,7 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
                       );
                     })}
                   </div>
-                </div>
+                </div> */}
 
                 {/* Features List */}
                 <div className="mb-4 sm:mb-6">
@@ -272,33 +313,7 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
                         : "bg-white border-2 border-gray-200 text-gray-800 hover:bg-[#5A8DB8] hover:text-white hover:border-[#5A8DB8] hover:-translate-y-0.5 transform transition-all duration-300"
                   }`}
                   style={plan.highlight ? { border: '1px solid #FFD700' } : {}}
-                  onClick={async () => {
-                    // If viewing from landing page, navigate to signup
-                    if (isInLandingPage) {
-                      navigate("/signup");
-                      return;
-                    }
-
-                    try {
-                      console.log('Plan selection debug:', {
-                        planName: plan.name,
-                        subscriptionType: plan.subscriptionType
-                      });
-                      
-                      // Subscribe to the plan first
-                      const result = await dispatch(subscribeToPlan(plan.subscriptionType)).unwrap();
-                      
-                      console.log('Subscription result:', result);
-                      
-                      toast.success(`Successfully subscribed to ${plan.name} plan!`);
-                      
-                      // Navigate to create profile
-                      navigate("/create-profile/personal-info");
-                    } catch (error: any) {
-                      console.error('Subscription error:', error);
-                      toast.error(error.message || `Failed to subscribe to ${plan.name} plan`);
-                    }
-                  }}
+                  onClick={() => handlePlanSelection(plan)}
                 >
                   {plan.button}
                 </Button>

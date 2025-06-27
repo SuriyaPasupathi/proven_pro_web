@@ -105,13 +105,33 @@ export const postUserCredentials = createAsyncThunk(
   'auth/postUserCredentials',
   async (payload: GoogleLoginPayload, { rejectWithValue }) => {
     try {
+      console.log('postUserCredentials called with payload:', { ...payload, token: '***' });
+      
       const response = await axios.post(`${baseUrl}google-auth/`, payload, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
+
+      console.log('Google auth response received:', {
+        hasAccess: !!response.data.access,
+        hasRefresh: !!response.data.refresh,
+        hasUser: !!response.data.user
+      });
+
+      // Store tokens in localStorage after successful Google authentication
+      if (response.data.access) {
+        localStorage.setItem('access_token', response.data.access);
+        console.log('Access token stored in localStorage');
+      }
+      if (response.data.refresh) {
+        localStorage.setItem('refresh_token', response.data.refresh);
+        console.log('Refresh token stored in localStorage');
+      }
+
       return response.data;
     } catch (error) {
+      console.error('Google auth error:', error);
       const authError = handleAuthError(error);
       return rejectWithValue(authError);
     }

@@ -6,8 +6,12 @@ import { checkProfileStatus } from '../store/Services/CreateProfileService';
 
 const ProtectedRoute = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated } = useSelector((state: RootState) => state.login);
+  const { isAuthenticated: loginAuthenticated } = useSelector((state: RootState) => state.login);
+  const { isAuthenticated: authAuthenticated } = useSelector((state: RootState) => state.auth);
   const { profileStatusLoading } = useSelector((state: RootState) => state.createProfile);
+
+  // Check if user is authenticated from either login or auth slice
+  const isAuthenticated = loginAuthenticated || authAuthenticated;
 
   useEffect(() => {
     if (isAuthenticated) {
