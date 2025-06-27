@@ -158,19 +158,34 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
     <header className="w-full border-b border-gray-200/50 bg-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] sticky top-0 z-50">
       <div className="w-11/12 mx-auto px-4 sm:px-6 md:px-8 h-14 sm:h-16 flex items-center justify-between relative">
         {/* Premium Background Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#5A8DB8]/5 via-transparent to-[#3C5979]/5 opacity-30"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-[#5A8DB8]/5 via-transparent to-[#3C5979]/5 opacity-30 z-0"></div>
         
         {/* Left: Logo & Search */}
-        <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto relative">
+        <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto relative z-10">
           <div 
-            className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group"
+            className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group relative z-20"
           >
-            <div className="relative">
+            <div className="relative flex-shrink-0">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
-              <img src={logo  } alt="ProvenPro Logo" className="relative w-6 h-6 sm:w-8 sm:h-8 transform group-hover:scale-105 transition-transform duration-300"
+              <img 
+                src={logo} 
+                alt="ProvenPro Logo" 
+                className="relative w-6 h-6 sm:w-8 sm:h-8 transform group-hover:scale-105 transition-transform duration-300 z-10"
+                onError={(e) => {
+                  console.error('Failed to load logo image:', e);
+                  // Try fallback to the alternative logo
+                  e.currentTarget.src = '../../assets/logo 2.png';
+                  e.currentTarget.onerror = () => {
+                    console.error('Both logo files failed to load');
+                    e.currentTarget.style.display = 'none';
+                  };
+                }}
+                onLoad={() => {
+                  console.log('Logo loaded successfully');
+                }}
               />
             </div>
-            <span className="text-base sm:text-lg font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent">
+            <span className="text-base sm:text-lg font-semibold bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] bg-clip-text text-transparent relative z-10 flex-shrink-0">
               Proven<span className="font-light">Pro</span>
             </span>
           </div>
@@ -191,7 +206,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
         </div>
 
         {/* Right: Navigation Items */}
-        <div className="hidden md:flex items-center gap-4 lg:gap-6">
+        <div className="hidden md:flex items-center gap-4 lg:gap-6 relative z-10">
           <button
             type="button"
             className="relative px-0 py-0 focus:outline-none group"
@@ -326,7 +341,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
         </div>
 
         {/* Mobile Actions */}
-        <div className="md:hidden flex items-center gap-2">
+        <div className="md:hidden flex items-center gap-2 relative z-10">
           <Button
             variant="ghost"
             size="icon"
