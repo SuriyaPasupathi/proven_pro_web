@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { getProfile, getProfileReviews } from '../../store/Services/CreateProfileService';
@@ -28,6 +28,8 @@ const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { profileId } = useParams();
   const navigate = useNavigate();
+  const navigateRef = useRef(navigate);
+  const hasFetchedRef = useRef(false);
   const { profileData, loading, error } = useSelector((state: RootState) => state.createProfile);
   const { reviews } = useSelector((state: RootState) => state.createProfile);
   const [profile, setProfile] = useState<ProfileData>({
@@ -58,32 +60,47 @@ const App: React.FC = () => {
       }
     }
   });
+  const lastFetchedId = useRef<string | null>(null);
 
+  // Update navigate ref when navigate changes
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        if (!profileId) {
-          const storedProfileId = localStorage.getItem('userProfileId');
-          if (storedProfileId) {
-            navigate(`/profile/${storedProfileId}`);
-            return;
-          }
-          navigate('/create-profile/personal-info');
+    navigateRef.current = navigate;
+  }, [navigate]);
+
+  const fetchProfile = useCallback(async () => {
+    // Prevent duplicate requests for the same profileId
+    if (lastFetchedId.current === profileId) {
+      console.log('Already fetched for this profileId:', profileId);
+      return;
+    }
+    lastFetchedId.current = profileId ?? null;
+
+    try {
+      if (!profileId) {
+        const storedProfileId = localStorage.getItem('userProfileId');
+        if (storedProfileId) {
+          navigateRef.current(`/profile/${storedProfileId}`);
           return;
         }
-        await dispatch(getProfile(profileId));
-        await dispatch(getProfileReviews(profileId));
-        setIsInitialLoading(false);
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          navigate('/login');
-        }
-        setIsInitialLoading(false);
+        navigateRef.current('/create-profile/personal-info');
+        return;
       }
-    };
+      await dispatch(getProfile(profileId));
+      await dispatch(getProfileReviews(profileId));
+      setIsInitialLoading(false);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        navigateRef.current('/login');
+      }
+      setIsInitialLoading(false);
+    }
+  }, [profileId, dispatch]);
 
+  useEffect(() => {
+    // Reset fetch flag when profileId changes
+    hasFetchedRef.current = false;
     fetchProfile();
-  }, [dispatch, profileId, navigate]);
+  }, [fetchProfile]);
 
   useEffect(() => {
     if (profileData) {
