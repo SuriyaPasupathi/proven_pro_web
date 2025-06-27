@@ -273,6 +273,12 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
                   }`}
                   style={plan.highlight ? { border: '1px solid #FFD700' } : {}}
                   onClick={async () => {
+                    // If viewing from landing page, navigate to signup
+                    if (isInLandingPage) {
+                      navigate("/signup");
+                      return;
+                    }
+
                     try {
                       console.log('Plan selection debug:', {
                         planName: plan.name,
