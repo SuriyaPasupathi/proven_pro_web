@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import Header from '../../../components/layout/header';
 import Footer from './Footer';
 import { FaStar, FaGem, FaRocket } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import FreePlanDailog from './SeeExamplePage/FreePlanDailog';
+import StandardPlanDailog from './SeeExamplePage/StandardPlanDailog';
+import PremiumPlanDailog from './SeeExamplePage/PremiumPlanDailog';
 
 interface ProfileCardProps {
   image: string;
@@ -98,9 +100,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 };
 
 const SeeExample: React.FC = () => {
-  const navigate = useNavigate();
   const [showFreeDialog, setShowFreeDialog] = useState(false);
-
+  const [showStandardDialog, setShowStandardDialog] = useState(false);
+  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
   const profiles = [
     {
       image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
@@ -131,7 +133,7 @@ const SeeExample: React.FC = () => {
         </span>
       ),
       highlight: false,
-      onSelect: () => navigate('/standard-plan'),
+      onSelect: () => setShowStandardDialog(true),
     },
     {
       image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop',
@@ -147,12 +149,12 @@ const SeeExample: React.FC = () => {
         </span>
       ),
       highlight: true,
-      onSelect: () => navigate('/premium-plan'),
+      onSelect: () => setShowPremiumDialog(true),
     },
   ];
 
   return (
-    <div className="flex flex-col min-h-screen">
+        <>
       <Header />
       <main className="flex-grow">
         <div className="relative py-8 px-2 sm:py-12 sm:px-4 md:px-8 bg-gradient-to-br from-blue-50 via-white to-blue-100">
@@ -184,7 +186,9 @@ const SeeExample: React.FC = () => {
       </main>
       <Footer />
       <FreePlanDailog open={showFreeDialog} onClose={() => setShowFreeDialog(false)} />
-    </div>
+      <StandardPlanDailog open={showStandardDialog} onClose={() => setShowStandardDialog(false)} />
+      <PremiumPlanDailog open={showPremiumDialog} onClose={() => setShowPremiumDialog(false)} />
+    </>
   );
 };
 

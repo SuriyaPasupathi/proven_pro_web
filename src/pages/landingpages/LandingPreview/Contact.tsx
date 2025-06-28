@@ -41,14 +41,11 @@ export default function Contact({ isInLandingPage = false }: ContactProps) {
           {/* Image */}
           <div className="w-full lg:w-1/2 flex justify-center">
             <div className="relative group w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[400px]">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
-              <div className="relative shadow-xl rounded-lg overflow-hidden transform group-hover:scale-[1.02] transition-all duration-300">
-                <img
-                  src={image}
-                  alt="Contact"
-                  className="rounded-lg w-full h-auto object-cover"
-                />
-              </div>
+              <img
+                src={image}
+                alt="Contact"
+                className="w-full h-auto object-cover"
+              />
             </div>
           </div>
         </div>

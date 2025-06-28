@@ -799,7 +799,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               {/* Profile Image - Full Width */}
               <div className="mb-3 xs:mb-4 sm:mb-6">
                 <div className="relative group">
-                  <div className="w-full aspect-square overflow-hidden bg-white border-4 border-black/20 transition-all duration-300 hover:border-black/40">
+                  <div className="w-full aspect-square overflow-hidden bg-white border-4 border-black/20 rounded-full transition-all duration-300 hover:border-black/40">
                     {!imageError && (profileData.profile_pic_url || profileData.profile_pic) ? (
                       <img 
                         src={getFullImageUrl(profileData.profile_pic_url || profileData.profile_pic)}
@@ -808,7 +808,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                         onError={() => setImageError(true)}
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center">
+                      <div className="w-full h-full bg-gradient-to-br from-[#5A8DB8] to-[#3C5979] flex items-center justify-center rounded-full">
                         <span className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white">
                           {`${profileData.first_name?.[0] || ''}${profileData.last_name?.[0] || ''}`.toUpperCase() || '?'}
                         </span>

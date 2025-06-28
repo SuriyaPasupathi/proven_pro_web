@@ -170,7 +170,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
               <img 
                 src={logo} 
                 alt="ProvenPro Logo" 
-                className="relative w-6 h-6 sm:w-8 sm:h-8 transform group-hover:scale-105 transition-transform duration-300 z-10"
+                className="relative w-6 h-6 sm:w-8 sm:h-8 transform group-hover:scale-105 transition-transform duration-300 z-10 rounded-lg"
                 onError={(e) => {
                   console.error('Failed to load logo image:', e);
                   // Try fallback to the alternative logo

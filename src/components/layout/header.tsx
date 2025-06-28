@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Menu, Search } from "lucide-react";
 import logo from "../../assets/logo.png";
+import logoFallback from "../../assets/logo 2.png";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import { searchUsers } from "@/store/Services/CreateProfileService";
@@ -78,21 +79,23 @@ export default function Header() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#5A8DB8]/5 via-transparent to-[#3C5979]/5 opacity-30"></div>
         
         {/* Left: Logo & Search */}
-        <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto relative">
+        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0 relative">
           <div 
             onClick={() => navigate("/")} 
-            className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group"
+            className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group flex-shrink-0"
           >
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
               <img 
                 src={logo} 
                 alt="ProvenPro Logo" 
-                className="relative w-6 h-6 sm:w-8 sm:h-8 transform group-hover:scale-105 transition-transform duration-300"
+                className="relative w-6 h-6 sm:w-8 sm:h-8 transform group-hover:scale-105 transition-transform duration-300 block rounded-lg"
+                style={{ minWidth: '24px', minHeight: '24px' }}
                 onError={(e) => {
                   console.error('Failed to load logo image:', e);
+                  console.log('Attempting to load fallback logo...');
                   // Try fallback to the alternative logo
-                  e.currentTarget.src = '../../assets/logo 2.png';
+                  e.currentTarget.src = logoFallback;
                   e.currentTarget.onerror = () => {
                     console.error('Both logo files failed to load');
                     e.currentTarget.style.display = 'none';
@@ -109,7 +112,7 @@ export default function Header() {
           </div>
 
           {/* Desktop Search Bar */}
-          <div className="hidden md:block md:ml-4 lg:ml-6 w-full max-w-xs relative">
+          <div className="hidden md:block md:ml-4 lg:ml-6 flex-1 max-w-xs relative">
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-0 group-hover:opacity-20 transition duration-300"></div>
               <div className="relative">
@@ -152,6 +155,51 @@ export default function Header() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Mobile Search Bar */}
+        <div className="md:hidden flex-1 mx-4 relative">
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] rounded-lg blur opacity-0 group-hover:opacity-20 transition duration-300"></div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+              <Input 
+                placeholder="Search users..." 
+                className="pl-8 h-8 text-sm bg-white border-gray-200/50 shadow-sm focus:shadow-md transition-all duration-300"
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+            </div>
+          </div>
+          
+          {/* Mobile Search Results Dropdown */}
+          {searchQuery && (searchResults.length > 0 || isSearching) && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-200/50 max-h-64 overflow-y-auto z-50">
+              {isSearching ? (
+                <div className="p-3 text-center text-sm text-gray-500">Searching...</div>
+              ) : searchError ? (
+                <div className="p-3 text-center text-sm text-red-500">{searchError.message}</div>
+              ) : (
+                searchResults.map((user: SearchUser) => (
+                  <div
+                    key={user.id}
+                    className="p-2.5 hover:bg-gray-50/80 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-200"
+                    onClick={() => handleUserClick(user.id)}
+                  >
+                    <div className="font-medium text-sm text-gray-900">{user.username}</div>
+                    {user.bio && (
+                      <div className="text-xs text-gray-500 truncate">{user.bio}</div>
+                    )}
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs text-gray-500">
+                        Rating: {(user.avg_rating || 0).toFixed(1)} ({user.total_reviews || 0} reviews)
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         {/* Middle: Nav Links (Desktop) */}
