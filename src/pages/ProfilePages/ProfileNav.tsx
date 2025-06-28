@@ -47,7 +47,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             features: ['Services & Categories', 'Work Experience', 'Tools & Skills'],
             icon: <Sparkles className="h-4 w-4 text-blue-600" />,
             color: 'blue',
-            path: '/standard-plan'
+            path: '/plans'
           },
           {
             name: 'Premium',
@@ -57,7 +57,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             features: ['All Standard features', 'Portfolio', 'Licenses & Certifications', 'Video Introduction'],
             icon: <Crown className="h-4 w-4 text-yellow-600" />,
             color: 'yellow',
-            path: '/premium-plan'
+            path: '/plans'
           }
         ];
       case 'standard':
@@ -70,7 +70,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             features: ['Portfolio', 'Licenses & Certifications', 'Video Introduction'],
             icon: <Crown className="h-4 w-4 text-yellow-600" />,
             color: 'yellow',
-            path: '/premium-plan'
+            path: '/plans'
           }
         ];
       case 'premium':
