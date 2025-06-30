@@ -8,11 +8,11 @@ import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 // import NotificationSheet from "@/components/layout/notificationsheet";
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../../store/Services/CreateProfileService';
+import { logout, subscribeToPlan } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
 import { useEditMode } from '../../context/EditModeContext';
 import ReviewDialog from '@/pages/ProfilePages/ReviewDialog';
-import { SubscriptionType } from '../../utils/subscriptionUtils';
+import { SubscriptionType, getUpgradeNavigationPath } from '../../utils/subscriptionUtils';
 
 
 interface NavbarProps {
@@ -154,6 +154,40 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
     }
   };
 
+  const handlePlanSelection = async (plan: any) => {
+    try {
+      console.log('Plan selection debug:', {
+        planName: plan.name,
+        subscriptionType: plan.subscriptionType,
+        currentSubscription,
+        isUpgrade: plan.subscriptionType !== currentSubscription
+      });
+      
+      // Subscribe to the plan first
+      const result = await dispatch(subscribeToPlan(plan.subscriptionType));
+      
+      console.log('Subscription result:', result);
+      
+      toast.success(`Successfully subscribed to ${plan.name} plan!`);
+      
+      // Determine the appropriate navigation path based on upgrade logic
+      let navigationPath = "/create-profile/personal-info"; // default
+      
+      if (plan.subscriptionType !== currentSubscription) {
+        // This is an upgrade, use the upgrade navigation logic
+        navigationPath = getUpgradeNavigationPath(currentSubscription as SubscriptionType, plan.subscriptionType);
+        console.log('Upgrade navigation path:', navigationPath);
+      }
+      
+      // Navigate to the appropriate step
+      navigate(navigationPath);
+      setIsUpgradeMenuOpen(false);
+    } catch (error: any) {
+      console.error('Subscription error:', error);
+      toast.error(error.message || `Failed to subscribe to ${plan.name} plan`);
+    }
+  };
+
   return (
     <header className="w-full border-b border-gray-200/50 bg-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] sticky top-0 z-50">
       <div className="w-11/12 mx-auto px-4 sm:px-6 md:px-8 h-14 sm:h-16 flex items-center justify-between relative">
@@ -259,8 +293,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                               : 'border-blue-200 bg-blue-50/50 hover:bg-blue-50'
                           }`}
                           onClick={() => {
-                            navigate(option.path);
-                            setIsUpgradeMenuOpen(false);
+                            handlePlanSelection(option);
                           }}
                         >
                           <div className="flex items-start justify-between mb-2">
@@ -439,8 +472,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                       variant="ghost" 
                       className="w-full justify-start text-black hover:text-[#3C5979] hover:bg-gray-50/80 transition-all duration-200 group"
                       onClick={() => {
-                        navigate(option.path);
-                        setIsMenuOpen(false);
+                        handlePlanSelection(option);
                       }}
                     >
                       <span className="relative z-10 flex items-center gap-2">

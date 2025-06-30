@@ -102,4 +102,32 @@ export const getStepProgress = (currentStep: number, subscriptionType: Subscript
   }
   
   return Math.round(((currentStepIndex + 1) / availableSteps.length) * 100);
+};
+
+// New function to determine the appropriate starting step when upgrading plans
+export const getUpgradeStartingStep = (fromPlan: SubscriptionType, toPlan: SubscriptionType): number => {
+  // If upgrading from free to standard, start from step 1
+  if (fromPlan === 'free' && toPlan === 'standard') {
+    return 1;
+  }
+  
+  // If upgrading from free to premium, start from step 1
+  if (fromPlan === 'free' && toPlan === 'premium') {
+    return 1;
+  }
+  
+  // If upgrading from standard to premium, start from step 6 (portfolio)
+  if (fromPlan === 'standard' && toPlan === 'premium') {
+    return 6;
+  }
+  
+  // Default fallback
+  return 1;
+};
+
+// New function to get the appropriate navigation path after plan upgrade
+export const getUpgradeNavigationPath = (fromPlan: SubscriptionType, toPlan: SubscriptionType): string => {
+  const startingStep = getUpgradeStartingStep(fromPlan, toPlan);
+  const stepConfig = PROFILE_STEPS.find(step => step.step === startingStep);
+  return stepConfig ? stepConfig.path : '/create-profile/personal-info';
 }; 

@@ -6,7 +6,7 @@ import { subscribeToPlan } from "../../../store/Services/CreateProfileService";
 import Header from "@/components/layout/header";
 import Footer from "./Footer";
 import { FaRocket, FaCheck,  } from 'react-icons/fa';
-import { getAvailableSteps, SubscriptionType } from "../../../utils/subscriptionUtils";
+import { getAvailableSteps, SubscriptionType, getUpgradeNavigationPath } from "../../../utils/subscriptionUtils";
 import toast from "react-hot-toast";
 
 interface PlansProps {
@@ -86,6 +86,10 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
   const { isAuthenticated: authAuthenticated } = useSelector((state: RootState) => state.auth);
   const isAuthenticated = loginAuthenticated || authAuthenticated;
 
+  // Get current subscription from profile data
+  const { profileData } = useSelector((state: RootState) => state.createProfile);
+  const currentSubscription = profileData?.subscription_type || 'free';
+
   // const getStepColor = (planColor: string) => {
   //   switch (planColor) {
   //     case "yellow":
@@ -133,7 +137,9 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
     try {
       console.log('Plan selection debug:', {
         planName: plan.name,
-        subscriptionType: plan.subscriptionType
+        subscriptionType: plan.subscriptionType,
+        currentSubscription,
+        isUpgrade: plan.subscriptionType !== currentSubscription
       });
       
       // Subscribe to the plan first
@@ -143,8 +149,17 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
       
       toast.success(`Successfully subscribed to ${plan.name} plan!`);
       
-      // Navigate to create profile
-      navigate("/create-profile/personal-info");
+      // Determine the appropriate navigation path based on upgrade logic
+      let navigationPath = "/create-profile/personal-info"; // default
+      
+      if (plan.subscriptionType !== currentSubscription) {
+        // This is an upgrade, use the upgrade navigation logic
+        navigationPath = getUpgradeNavigationPath(currentSubscription as SubscriptionType, plan.subscriptionType);
+        console.log('Upgrade navigation path:', navigationPath);
+      }
+      
+      // Navigate to the appropriate step
+      navigate(navigationPath);
     } catch (error: any) {
       console.error('Subscription error:', error);
       toast.error(error.message || `Failed to subscribe to ${plan.name} plan`);
