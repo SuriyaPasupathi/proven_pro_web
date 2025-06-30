@@ -579,7 +579,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
             <div className="space-y-2 sm:space-y-3">
               <div className="text-center">
                 <div className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-xl sm:rounded-2xl text-gray-900">
-                  <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                  <span className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-900">
                     {profileData.rating?.toFixed(1) || "5.0"}
                   </span>
                 </div>
