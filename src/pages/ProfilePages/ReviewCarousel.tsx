@@ -152,8 +152,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
         <div className="flex justify-start mb-4 xs:mb-6 sm:mb-8">
           <Button 
             className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 xs:gap-2 text-xs xs:text-sm sm:text-base"
-            onClick={() => setIsReviewDialogOpen(true)}
-            disabled={isSubmitting}
+            
           >
             <MessageSquare className="h-3 w-3 xs:h-4 xs:w-4" />
             Reviews
@@ -181,8 +180,7 @@ const ReviewCarousel: React.FC<ReviewCarouselProps> = ({
       <div className="flex justify-between items-center mb-4 xs:mb-6 sm:mb-8">
         <Button 
           className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 xs:gap-2 text-xs xs:text-sm sm:text-base"
-          onClick={() => setIsReviewDialogOpen(true)}
-          disabled={isSubmitting}
+         
         >
           <MessageSquare className="h-3 w-3 xs:h-4 xs:w-4" />
           Reviews

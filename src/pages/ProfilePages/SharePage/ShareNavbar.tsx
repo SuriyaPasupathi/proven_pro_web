@@ -94,22 +94,6 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen, shareToken, profileId }: NavbarProp
               <span className="relative z-10">Write a Review</span>
               <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             </button>
-            <button
-              type="button"
-              className="relative px-0 py-0 focus:outline-none group"
-              onClick={() => navigate('/plans')}
-            >
-              <span className="relative z-10">Pricing</span>
-              <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-            </button>
-            <button
-              type="button"
-              className="relative px-0 py-0 focus:outline-none group"
-              onClick={() => navigate('/contact')}
-            >
-              <span className="relative z-10">Contact Us</span>
-              <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-            </button>
           </nav>
 
           {/* Mobile Actions */}
@@ -174,26 +158,6 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen, shareToken, profileId }: NavbarProp
               }}
             >
               Write a Review
-            </button>
-            <button
-              type="button"
-              className="w-full text-left px-2 py-1 rounded-lg hover:bg-gray-50/80 transition-colors duration-200"
-              onClick={() => {
-                navigate('/plans');
-                setIsMenuOpen(false);
-              }}
-            >
-              Pricing
-            </button>
-            <button
-              type="button"
-              className="w-full text-left px-2 py-1 rounded-lg hover:bg-gray-50/80 transition-colors duration-200"
-              onClick={() => {
-                navigate('/contact');
-                setIsMenuOpen(false);
-              }}
-            >
-              Contact Us
             </button>
           </div>
         </div>

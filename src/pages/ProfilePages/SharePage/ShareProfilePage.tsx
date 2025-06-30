@@ -110,10 +110,10 @@ const ShareProfilePage = () => {
 
   if (error || profileError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center p-8 max-w-md w-full mx-4">
-          <h2 className="text-2xl font-bold text-red-500 mb-4">Error Loading Profile</h2>
-          <p className="text-gray-600">{error || profileError?.message}</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="text-center p-6 sm:p-8 max-w-md w-full">
+          <h2 className="text-xl sm:text-2xl font-bold text-red-500 mb-3 sm:mb-4">Error Loading Profile</h2>
+          <p className="text-sm sm:text-base text-gray-600">{error || profileError?.message}</p>
         </div>
       </div>
     );
@@ -121,10 +121,10 @@ const ShareProfilePage = () => {
 
   if (!profileData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center p-8 max-w-md w-full mx-4">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">Profile Not Found</h2>
-          <p className="text-gray-600">The requested profile could not be found.</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="text-center p-6 sm:p-8 max-w-md w-full">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2 sm:mb-3">Profile Not Found</h2>
+          <p className="text-sm sm:text-base text-gray-600">The requested profile could not be found.</p>
         </div>
       </div>
     );
@@ -141,71 +141,62 @@ const ShareProfilePage = () => {
           shareToken={shareToken}
           profileId={targetProfileId}
         />
-        
-        <div className="w-11/12 mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mt-6 md:mt-8">
-            {/* Sidebar - takes 3 columns on large screens, full width on mobile */}
-            <div className="lg:col-span-3 order-1">
-              <div className="sticky top-8">
+        <div className="pt-16 sm:pt-20 w-11/12 mx-auto">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6 md:gap-8 mt-4 sm:mt-6 md:mt-8">
+            <div className="xl:col-span-3 order-2 xl:order-1">
+              <div className="xl:sticky xl:top-8">
                 <ProfileSidebar profileData={{ ...profile, id: targetProfileId || '' }} />
               </div>
             </div>
             
-            {/* Main content - takes 9 columns on large screens */}
-            <div className="lg:col-span-9 order-2">
-              <div className="mb-8">
-                <ProfileHeader profileData={{ ...profile, id: targetProfileId || '' }} />
+            <div className="xl:col-span-9 order-1 xl:order-2">
+              <div className="mb-6 sm:mb-8">
+                <ProfileHeader 
+                  profileData={{ ...profile, id: targetProfileId || '' }} 
+                  isPublicView={true}
+                  shareToken={shareToken}
+                  profileId={targetProfileId}
+                />
               </div>
               
-              <div className="space-y-8 md:space-y-12 mt-6 md:mt-8">
-              
-
+              <div className="space-y-6 sm:space-y-8 md:space-y-12 mt-4 sm:mt-6 md:mt-8 mb-8 sm:mb-10">
                 {profile.categories && profile.categories.length > 0 && (
-                  <ServicesSection 
-                    categories={profile.categories}
-                    services_categories={profile.services_categories}
-                    services_description={profile.services_description}
-                    rate_range={profile.rate_range}
-                    availability={profile.availability}
-                  />
-                )}
-
-                {/* Horizontal divider */}
-                {profile.categories && profile.categories.length > 0 && (
-                  <div className="border-t border-gray-200"></div>
+                  <>
+                    <ServicesSection 
+                      categories={profile.categories}
+                      services_categories={profile.services_categories}
+                      services_description={profile.services_description}
+                      rate_range={profile.rate_range}
+                      availability={profile.availability}
+                    />
+                    <div className="border-t border-gray-200"></div>
+                  </>
                 )}
 
                 {profile.work_experiences && profile.work_experiences.length > 0 && (
-                  <ExperienceSection experiences={profile.work_experiences} />
-                )}
-
-                {/* Horizontal divider */}
-                {profile.work_experiences && profile.work_experiences.length > 0 && (
-                  <div className="border-t border-gray-200"></div>
+                  <>
+                    <ExperienceSection experiences={profile.work_experiences} />
+                    <div className="border-t border-gray-200"></div>
+                  </>
                 )}
 
                 {((profile.technical_skills && profile.technical_skills.length > 0) || 
                   (profile.soft_skills && profile.soft_skills.length > 0)) && (
-                  <SkillsSection 
-                    technical_skills={profile.technical_skills}
-                    soft_skills={profile.soft_skills}
-                    skills_description={profile.skills_description}
-                  />
-                )}
-
-                {/* Horizontal divider */}
-                {((profile.technical_skills && profile.technical_skills.length > 0) || 
-                  (profile.soft_skills && profile.soft_skills.length > 0)) && (
-                  <div className="border-t border-gray-200"></div>
+                  <>
+                    <SkillsSection 
+                      technical_skills={profile.technical_skills}
+                      soft_skills={profile.soft_skills}
+                      skills_description={profile.skills_description}
+                    />
+                    <div className="border-t border-gray-200"></div>
+                  </>
                 )}
 
                 {profile.primary_tools && profile.primary_tools.length > 0 && (
-                  <ToolsSection primary_tools={profile.primary_tools} />
-                )}
-
-                {/* Horizontal divider */}
-                {profile.primary_tools && profile.primary_tools.length > 0 && (
-                  <div className="border-t border-gray-200"></div>
+                  <>
+                    <ToolsSection primary_tools={profile.primary_tools} />
+                    <div className="border-t border-gray-200"></div>
+                  </>
                 )}
 
                 {profile.portfolio && profile.portfolio.length > 0 && (

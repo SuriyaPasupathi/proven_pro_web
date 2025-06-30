@@ -80,6 +80,9 @@ interface ProfileHeaderProps {
       };
     };
   };
+  isPublicView?: boolean;
+  shareToken?: string;
+  profileId?: string;
 }
 
 interface EditProfileDialogProps {
@@ -407,7 +410,7 @@ const getStarFill = (starPosition: number, overallRating: number): { fill: strin
   }
 };
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView, shareToken, profileId }) => {
   const dispatch = useAppDispatch();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -561,6 +564,18 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
 
           {/* Right Column: Rating Section */}
           <div className="w-full lg:w-80 flex-shrink-0">
+            {/* Public Review Button - Only show when viewing someone else's profile */}
+            {isPublicView && (
+              <div className="flex justify-center mb-4">
+                <Button
+                  // onClick={() => setIsReviewDialogOpen(true)}
+                  className="w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 rounded-lg"
+                >
+                  <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+                  See Public Review
+                </Button>
+              </div>
+            )}
             <div className="space-y-2 sm:space-y-3">
               <div className="text-center">
                 <div className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-xl sm:rounded-2xl text-gray-900">
@@ -587,6 +602,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
                     );
                   })}
                 </div>
+                
                 <p className="text-xs sm:text-sm text-gray-600 mb-1">{profileData.reviews?.length || 0} reviews</p>
                 {/* Rating Label */}
                 <div className="text-xs sm:text-sm font-medium" style={{ color: getStarColor(profileData.rating || 0) }}>
@@ -604,6 +620,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
                     return 'No Rating';
                   })()}
                 </div>
+                
+               
               </div>
               <div className="space-y-1 sm:space-y-2">
                 {calculateRatingDistribution(profileData.reviews).map((rating, index) => (
@@ -651,6 +669,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData }) => {
         isOpen={isReviewDialogOpen}
         onClose={() => setIsReviewDialogOpen(false)}
         onSubmit={handleReviewSubmit}
+        shareToken={shareToken}
+        profileId={profileId}
       />
     </>
   );
