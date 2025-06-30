@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from "../../../store/store";
 import { subscribeToPlan } from "../../../store/Services/CreateProfileService";
 import Header from "@/components/layout/header";
 import Footer from "./Footer";
-import { FaRocket, FaCheck,  } from 'react-icons/fa';
+import { FaRocket } from 'react-icons/fa';
 import { getAvailableSteps, SubscriptionType, getUpgradeNavigationPath } from "../../../utils/subscriptionUtils";
 import toast from "react-hot-toast";
 
@@ -33,7 +33,7 @@ const plans = [
   },
   {
     name: "Premium",
-    price: "USD 20/semiannually",
+    price: "pesos 1,120/semiannually",
     subscriptionType: "premium" as SubscriptionType,
     features: [
       "Profile Name and Image",
@@ -57,7 +57,7 @@ const plans = [
   },
   {
     name: "Standard",
-    price: "USD 10/semiannually",
+    price: "pesos 560/semiannually",
     subscriptionType: "standard" as SubscriptionType,
     features: [
       "Profile Name and Image",
@@ -248,7 +248,7 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
                   </div>
 
                   {/* Steps Info */}
-                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
+                  {/* <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
                     plan.highlight 
                       ? "bg-yellow-100 text-yellow-700" 
                       : plan.color === "blue"
@@ -257,7 +257,7 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
                   }`}>
                     <span>{plan.stepRange} Profile Steps</span>
                     <FaCheck className="w-3 h-3" />
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Profile Creation Steps - Hidden */}

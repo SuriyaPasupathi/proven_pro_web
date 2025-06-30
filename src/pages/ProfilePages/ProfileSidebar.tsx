@@ -18,7 +18,7 @@ import {
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 import { Label } from "@/components/ui/label";
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2, Eye } from 'lucide-react';
 import SectionLock from '../../components/SectionLock';
 
 // Get the base URL from environment variable
@@ -38,7 +38,7 @@ interface Certification {
   certifications_expiration_date: string;
   certifications_id: string;
   certifications_image: string;
-  certifications_image_url: string;
+  certifications_image_url?: string;
 }
 
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
@@ -52,6 +52,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
   const [isCertDialogOpen, setIsCertDialogOpen] = useState(false);
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string>('');
+  const [previewTitle, setPreviewTitle] = useState<string>('');
   
   // Delete states
   const [deleteType, setDeleteType] = useState<'image' | 'video' | 'certification' | null>(null);
@@ -543,10 +546,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       
       // Create a new FormData instance
       const formData = new FormData();
+      formData.append('subscription_type', reduxProfileData?.subscription_type || 'premium');
       
       // Handle certification image upload if selected
       if (selectedCertImage) {
-        formData.append('certifications_image', selectedCertImage);
+        formData.append('certifications_image_0', selectedCertImage);
       }
 
       let updatedCerts: Certification[];
@@ -680,7 +684,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     });
   };
 
-  // Update the renderCertification function to use the new delete handler
+  // Function to handle opening the image preview
+  const handleOpenPreview = (imageUrl: string, title: string) => {
+    setPreviewImage(getFullImageUrl(imageUrl));
+    setPreviewTitle(title);
+    setIsPreviewDialogOpen(true);
+  };
+
+  // Update the renderCertification function to include preview button
   const renderCertification = (cert: Certification, index: number) => (
     <div key={index} className="relative group">
       <div className="">
@@ -769,7 +780,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           
           {/* Certification Image */}
           {cert.certifications_image_url && (
-            <div className="mt-5 xs:mt-6 sm:mt-7 rounded-xl sm:rounded-2xl overflow-hidden border border-black/15 bg-gradient-to-br from-white to-gray-50/50 shadow-sm">
+            <div className="mt-5 xs:mt-6 sm:mt-7 rounded-xl sm:rounded-2xl overflow-hidden border border-black/15 bg-gradient-to-br from-white to-gray-50/50 shadow-sm relative group">
               <img 
                 src={getFullImageUrl(cert.certifications_image_url)} 
                 alt={cert.certifications_name}
@@ -779,6 +790,17 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   target.style.display = 'none';
                 }}
               />
+              {/* Preview overlay */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-white/90 text-gray-800 hover:bg-white transition-all duration-300 hover:scale-110"
+                  onClick={() => handleOpenPreview(cert.certifications_image_url || '', cert.certifications_name)}
+                >
+                  <Eye size={20} />
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -816,23 +838,23 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     )}
                   </div>
                   {isEditMode && (
-                    <div className="absolute top-2 right-2 xs:top-3 xs:right-3 flex gap-1 xs:gap-1.5 z-10">
+                    <div className="absolute top-2 right-2 xs:top-3 xs:right-3 flex gap-2 z-10">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-800"
+                        className="h-8 w-8 bg-white/90 rounded-full shadow hover:bg-gray-100"
                         onClick={() => setIsImageDialogOpen(true)}
                       >
-                        <Pencil size={18} className=" mr-1" />
+                        <Pencil size={18} />
                       </Button>
                       {(profileData.profile_pic_url || profileData.profile_pic) && (
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 "
+                          className="h-8 w-8 bg-white/90 rounded-full shadow hover:bg-gray-100 text-red-500"
                           onClick={() => handleDeleteClick('image')}
                         >
-                          <Trash2 size={18} className=" mr-1" />
+                          <Trash2 size={18} />
                         </Button>
                       )}
                     </div>
@@ -1412,6 +1434,44 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Image Preview Dialog */}
+        <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
+          <DialogContent className="w-[95vw] max-w-2xl mx-auto bg-white/95 backdrop-blur-xl border border-[#5A8DB8]/30 rounded-2xl sm:rounded-3xl shadow-2xl transition-all duration-300">
+            <DialogHeader className="space-y-3 px-4 sm:px-6">
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-black flex items-center gap-2">
+                  <Eye size={24} className="text-[#5A8DB8]" />
+                  {previewTitle}
+                </DialogTitle>
+              </div>
+              <div className="h-1 w-16 sm:w-20 bg-gradient-to-r from-[#5A8DB8] to-[#70a4d8] rounded-full"></div>
+            </DialogHeader>
+            <div className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="relative bg-gray-100 rounded-xl overflow-hidden">
+                <img 
+                  src={previewImage} 
+                  alt={previewTitle}
+                  className="w-full h-auto max-h-[60vh] object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
+              </div>
+            </div>
+            <DialogFooter className="flex justify-end px-4 sm:px-6 pb-4 sm:pb-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsPreviewDialogOpen(false)}
+                className="border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition text-sm sm:text-base py-2 sm:py-2.5"
+              >
+                Close
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
 

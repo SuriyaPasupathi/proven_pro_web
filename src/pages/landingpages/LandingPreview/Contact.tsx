@@ -20,31 +20,33 @@ export default function Contact({ isInLandingPage = false }: ContactProps) {
           }}></div>
         </div>
 
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10 md:gap-12 lg:gap-16 relative z-10">
           {/* Text Content */}
-          <div className="w-full lg:w-1/2 text-center lg:text-left">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight">
+          <div className="w-full lg:w-1/2 text-center lg:text-left lg:pr-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 md:mb-8 leading-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5A8DB8] to-[#3C5979]">
-                Have questions<br className="hidden sm:block" />or need more<br className="hidden sm:block" />information?
+                Have Questions<br className="hidden sm:block" />Or Need More<br className="hidden sm:block" />Information?
               </span>
             </h2>
-            <p className="text-sm sm:text-base md:text-lg text-gray-700 mb-4 sm:mb-6 md:mb-8 max-w-xl mx-auto lg:mx-0">
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 mb-6 sm:mb-8 md:mb-10 max-w-xl mx-auto lg:mx-0">
               Our team is here to help you with any questions you might have about our platform, features, or services.
             </p>
-            <Button 
-              className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-300"
-            >
-              Contact us
-            </Button>
+            <div className="flex justify-center lg:justify-start">
+              <Button 
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-300"
+              >
+                Contact us
+              </Button>
+            </div>
           </div>
 
           {/* Image */}
-          <div className="w-full lg:w-1/2 flex justify-center">
-            <div className="relative group w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[400px]">
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
+            <div className="relative group w-full max-w-[300px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[450px]">
               <img
                 src={image}
                 alt="Contact"
-                className="w-full h-auto object-cover"
+                className="w-full h-auto object-cover rounded-lg shadow-lg transform scale-x-[-1]"
               />
             </div>
           </div>

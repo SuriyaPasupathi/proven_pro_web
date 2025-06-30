@@ -18,7 +18,7 @@ interface Certification {
   certifications_expiration_date: string;
   certifications_id: string;
   certifications_image: File | null;
-  certifications_image_url: string;
+  certifications_image_url?: string;
 }
 
 const Licenses: React.FC = () => {
@@ -148,7 +148,6 @@ const Licenses: React.FC = () => {
         certifications_issued_date: cert.certifications_issued_date,
         certifications_expiration_date: cert.certifications_expiration_date,
         certifications_id: cert.certifications_id,
-        certifications_image_url: cert.certifications_image_url,
       }));
 
       const formData = new FormData();
@@ -158,7 +157,7 @@ const Licenses: React.FC = () => {
       // Append certification images if they exist
       certifications.forEach((cert, index) => {
         if (cert.certifications_image) {
-          formData.append(`certification_image_${index}`, cert.certifications_image);
+          formData.append(`certifications_image_${index}`, cert.certifications_image);
         }
       });
 
@@ -374,6 +373,16 @@ const Licenses: React.FC = () => {
                   {certification.certifications_image && (
                     <div className="mt-3 text-sm text-black bg-[#5A8DB8]/10 px-3 py-1.5 rounded-full break-all max-w-full text-center font-medium">
                       {certification.certifications_image.name}
+                    </div>
+                  )}
+                  {certification.certifications_image_url && (
+                    <div className="mt-3 relative group">
+                      <img 
+                        src={certification.certifications_image_url} 
+                        alt="Certification preview"
+                        className="w-32 h-32 mx-auto object-cover rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                   )}
                 </div>
