@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { useAppDispatch } from '../../store/store';
-import { submitProfileReview } from '../../store/Services/CreateProfileService';
+import { submitProfileReview, getProfileReviewsPublic } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
 
 interface ReviewDialogProps {
@@ -73,6 +73,9 @@ const ReviewDialog = ({ isOpen, onClose, onSubmit, shareToken, profileId }: Revi
         
         toast.success('Review submitted successfully!');
         console.log('Review submitted via API:', result);
+
+        // Refresh reviews after successful submission
+        await dispatch(getProfileReviewsPublic(profileId));
       } else {
         // Fallback to the original onSubmit for backward compatibility
         onSubmit({ 
