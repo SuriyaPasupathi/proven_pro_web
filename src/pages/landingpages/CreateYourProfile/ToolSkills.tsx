@@ -321,7 +321,7 @@ const ToolSkills: React.FC = () => {
                 Select Tools
               </DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
               {dropdownLoading ? (
                 <div className="col-span-2 flex justify-center py-8">
                   <div className="h-8 w-8 animate-spin text-[#5A8DB8] border-2 border-[#5A8DB8]/20 border-t-[#5A8DB8] rounded-full" />
@@ -344,6 +344,23 @@ const ToolSkills: React.FC = () => {
                 ))
               )}
             </div>
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsToolsOpen(false)}
+                className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition px-4 py-2 rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setIsToolsOpen(false)}
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition px-4 py-2 rounded-xl"
+              >
+                Done
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
 
@@ -355,7 +372,7 @@ const ToolSkills: React.FC = () => {
                 Select Technical Skills
               </DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
               {dropdownLoading ? (
                 <div className="col-span-2 flex justify-center py-8">
                   <div className="h-8 w-8 animate-spin text-[#5A8DB8] border-2 border-[#5A8DB8]/20 border-t-[#5A8DB8] rounded-full" />
@@ -378,6 +395,23 @@ const ToolSkills: React.FC = () => {
                 ))
               )}
             </div>
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsSkillsOpen(false)}
+                className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition px-4 py-2 rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setIsSkillsOpen(false)}
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition px-4 py-2 rounded-xl"
+              >
+                Done
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
 
@@ -389,7 +423,7 @@ const ToolSkills: React.FC = () => {
                 Select Soft Skills
               </DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
               {dropdownLoading ? (
                 <div className="col-span-2 flex justify-center py-8">
                   <div className="h-8 w-8 animate-spin text-[#5A8DB8] border-2 border-[#5A8DB8]/20 border-t-[#5A8DB8] rounded-full" />
@@ -411,6 +445,23 @@ const ToolSkills: React.FC = () => {
                   </Button>
                 ))
               )}
+            </div>
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsSoftSkillsOpen(false)}
+                className="border-2 border-[#5A8DB8]/30 text-black hover:bg-[#5A8DB8]/10 transition px-4 py-2 rounded-xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setIsSoftSkillsOpen(false)}
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition px-4 py-2 rounded-xl"
+              >
+                Done
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
