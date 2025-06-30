@@ -33,7 +33,7 @@ const plans = [
   },
   {
     name: "Premium",
-    price: "pesos 1,120/semiannually",
+    price: "PHP 1,120/semiannually",
     subscriptionType: "premium" as SubscriptionType,
     features: [
       "Profile Name and Image",
@@ -57,7 +57,7 @@ const plans = [
   },
   {
     name: "Standard",
-    price: "pesos 560/semiannually",
+    price: "PHP 560/semiannually",
     subscriptionType: "standard" as SubscriptionType,
     features: [
       "Profile Name and Image",
@@ -226,14 +226,14 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
 
                   {/* Price */}
                   <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
-                    {plan.price.includes("USD") ? (
+                    {plan.price.includes("PHP") ? (
                       <div className="flex items-center justify-center gap-1">
-                        <span className="text-xs sm:text-sm font-normal text-gray-600">USD</span>
-                        <span className={plan.highlight ? "text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500" : "text-transparent bg-clip-text bg-gradient-to-r from-[#5A8DB8] to-[#3C5979]"}>
-                          {plan.price.match(/\d+/)}
+                        <span className="text-xs sm:text-sm font-small text-gray-600">PHP</span>
+                        <span className={`font-bold ${plan.highlight ? "text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500" : "text-transparent bg-clip-text bg-gradient-to-r from-[#5A8DB8] to-[#3C5979]"}`}> 
+                          {plan.price.match(/\d[\d,]*/)?.[0]}
                         </span>
                         <span className="text-xs sm:text-sm font-bold text-gray-600">
-                          {plan.price.replace(/.*?\d+/, "")}
+                          {plan.price.replace(/.*?(\d[\d,]*)/, "")}
                         </span>
                       </div>
                     ) : (
@@ -243,9 +243,9 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
                     )}
                   </div>
 
-                  <div className="text-xs sm:text-sm text-gray-500 mb-4">
+                  {/* <div className="text-xs sm:text-sm text-gray-500 mb-4">
                     {plan.price === "Free" ? "" : "per year"}
-                  </div>
+                  </div> */}
 
                   {/* Steps Info */}
                   {/* <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${

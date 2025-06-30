@@ -791,15 +791,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 }}
               />
               {/* Preview overlay */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-full bg-white/90 text-gray-800 hover:bg-white transition-all duration-300 hover:scale-110"
-                  onClick={() => handleOpenPreview(cert.certifications_image_url || '', cert.certifications_name)}
-                >
-                  <Eye size={20} />
-                </Button>
+              <div 
+                className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
+                onClick={() => handleOpenPreview(cert.certifications_image_url || '', cert.certifications_name)}
+              >
+                <div className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-white/50 transition-all duration-300 hover:scale-105">
+                  <p className="text-xs sm:text-sm font-medium text-gray-800">Preview</p>
+                </div>
               </div>
             </div>
           )}
