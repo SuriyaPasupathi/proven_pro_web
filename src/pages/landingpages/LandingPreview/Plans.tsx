@@ -8,6 +8,8 @@ import Footer from "./Footer";
 import { FaRocket } from 'react-icons/fa';
 import { getAvailableSteps, SubscriptionType, getUpgradeNavigationPath } from "../../../utils/subscriptionUtils";
 import toast from "react-hot-toast";
+import Navbar from "../../ProfilePages/ProfileNav";
+import { useState } from "react";
 
 interface PlansProps {
   isInLandingPage?: boolean;
@@ -90,6 +92,9 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
   const { profileData } = useSelector((state: RootState) => state.createProfile);
   const currentSubscription = profileData?.subscription_type || 'free';
 
+  // State for mobile menu (needed for ProfileNav)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   // const getStepColor = (planColor: string) => {
   //   switch (planColor) {
   //     case "yellow":
@@ -168,7 +173,14 @@ export default function Plans({ isInLandingPage = false }: PlansProps) {
 
   return (
     <>
-      {!isInLandingPage && <Header />}
+      {/* Conditionally render the appropriate header based on authentication */}
+      {!isInLandingPage && (
+        isAuthenticated ? (
+          <Navbar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+        ) : (
+          <Header />
+        )
+      )}
       <section id="plans-section" className="bg-gradient-to-b from-white via-blue-50/50 to-white py-8 sm:py-12 md:py-16 px-4 sm:px-6 md:px-8 w-full relative overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute inset-0">

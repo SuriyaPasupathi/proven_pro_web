@@ -1,5 +1,5 @@
 import React from 'react';
-import profileImg from '../../../../assets/profilepage.jpg';
+import profileImg from '../../../../assets/client.jpg';
 import provenLogo from '../../../../assets/provenlogo.png';
 
 interface PremiumPlanDialogProps {
@@ -206,11 +206,11 @@ const PremiumPlanDailog: React.FC<PremiumPlanDialogProps> = ({ open, onClose }) 
         </div>
         
         {/* Footer Button */}
-        <div className="flex justify-center mt-6 sm:mt-8">
+        {/* <div className="flex justify-center mt-6 sm:mt-8">
           <button className="bg-[#3C5979] text-white px-6 sm:px-8 py-2 sm:py-3 rounded font-semibold text-base sm:text-lg shadow hover:bg-[#5A8DB8] transition-all duration-200 cursor-default" disabled>
             Select Premium
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

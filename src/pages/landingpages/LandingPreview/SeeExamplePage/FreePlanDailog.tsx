@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import profileImg from '../../../../assets/profilepage.jpg';
+import profileImg from '../../../../assets/client.jpg';
 
 interface FreePlanDialogProps {
   open: boolean;

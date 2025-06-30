@@ -2,15 +2,34 @@ import { Button } from "@/components/ui/button";
 import image from "../../../assets/Contact.jpg";
 import Header from "@/components/layout/header";
 import Footer from "./Footer";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import Navbar from "../../ProfilePages/ProfileNav";
+import { useState } from "react";
 
 interface ContactProps {
   isInLandingPage?: boolean;
 }
 
 export default function Contact({ isInLandingPage = false }: ContactProps) {
+  // Check authentication status from both slices
+  const { isAuthenticated: loginAuthenticated } = useSelector((state: RootState) => state.login);
+  const { isAuthenticated: authAuthenticated } = useSelector((state: RootState) => state.auth);
+  const isAuthenticated = loginAuthenticated || authAuthenticated;
+
+  // State for mobile menu (needed for ProfileNav)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <>
-      {!isInLandingPage && <Header />}
+      {/* Conditionally render the appropriate header based on authentication */}
+      {!isInLandingPage && (
+        isAuthenticated ? (
+          <Navbar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+        ) : (
+          <Header />
+        )
+      )}
       <section id="contact-section" className="w-full bg-gradient-to-br from-blue-50 via-white to-blue-100 py-8 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-10 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
