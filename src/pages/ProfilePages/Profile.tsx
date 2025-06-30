@@ -129,13 +129,13 @@ const App: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center p-8 max-w-md w-full mx-4">
-          <h2 className="text-2xl font-bold text-red-500 mb-4">Error Loading Profile</h2>
-          <p className="text-gray-600">{error.message}</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="text-center p-6 sm:p-8 max-w-md w-full">
+          <h2 className="text-xl sm:text-2xl font-bold text-red-500 mb-4">Error Loading Profile</h2>
+          <p className="text-sm sm:text-base text-gray-600 mb-4">{error.message}</p>
           {error.status === 401 && (
             <Button 
-              className="mt-4 bg-[#70a4d8] hover:bg-[#3C5979] text-white transition-all duration-300"
+              className="mt-4 bg-[#70a4d8] hover:bg-[#3C5979] text-white transition-all duration-300 w-full sm:w-auto"
               onClick={() => navigate('/login')}
             >
               Go to Login
@@ -154,65 +154,81 @@ const App: React.FC = () => {
           <ProfileNav isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
         </div>
         
-        {/* Main content with responsive padding */}
-        <div className="pt-16 sm:pt-20 w-11/12 mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8 mt-4 sm:mt-6 md:mt-8">
-            {/* Sidebar - responsive sticky behavior */}
+        {/* Main content with improved responsive padding */}
+        <div className="pt-16 sm:pt-20 px-4 sm:px-6 md:px-8 lg:px-0 lg:w-11/12 lg:mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8 mt-2 sm:mt-4 md:mt-6 lg:mt-8">
+            {/* Sidebar - improved mobile layout */}
             <div className="lg:col-span-3 order-1">
               <div className="lg:sticky lg:top-20 sm:top-24">
                 <ProfileSidebar profileData={profile} />
               </div>
             </div>
             
-            {/* Main content - responsive columns */}
+            {/* Main content - improved mobile spacing */}
             <div className="lg:col-span-9 order-2">
-              <div className="">
+              <div className="mb-4 sm:mb-6 md:mb-8">
                 <ProfileHeader profileData={profile} />
               </div>
 
-              <div className="space-y-6 sm:space-y-8 md:space-y-12 mt-4 sm:mt-6 md:mt-8 mb-8 sm:mb-10">
+              <div className="space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-12 mb-6 sm:mb-8 md:mb-10">
                 {/* <ReviewCarousel reviews={transformedReviews} /> */}
                 <SectionLock requiredPlan="standard" title="Standard Features">
-                <ServicesSection 
-                  categories={profile.categories}
-                  services_categories={profile.services_categories}
-                  services_description={profile.services_description}
-                    rate_range={profile.rate_range}
-                    availability={profile.availability}
-                  />
-                </SectionLock>
-                {/* Horizontal divider */}
-                <div className="border-t border-black"></div>
-                
-                <SectionLock requiredPlan="standard" title="Standard Features">
-                  <ExperienceSection experiences={profile.work_experiences} />
+                  <div className="px-0 sm:px-2">
+                    <ServicesSection 
+                      categories={profile.categories}
+                      services_categories={profile.services_categories}
+                      services_description={profile.services_description}
+                      rate_range={profile.rate_range}
+                      availability={profile.availability}
+                    />
+                  </div>
                 </SectionLock>
                 
-                   {/* Horizontal divider */}
-                   <div className="border-t border-black"></div>
+                {/* Horizontal divider with responsive margins */}
+                <div className="border-t border-gray-200 my-4 sm:my-6 md:my-8"></div>
                 
                 <SectionLock requiredPlan="standard" title="Standard Features">
-                <SkillsSection 
-                  technical_skills={profile.technical_skills}
-                  soft_skills={profile.soft_skills}
-                  skills_description={profile.skills_description}
-                />
+                  <div className="px-0 sm:px-2">
+                    <ExperienceSection experiences={profile.work_experiences} />
+                  </div>
                 </SectionLock>
-                {/* Horizontal divider */}
-                <div className="border-t border-black"></div>
+                
+                {/* Horizontal divider with responsive margins */}
+                <div className="border-t border-gray-200 my-4 sm:my-6 md:my-8"></div>
+                
                 <SectionLock requiredPlan="standard" title="Standard Features">
-                <ToolsSection primary_tools={profile.primary_tools} />
+                  <div className="px-0 sm:px-2">
+                    <SkillsSection 
+                      technical_skills={profile.technical_skills}
+                      soft_skills={profile.soft_skills}
+                      skills_description={profile.skills_description}
+                    />
+                  </div>
                 </SectionLock>
-                {/* Horizontal divider */}
-                <div className="border-t border-black"></div>
+                
+                {/* Horizontal divider with responsive margins */}
+                <div className="border-t border-gray-200 my-4 sm:my-6 md:my-8"></div>
+                
+                <SectionLock requiredPlan="standard" title="Standard Features">
+                  <div className="px-0 sm:px-2">
+                    <ToolsSection primary_tools={profile.primary_tools} />
+                  </div>
+                </SectionLock>
+                
+                {/* Horizontal divider with responsive margins */}
+                <div className="border-t border-gray-200 my-4 sm:my-6 md:my-8"></div>
+                
                 <SectionLock requiredPlan="premium" title="Premium Features">
-                  <PortfolioSection 
-                    projects={profile.portfolio}
-                    portfolio={profile.portfolio}
-                  />
+                  <div className="px-0 sm:px-2">
+                    <PortfolioSection 
+                      projects={profile.portfolio}
+                      portfolio={profile.portfolio}
+                    />
+                  </div>
                 </SectionLock>
-                {/* Horizontal divider */}
-                <div className="border-t border-black"></div>
+                
+                {/* Bottom spacing for mobile */}
+                <div className="h-4 sm:h-6 md:h-8 lg:h-12"></div>
               </div>
             </div>
           </div>

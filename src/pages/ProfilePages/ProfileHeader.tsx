@@ -340,11 +340,11 @@ const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
 const calculateRatingDistribution = (reviews: Array<{ rating: number }> = []) => {
   const totalReviews = reviews.length;
   if (totalReviews === 0) return [
-    { label: "5-star", value: 0, color: "from-[#FFCF3F] to-[#FFCF3F]" },
-    { label: "4-star", value: 0, color: "from-[#FF5050] to-[#FF5050]" },
-    { label: "3-star", value: 0, color: "from-[#D93973] to-[#D93973]" },
-    { label: "2-star", value: 0, color: "from-[#5800B0] to-[#5800B0]" },
-    { label: "1-star", value: 0, color: "from-[#6A686C] to-[#6A686C]" },
+    { label: "5-star", value: 0, color: "from-[#5A8DB8] to-[#5A8DB8]" },
+    { label: "4-star", value: 0, color: "from-[#5A8DB8] to-[#5A8DB8]" },
+    { label: "3-star", value: 0, color: "from-[#5A8DB8] to-[#5A8DB8]" },
+    { label: "2-star", value: 0, color: "from-[#5A8DB8] to-[#5A8DB8]" },
+    { label: "1-star", value: 0, color: "from-[#5A8DB8] to-[#5A8DB8]" },
   ];
 
   // Initialize counts for 5-1 stars (in reverse order)
@@ -362,11 +362,11 @@ const calculateRatingDistribution = (reviews: Array<{ rating: number }> = []) =>
     label: `${5 - index}-star`,
     value: Math.round((count / totalReviews) * 100),
     color: [
-      "from-[#FFCF3F] to-[#FFCF3F]", // 5-star (Exceptional)
-      "from-[#FF5050] to-[#FF5050]", // 4-star (Very Good)
-      "from-[#D93973] to-[#D93973]", // 3-star (Good)
-      "from-[#5800B0] to-[#5800B0]", // 2-star (Fair)
-      "from-[#6A686C] to-[#6A686C]"  // 1-star (Poor)
+      "from-[#5A8DB8] to-[#5A8DB8]", // 5-star (Exceptional)
+      "from-[#5A8DB8] to-[#5A8DB8]", // 4-star (Very Good)
+      "from-[#5A8DB8] to-[#5A8DB8]", // 3-star (Good)
+      "from-[#5A8DB8] to-[#5A8DB8]", // 2-star (Fair)
+      "from-[#5A8DB8] to-[#5A8DB8]"  // 1-star (Poor)
     ][index]
   }));
 };

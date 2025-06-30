@@ -246,7 +246,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             className="relative px-0 py-0 focus:outline-none group"
             onClick={() => navigate('/plans')}
           >
-            <span className="relative z-10 text-black">Pricing</span>
+            <span className="relative z-10 text-black font-semibold ">Pricing</span>
             <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
           </button>
           <button
@@ -254,7 +254,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
             className="relative px-0 py-0 focus:outline-none group"
             onClick={() => navigate('/contact')}
           >
-            <span className="relative z-10 text-black">Contact Us</span>
+            <span className="relative z-10 text-black font-semibold">Contact Us</span>
             <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
           </button>
           {/* <NotificationSheet /> */}
@@ -425,17 +425,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
         <div className="md:hidden bg-white border-t border-gray-200/50 shadow-sm">
           <div className="max-w-screen-xl mx-auto px-4 py-4 space-y-4">
             <nav className="flex flex-col space-y-2">
-              <Button 
-                variant="ghost" 
-                className="text-left text-black hover:text-[#3C5979] hover:bg-gray-50/80 justify-start transition-all duration-200 group"
-                onClick={() => {
-                  setIsReviewDialogOpen(true);
-                  setIsMenuOpen(false);
-                }}
-              >
-                <span className="relative z-10">Write a Review</span>
-                <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-              </Button>
+             
               <Button 
                 variant="ghost" 
                 className="text-left text-black hover:text-[#3C5979] hover:bg-gray-50/80 justify-start transition-all duration-200 group"
@@ -444,7 +434,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                   setIsMenuOpen(false);
                 }}
               >
-                <span className="relative z-10">Pricing</span>
+                <span className="relative z-10 font-semibold">Pricing</span>
                 <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
               </Button>
               <Button 
@@ -455,7 +445,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                   setIsMenuOpen(false);
                 }}
               >
-                <span className="relative z-10">Contact Us</span>
+                <span className="relative z-10 font-semibold">Contact Us</span>
                 <div className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
               </Button>
               
