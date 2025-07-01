@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search,ChevronDown, Menu, X, Crown, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Search,ChevronDown, Menu, X, Crown, Sparkles } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AccountDropdown from './AccountDropdown';
@@ -8,11 +8,11 @@ import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 // import NotificationSheet from "@/components/layout/notificationsheet";
 import { useNavigate } from 'react-router-dom';
-import { logout, subscribeToPlan } from '../../store/Services/CreateProfileService';
+import { logout } from '../../store/Services/CreateProfileService';
 import { toast } from 'sonner';
 import { useEditMode } from '../../context/EditModeContext';
 import ReviewDialog from '@/pages/ProfilePages/ReviewDialog';
-import { SubscriptionType, getUpgradeNavigationPath } from '../../utils/subscriptionUtils';
+import { SubscriptionType } from '../../utils/subscriptionUtils';
 
 
 interface NavbarProps {
@@ -154,37 +154,14 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
     }
   };
 
-  const handlePlanSelection = async (plan: any) => {
+  const handlePlanSelection = async () => {
     try {
-      console.log('Plan selection debug:', {
-        planName: plan.name,
-        subscriptionType: plan.subscriptionType,
-        currentSubscription,
-        isUpgrade: plan.subscriptionType !== currentSubscription
-      });
-      
-      // Subscribe to the plan first
-      const result = await dispatch(subscribeToPlan(plan.subscriptionType));
-      
-      console.log('Subscription result:', result);
-      
-      toast.success(`Successfully subscribed to ${plan.name} plan!`);
-      
-      // Determine the appropriate navigation path based on upgrade logic
-      let navigationPath = "/create-profile/personal-info"; // default
-      
-      if (plan.subscriptionType !== currentSubscription) {
-        // This is an upgrade, use the upgrade navigation logic
-        navigationPath = getUpgradeNavigationPath(currentSubscription as SubscriptionType, plan.subscriptionType);
-        console.log('Upgrade navigation path:', navigationPath);
-      }
-      
-      // Navigate to the appropriate step
-      navigate(navigationPath);
+      // Navigate directly to the plans page
+      navigate('/plans');
       setIsUpgradeMenuOpen(false);
     } catch (error: any) {
-      console.error('Subscription error:', error);
-      toast.error(error.message || `Failed to subscribe to ${plan.name} plan`);
+      console.error('Navigation error:', error);
+      toast.error('Failed to navigate to plans page');
     }
   };
 
@@ -293,7 +270,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                               : 'border-blue-200 bg-blue-50/50 hover:bg-blue-50'
                           }`}
                           onClick={() => {
-                            handlePlanSelection(option);
+                            handlePlanSelection();
                           }}
                         >
                           <div className="flex items-start justify-between mb-2">
@@ -306,14 +283,14 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                           
                           <p className="text-xs text-gray-600 mb-2">{option.description}</p>
                           
-                          <div className="space-y-1">
+                          {/* <div className="space-y-1">
                             {option.features.map((feature, featureIndex) => (
                               <div key={featureIndex} className="flex items-center gap-2">
                                 <CheckCircle2 className="h-3 w-3 text-green-600" />
                                 <span className="text-xs text-gray-700">{feature}</span>
                               </div>
                             ))}
-                          </div>
+                          </div> */}
                         </div>
                       ))}
                     </div>
@@ -462,7 +439,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }: NavbarProps) => {
                       variant="ghost" 
                       className="w-full justify-start text-black hover:text-[#3C5979] hover:bg-gray-50/80 transition-all duration-200 group"
                       onClick={() => {
-                        handlePlanSelection(option);
+                        handlePlanSelection();
                       }}
                     >
                       <span className="relative z-10 flex items-center gap-2">
