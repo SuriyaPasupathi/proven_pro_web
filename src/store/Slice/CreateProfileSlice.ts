@@ -160,6 +160,7 @@ const createProfileSlice = createSlice({
         state.profileData = {
           ...state.profileData,
           ...action.payload,
+          email: action.payload.email || action.payload.profile_mail || '',
         };
         state.verificationDetails = action.payload.verification_details || null;
       })

@@ -42,6 +42,9 @@ const Verification = () => {
   const [previewType, setPreviewType] = useState<'gov_id' | 'address' | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+  const [govIdPending, setGovIdPending] = useState(false);
+  const [addressPending, setAddressPending] = useState(false);
+
   useEffect(() => {
     if (profileId) {
       dispatch(getProfile(profileId));
@@ -117,6 +120,7 @@ const Verification = () => {
       })).unwrap();
       toast.success('Document uploaded successfully');
       setSelectedFile(null);
+      setGovIdPending(true);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -139,6 +143,7 @@ const Verification = () => {
       })).unwrap();
       toast.success('Address document uploaded successfully');
       setSelectedAddressFile(null);
+      setAddressPending(true);
       if (addressFileInputRef.current) {
         addressFileInputRef.current.value = '';
       }
@@ -314,6 +319,18 @@ const Verification = () => {
     };
   }, [previewUrl]);
 
+  useEffect(() => {
+    if (profileData?.verification_details?.government_id?.uploaded) {
+      setGovIdPending(false);
+    }
+  }, [profileData?.verification_details?.government_id?.uploaded]);
+
+  useEffect(() => {
+    if (profileData?.verification_details?.address_proof?.uploaded) {
+      setAddressPending(false);
+    }
+  }, [profileData?.verification_details?.address_proof?.uploaded]);
+
   const getStatusIcon = (uploaded: boolean, verified: boolean) => {
     if (verified) {
       return <CheckCircle2 className="w-5 h-5 text-green-500" />;
@@ -372,16 +389,20 @@ const Verification = () => {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#5A8DB8]/10 to-[#5A8DB8]/5">
                 <span className="text-lg font-semibold text-black">+50 Proven Proof</span>
                 <div className="h-1 w-1 rounded-full bg-[#5A8DB8]/40"></div>
-                {profileData?.verification_details?.government_id && (
+                {(govIdPending || profileData?.verification_details?.government_id) && (
                   <div className="flex items-center gap-2">
-                    {getStatusIcon(
-                      profileData.verification_details.government_id.uploaded,
-                      profileData.verification_details.government_id.verified
-                    )}
-                    {getStatusText(
-                      profileData.verification_details.government_id.uploaded,
-                      profileData.verification_details.government_id.verified
-                    )}
+                    {govIdPending
+                      ? getStatusIcon(true, false)
+                      : getStatusIcon(
+                          profileData?.verification_details?.government_id?.uploaded ?? false,
+                          profileData?.verification_details?.government_id?.verified ?? false
+                        )}
+                    {govIdPending
+                      ? getStatusText(true, false)
+                      : getStatusText(
+                          profileData?.verification_details?.government_id?.uploaded ?? false,
+                          profileData?.verification_details?.government_id?.verified ?? false
+                        )}
                   </div>
                 )}
               </div>
@@ -485,16 +506,20 @@ const Verification = () => {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#5A8DB8]/10 to-[#5A8DB8]/5">
                 <span className="text-lg font-semibold text-black">+25 Proven Proof</span>
                 <div className="h-1 w-1 rounded-full bg-[#5A8DB8]/40"></div>
-                {profileData?.verification_details?.address_proof && (
+                {(addressPending || profileData?.verification_details?.address_proof) && (
                   <div className="flex items-center gap-2">
-                    {getStatusIcon(
-                      profileData.verification_details.address_proof.uploaded,
-                      profileData.verification_details.address_proof.verified
-                    )}
-                    {getStatusText(
-                      profileData.verification_details.address_proof.uploaded,
-                      profileData.verification_details.address_proof.verified
-                    )}
+                    {addressPending
+                      ? getStatusIcon(true, false)
+                      : getStatusIcon(
+                          profileData?.verification_details?.address_proof?.uploaded ?? false,
+                          profileData?.verification_details?.address_proof?.verified ?? false
+                        )}
+                    {addressPending
+                      ? getStatusText(true, false)
+                      : getStatusText(
+                          profileData?.verification_details?.address_proof?.uploaded ?? false,
+                          profileData?.verification_details?.address_proof?.verified ?? false
+                        )}
                   </div>
                 )}
               </div>

@@ -26,10 +26,9 @@ const AccountSettings: React.FC = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // Email state
-  const [email, setEmail] = useState(profileData?.profile_mail || '');
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showOtpDialog, setShowOtpDialog] = useState(false);
-  const [newEmail, setNewEmail] = useState(email || '');
+  const [newEmail, setNewEmail] = useState(profileData?.profile_mail || '');
   const [emailError, setEmailError] = useState('');
   const [emailSuccess, setEmailSuccess] = useState('');
   
@@ -74,7 +73,6 @@ const AccountSettings: React.FC = () => {
       setShowOtpDialog(false);
       setOtp('');
       setOtpSent(false);
-      setEmail(newEmail);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Invalid verification code';
       setOtpError(errorMessage);
@@ -216,7 +214,7 @@ const AccountSettings: React.FC = () => {
               </Dialog>
             </div>
             <div className="text-base text-black/80">
-              Your email address is <span className="font-semibold text-black">{email}</span>
+              Your email address is <span className="font-semibold text-black">{profileData?.email}</span>
             </div>
           </div>
 

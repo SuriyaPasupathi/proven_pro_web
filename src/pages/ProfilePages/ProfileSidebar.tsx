@@ -911,6 +911,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                         >
                           <Pencil size={18} className=" mr-1" />
                         </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-300"
+                          onClick={() => handleDeleteClick('video')}
+                        >
+                          <Trash2 size={18} className=" mr-1" />
+                        </Button>
                       </div>
                     )}
                   </div>

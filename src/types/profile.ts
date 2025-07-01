@@ -10,6 +10,7 @@ export interface ProfileData {
   profile_url?: string;
   profile_mail?: string;
   mobile?: string;
+  email?: string;
 
   // Profile Image
   profile_pic?: string;
