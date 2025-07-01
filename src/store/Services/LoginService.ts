@@ -55,7 +55,7 @@ const handleAuthError = (error: unknown): AuthError => {
         };
       case 403:
         return {
-          message: data.detail || 'Account not verified. Please confirm registration from your email.',
+          message: data.detail || 'Account not verified Please confirm registration from your email.',
           status,
           code: 'FORBIDDEN'
         };

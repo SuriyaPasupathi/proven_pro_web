@@ -36,12 +36,32 @@ const passwordSchema = z
 
 const formSchema = z
   .object({
-    email: z.string().email({
-      message: 'Please enter a valid email address',
-    }),
-    username: z.string().min(3, {
-      message: 'Username must be at least 3 characters',
-    }),
+    email: z.string()
+      .min(1, {
+        message: 'Email is required',
+      })
+      .email({
+        message: 'Please enter a valid email address',
+      })
+      .refine((value) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value), {
+        message: 'Please enter a valid email format (e.g., user@example.com)',
+      })
+      .refine((value) => !/\s/.test(value), {
+        message: 'Email cannot contain spaces',
+      })
+      .refine((value) => value.length <= 254, {
+        message: 'Email is too long (maximum 254 characters)',
+      }),
+    username: z.string()
+      .min(3, {
+        message: 'Username must be at least 3 characters',
+      })
+      .refine((value) => !/\s/.test(value), {
+        message: 'Username cannot contain spaces. Use letters, numbers, or underscores.',
+      })
+      .refine((value) => /^[A-Za-z0-9_]+$/.test(value), {
+        message: 'Username must contain only letters, numbers, or underscores.',
+      }),
     password: passwordSchema,
     confirmPassword: z.string(),
   })
@@ -72,10 +92,60 @@ export function SignUpForm() {
     },
   });
 
-  const { watch } = form;
+  const { watch, formState } = form;
   const password = watch('password');
+  const confirmPassword = watch('confirmPassword');
+  const username = watch('username');
+  const email = watch('email');
   const hasMinLength = password.length >= 8;
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const passwordsMatch = password === confirmPassword && password.length > 0;
+
+  // Check if username is valid
+  const isUsernameValid = username && 
+    username.length >= 3 && 
+    !/\s/.test(username) && 
+    /^[A-Za-z0-9_]+$/.test(username);
+
+  // Check if email is valid
+  const isEmailValid = email && 
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email) &&
+    !/\s/.test(email) &&
+    email.length <= 254;
+
+  // Check if form is valid
+  const isFormValid = formState.isValid && isUsernameValid && isEmailValid && passwordsMatch && agreedToTerms;
+
+  // Debug logging for validation
+  useEffect(() => {
+    if (username) {
+      console.log('Username validation check:', {
+        username,
+        hasSpaces: /\s/.test(username),
+        isValidFormat: /^[A-Za-z0-9_]+$/.test(username),
+        length: username.length,
+        isUsernameValid
+      });
+    }
+    if (email) {
+      console.log('Email validation check:', {
+        email,
+        hasSpaces: /\s/.test(email),
+        isValidFormat: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email),
+        length: email.length,
+        isEmailValid
+      });
+    }
+    if (password || confirmPassword) {
+      console.log('Password validation check:', {
+        passwordLength: password.length,
+        hasMinLength,
+        hasSpecialChar,
+        passwordsMatch,
+        confirmPasswordLength: confirmPassword.length
+      });
+    }
+  }, [username, isUsernameValid, email, isEmailValid, password, confirmPassword, hasMinLength, hasSpecialChar, passwordsMatch]);
 
   // Handle email verification
   useEffect(() => {
@@ -222,6 +292,22 @@ export function SignUpForm() {
                         className="w-full h-10 sm:h-11 text-sm sm:text-base"
                       />
                     </FormControl>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Use only letters, numbers, and underscores. No spaces allowed.
+                    </div>
+                    {username && (
+                      <div className="text-xs mt-1">
+                        {/\s/.test(username) ? (
+                          <span className="text-red-500 font-medium">❌ Contains spaces - Cannot create account</span>
+                        ) : !/^[A-Za-z0-9_]+$/.test(username) ? (
+                          <span className="text-red-500 font-medium">❌ Invalid characters - Cannot create account</span>
+                        ) : username.length < 3 ? (
+                          <span className="text-red-500 font-medium">❌ Too short - Cannot create account</span>
+                        ) : (
+                          <span className="text-green-500 font-medium">✅ Valid username</span>
+                        )}
+                      </div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -244,6 +330,22 @@ export function SignUpForm() {
                         list="email-suggestions"
                       />
                     </FormControl>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Enter a valid email address (e.g., user@example.com)
+                    </div>
+                    {email && (
+                      <div className="text-xs mt-1">
+                        {/\s/.test(email) ? (
+                          <span className="text-red-500 font-medium">❌ Email cannot contain spaces</span>
+                        ) : !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email) ? (
+                          <span className="text-red-500 font-medium">❌ Invalid email format</span>
+                        ) : email.length > 254 ? (
+                          <span className="text-red-500 font-medium">❌ Email is too long</span>
+                        ) : (
+                          <span className="text-green-500 font-medium">✅ Valid email</span>
+                        )}
+                      </div>
+                    )}
                     <datalist id="email-suggestions">
                       <option value="@gmail.com" />
                       <option value="@yahoo.com" />
@@ -288,6 +390,11 @@ export function SignUpForm() {
                         text="Must contain one special character"
                         isValid={hasSpecialChar}
                       />
+                      {hasMinLength && hasSpecialChar && (
+                        <div className="text-xs text-green-500 font-medium mt-2">
+                          ✅ Password requirements met - Ready for confirmation
+                        </div>
+                      )}
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -318,6 +425,18 @@ export function SignUpForm() {
                         </button>
                       </div>
                     </FormControl>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Re-enter your password to confirm
+                    </div>
+                    {confirmPassword && password && (
+                      <div className="text-xs mt-1">
+                        {passwordsMatch ? (
+                          <span className="text-green-500 font-medium">✅ Passwords match</span>
+                        ) : (
+                          <span className="text-red-500 font-medium">❌ Passwords do not match</span>
+                        )}
+                      </div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -355,8 +474,8 @@ export function SignUpForm() {
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-[#5A8DB8] hover:bg-[#3C5979] text-white font-semibold transition-all duration-300"
-                disabled={isLoading || !agreedToTerms}
+                className="w-full h-11 bg-[#5A8DB8] hover:bg-[#3C5979] text-white font-semibold transition-all duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                disabled={isLoading || !isFormValid}
               >
                 {isLoading ? 'Creating account...' : 'Create account'}
               </Button>
