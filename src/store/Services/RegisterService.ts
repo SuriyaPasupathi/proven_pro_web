@@ -39,8 +39,14 @@ const handleAuthError = (error: unknown): AuthError => {
 
     switch (status) {
       case 400:
+        let message = data.error || 'This username is already taken';
+        if (data.email && Array.isArray(data.email)) {
+          message = data.email[0];
+        } else if (data.username && Array.isArray(data.username)) {
+          message = data.username[0];
+        }
         return {
-          message: data.error || 'Invalid registration data',
+          message,
           status,
           code: 'BAD_REQUEST'
         };
