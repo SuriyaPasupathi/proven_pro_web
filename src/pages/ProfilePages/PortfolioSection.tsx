@@ -437,39 +437,10 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
     }
   };
 
-  if (!projectItems || projectItems.length === 0) {
-    return (
-      <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
-        <div className="flex justify-between items-center mb-4 xs:mb-6">
-          <h2 className="text-xl xs:text-2xl font-bold text-black">
-            Portfolio
-          </h2>
-          {isEditMode && (
-            <div className="flex gap-2">
-              <Button 
-                variant="ghost" 
-                className="p-1 xs:p-1.5 h-auto text-black hover:text-black hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
-                onClick={() => {
-                  setEditingItem(null);
-                  setIsDialogOpen(true);
-                }}
-              >
-                <Plus className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
-              </Button>
-            </div>
-          )}
-        </div>
-        <div className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-lg p-4 xs:p-6 border border-[#5A8DB8]/10">
-          <p className="text-sm xs:text-base text-gray-600">No projects available.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
       <div className="flex justify-between items-center mb-4 xs:mb-6">
-        <h2 className="text-xl xs:text-4xl font-bold text-black">
+        <h2 className="text-xl xs:text-2xl font-bold text-black">
           Portfolio
         </h2>
         {isEditMode && (
@@ -487,85 +458,90 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
           </div>
         )}
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 xs:gap-6">
-        {projectItems
-          .slice(0, isExpanded ? undefined : 3)
-          .map((item: Project, index: number) => {
-          const imageUrl = getFullImageUrl(item.project_image_url || item.project_image);
-          
-          console.log(`Project ${index}:`, {
-            title: item.project_title,
-            project_image: item.project_image,
-            project_image_url: item.project_image_url,
-            finalImageUrl: imageUrl
-          });
-          
-          return (
-            <div 
-              key={index}
-              className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              onClick={() => handleItemClick(index)}
-            >
-              <div className="aspect-square overflow-hidden">
-                <img 
-                  src={imageUrl}
-                  alt={item.project_title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    console.log('Image failed to load:', imageUrl);
-                    target.src = PLACEHOLDER_IMAGE;
-                  }}
-                  onLoad={() => {
-                    console.log('Image loaded successfully:', imageUrl);
-                  }}
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 xs:p-6">
-                <h3 className="text-white font-semibold text-lg xs:text-xl mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{item.project_title}</h3>
-                <p className="text-gray-200 text-sm xs:text-base transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">{item.project_description}</p>
-                <a 
-                  href={item.project_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 text-white hover:text-blue-300 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-200 flex items-center gap-2"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  View Project
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </a>
-              </div>
-              {isEditMode && (
-                <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <Button
-                    variant="ghost"
-                    className="p-2 h-auto bg-white/90 hover:bg-white text-black hover:text-black rounded-full shadow-md"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEdit(item);
+      {(!projectItems || projectItems.length === 0) ? (
+        <div className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-lg p-4 xs:p-6 border border-[#5A8DB8]/10">
+          <p className="text-sm xs:text-base text-gray-600">No projects available.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 xs:gap-6">
+          {projectItems
+            .slice(0, isExpanded ? undefined : 3)
+            .map((item: Project, index: number) => {
+            const imageUrl = getFullImageUrl(item.project_image_url || item.project_image);
+            
+            console.log(`Project ${index}:`, {
+              title: item.project_title,
+              project_image: item.project_image,
+              project_image_url: item.project_image_url,
+              finalImageUrl: imageUrl
+            });
+            
+            return (
+              <div 
+                key={index}
+                className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                onClick={() => handleItemClick(index)}
+              >
+                <div className="aspect-square overflow-hidden">
+                  <img 
+                    src={imageUrl}
+                    alt={item.project_title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      console.log('Image failed to load:', imageUrl);
+                      target.src = PLACEHOLDER_IMAGE;
                     }}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="p-2 h-auto bg-white/90 hover:bg-white text-red-600 hover:text-red-700 rounded-full shadow-md"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteClick(item);
+                    onLoad={() => {
+                      console.log('Image loaded successfully:', imageUrl);
                     }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  />
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 xs:p-6">
+                  <h3 className="text-white font-semibold text-lg xs:text-xl mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{item.project_title}</h3>
+                  <p className="text-gray-200 text-sm xs:text-base transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">{item.project_description}</p>
+                  <a 
+                    href={item.project_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 text-white hover:text-blue-300 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-200 flex items-center gap-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    View Project
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </a>
+                </div>
+                {isEditMode && (
+                  <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <Button
+                      variant="ghost"
+                      className="p-2 h-auto bg-white/90 hover:bg-white text-black hover:text-black rounded-full shadow-md"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(item);
+                      }}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="p-2 h-auto bg-white/90 hover:bg-white text-red-600 hover:text-red-700 rounded-full shadow-md"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(item);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
       
       {projectItems.length > 3 && (
         <Button 

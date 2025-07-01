@@ -755,7 +755,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 <div className="flex items-start gap-3">
                  
                   <div>
-                    <p className="font-semibold text-gray-800 text-sm xs:text-base mb-1">Expiry Date :</p>
+                    <p className="font-semibold text-gray-800 text-sm xs:text-base mb-1">Completed Date :</p>
                     <span className="text-gray-800 font-medium text-sm xs:text-base">{new Date(cert.certifications_expiration_date).toLocaleDateString('en-US', { 
                       year: 'numeric', 
                       month: 'long', 
@@ -1331,7 +1331,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                 <div className="space-y-2">
                   <Label htmlFor="certifications_expiration_date" className="text-sm font-medium text-black flex items-center gap-2">
                     <div className="h-3 w-3 sm:w-4 sm:h-4" />
-                    Expiration Date 
+                    Completed Date 
                   </Label>
                   <Input
                     id="certifications_expiration_date"
