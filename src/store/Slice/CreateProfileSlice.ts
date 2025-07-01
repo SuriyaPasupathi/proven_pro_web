@@ -430,10 +430,16 @@ const createProfileSlice = createSlice({
         state.subscriptionLoading = false;
         state.subscriptionSuccess = true;
         state.error = null;
-        state.profileData = {
-          ...state.profileData,
-          subscription_type: action.payload.subscription_type
-        };
+        if (state.profileData) {
+          state.profileData = {
+            ...state.profileData,
+            subscription_type: action.payload.subscription_type
+          };
+        } else {
+          state.profileData = {
+            subscription_type: action.payload.subscription_type
+          };
+        }
       })
       .addCase(subscribeToPlan.rejected, (state, action) => {
         state.subscriptionLoading = false;

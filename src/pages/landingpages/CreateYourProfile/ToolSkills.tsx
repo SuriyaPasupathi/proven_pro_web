@@ -71,6 +71,26 @@ const ToolSkills: React.FC = () => {
     }
   }, [isSoftSkillsOpen, dispatch]);
 
+  // Pre-fill form with existing data if available
+  useEffect(() => {
+    if (profileData) {
+      console.log('ToolSkills: Pre-filling with existing data:', {
+        primary_tools: profileData.primary_tools,
+        technical_skills: profileData.technical_skills,
+        soft_skills: profileData.soft_skills,
+        skills_description: profileData.skills_description
+      });
+
+      setForm(prev => ({
+        ...prev,
+        primary_tools: getSkillsArray(profileData.primary_tools),
+        technical_skills: getSkillsArray(profileData.technical_skills),
+        soft_skills: getSkillsArray(profileData.soft_skills),
+        skills_description: profileData.skills_description || ""
+      }));
+    }
+  }, [profileData]);
+
   const getSkillsArray = (skills: any): Skill[] => {
     if (!skills) return [];
     if (Array.isArray(skills)) {
@@ -123,6 +143,15 @@ const ToolSkills: React.FC = () => {
         soft_skills: form.soft_skills.map(skill => skill.name.trim()),
         skills_description: form.skills_description.trim(),
       };
+
+      // Debug logging
+      console.log('ToolSkills: Form submission debug:', {
+        subscriptionType,
+        primary_tools: profileData.primary_tools,
+        technical_skills: profileData.technical_skills,
+        soft_skills: profileData.soft_skills,
+        skills_description: profileData.skills_description
+      });
 
       const result = await dispatch(createUserProfile(profileData)).unwrap();
       

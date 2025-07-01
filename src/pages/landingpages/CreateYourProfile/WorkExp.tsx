@@ -51,7 +51,10 @@ const WorkExp: React.FC = () => {
   // Initialize form with existing data if available
   useEffect(() => {
     if (profileData?.work_experiences && profileData.work_experiences.length > 0) {
+      console.log('WorkExp: Pre-filling with existing work experiences:', profileData.work_experiences);
       setWorkForms(profileData.work_experiences);
+    } else {
+      console.log('WorkExp: No existing work experiences found');
     }
   }, [profileData]);
 
@@ -196,6 +199,13 @@ const WorkExp: React.FC = () => {
       const formData = new FormData();
       formData.append('subscription_type', subscriptionType);
       formData.append('work_experiences', JSON.stringify(workForms));
+
+      // Debug logging
+      console.log('WorkExp: Form submission debug:', {
+        subscriptionType,
+        workExperiences: workForms,
+        formDataEntries: Array.from(formData.entries())
+      });
 
       const result = await dispatch(createUserProfile(formData)).unwrap();
       

@@ -13,6 +13,7 @@ const CURRENT_STEP = 2;
 interface ProfileImgForm {
   profile_pic: File | null;
   profile_pic_url: string;
+  hasExistingImage: boolean;
 }
 
 const ProfileImg: React.FC = () => {
@@ -35,6 +36,7 @@ const ProfileImg: React.FC = () => {
   const [form, setForm] = useState<ProfileImgForm>({
     profile_pic: null,
     profile_pic_url: "",
+    hasExistingImage: false,
   });
 
   const [isDragging, setIsDragging] = useState(false);
@@ -43,11 +45,20 @@ const ProfileImg: React.FC = () => {
   useEffect(() => {
     // Pre-fill form with existing data if available
     if (profileData?.profile_pic_url) {
+      console.log('ProfileImg: Found existing profile image:', profileData.profile_pic_url);
       setForm(prev => ({
         ...prev,
-        profile_pic_url: profileData.profile_pic_url || ""
+        profile_pic_url: profileData.profile_pic_url || "",
+        hasExistingImage: true
       }));
+    } else {
+      console.log('ProfileImg: No existing profile image found');
     }
+    
+    // Debug logging for profile data
+    console.log('ProfileImg useEffect - profileData:', profileData);
+    console.log('ProfileImg useEffect - subscriptionType:', subscriptionType);
+    
     // TEMP FIX: Auto-refresh if not free plan to force correct stepper
     // if (profileData?.subscription_type && profileData.subscription_type !== 'free') {
     //   window.location.reload();
@@ -75,7 +86,8 @@ const ProfileImg: React.FC = () => {
       
       setForm({
         profile_pic: file,
-        profile_pic_url: previewUrl
+        profile_pic_url: previewUrl,
+        hasExistingImage: false
       });
     }
   };
@@ -114,7 +126,8 @@ const ProfileImg: React.FC = () => {
       
       setForm({
         profile_pic: file,
-        profile_pic_url: previewUrl
+        profile_pic_url: previewUrl,
+        hasExistingImage: false
       });
     }
   };
@@ -127,20 +140,37 @@ const ProfileImg: React.FC = () => {
     e.preventDefault();
     
     try {
-      if (!form.profile_pic) {
+      // Check if we have either a new image file or an existing image
+      if (!form.profile_pic && !form.hasExistingImage) {
         toast.error('Please upload a profile image');
         return;
       }
 
       const formData = new FormData();
       formData.append('subscription_type', subscriptionType);
-      formData.append('profile_pic', form.profile_pic);
+      
+      // Only append profile_pic if we have a new file
+      if (form.profile_pic) {
+        formData.append('profile_pic', form.profile_pic);
+        console.log('ProfileImg: Submitting new profile image file');
+      } else {
+        console.log('ProfileImg: No new image file, preserving existing image');
+      }
+
+      // Debug logging
+      console.log('ProfileImg: Form submission debug:', {
+        hasNewImage: !!form.profile_pic,
+        hasExistingImage: form.hasExistingImage,
+        existingImageUrl: profileData?.profile_pic_url,
+        subscriptionType,
+        formDataEntries: Array.from(formData.entries())
+      });
 
       const result = await dispatch(createUserProfile(formData)).unwrap();
       
       if (result) {
-        // Clean up the preview URL
-        if (form.profile_pic_url) {
+        // Clean up the preview URL if it was created from a new file
+        if (form.profile_pic && form.profile_pic_url) {
           URL.revokeObjectURL(form.profile_pic_url);
         }
 
@@ -172,6 +202,9 @@ const ProfileImg: React.FC = () => {
       toast.error(error.message || "Failed to save profile image");
     }
   };
+
+  // Check if form is valid (has either new image or existing image)
+  const isFormValid = form.profile_pic || form.hasExistingImage;
 
   return (
     <StepAccessControl currentStep={CURRENT_STEP}>
@@ -227,7 +260,7 @@ const ProfileImg: React.FC = () => {
                           className="w-32 h-32 mx-auto rounded-full object-cover border-4 border-[#5A8DB8]/20"
                         />
                         <p className="text-sm text-gray-600">
-                          Image uploaded successfully
+                          {form.hasExistingImage ? 'Existing profile image' : 'Image uploaded successfully'}
                         </p>
                         <Button
                           type="button"
@@ -235,7 +268,7 @@ const ProfileImg: React.FC = () => {
                           onClick={handleUploadClick}
                           className="text-[#5A8DB8] border-[#5A8DB8] hover:bg-[#5A8DB8] hover:text-white"
                         >
-                          Change Image
+                          {form.hasExistingImage ? 'Change Image' : 'Change Image'}
                         </Button>
                       </div>
                     ) : (
@@ -299,7 +332,7 @@ const ProfileImg: React.FC = () => {
                   </Button>
                   <Button
                     type="submit"
-                    disabled={loading || !form.profile_pic}
+                    disabled={loading || !isFormValid}
                     className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? "Saving..." : "Save & Continue"}
