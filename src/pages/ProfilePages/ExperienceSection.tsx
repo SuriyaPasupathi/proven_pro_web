@@ -364,42 +364,6 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experiences = [] 
     }
   };
 
-  if (!experiences.length) {
-    return (
-      <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
-        <div className="flex justify-between items-center mb-4 xs:mb-6">
-          <h2 className="text-xl xs:text-4xl font-bold text-black">
-            Experience
-          </h2>
-          {isEditMode && (
-            <div className="flex gap-2">
-              <Button 
-                variant="ghost" 
-                className="p-1 xs:p-1.5 h-auto text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 rounded-full transition-all duration-300"
-                onClick={() => {
-                  setEditingExperience(null);
-                  setForm({
-                    company_name: "",
-                    position: "",
-                    experience_start_date: "",
-                    experience_end_date: "",
-                    key_responsibilities: "",
-                  });
-                  setIsDialogOpen(true);
-                }}
-              >
-                <Plus className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
-              </Button>
-            </div>
-          )}
-        </div>
-        <div className="bg-gradient-to-br from-[#5A8DB8]/5 to-white rounded-lg p-4 xs:p-6 border border-[#5A8DB8]/10">
-          <p className="text-sm xs:text-base text-gray-600">No experience information available.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
       <div className="flex justify-between items-center mb-4 xs:mb-6">
