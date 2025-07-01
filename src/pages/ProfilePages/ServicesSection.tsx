@@ -496,7 +496,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
                     </div>
                     <div className="flex flex-col xs:flex-row xs:gap-6 text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-gray-600 font-semibold">Rate-range : {service.rate_range} $</span>
+                        <span className="text-gray-600 font-semibold">Rate-range : {service.rate_range}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-600 font-semibold">Availability : {service.availability}</span>
