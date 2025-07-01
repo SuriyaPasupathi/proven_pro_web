@@ -635,6 +635,20 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
             )}
           </div>
         </div>
+
+        {/* Skills Description Section */}
+        {form.skills_description && (
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-black">
+              Skills Description
+            </h3>
+            <div className="bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-4 rounded-lg shadow-sm border border-[#5A8DB8]/10">
+              <p className="text-sm text-black leading-relaxed whitespace-pre-wrap">
+                {form.skills_description}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
