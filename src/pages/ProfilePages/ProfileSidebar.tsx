@@ -696,23 +696,23 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     <div key={index} className="relative group">
       <div className="relative">
         {isEditMode && (
-          <div className="absolute top-3 right-3 xs:top-4 xs:right-4 flex gap-2 z-10">
+          <div className="absolute top-3 right-3 xs:top-4 xs:right-4 flex gap-3 z-10">
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white border border-white/50 transition-all duration-300 hover:scale-110"
+              className="h-4 w-4 hover:text-[#5A8DB8]"
               onClick={() => handleOpenCertDialog(cert)}
             >
-              <Pencil size={18}  />
+              <Pencil size={14}  />
               
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white text-red-600 border border-white/50 transition-all duration-300 hover:scale-110"
+              className="h-4 w-4 hover:text-red-600"
               onClick={() => handleDeleteClick('certification', cert.certifications_id)}
             >
-              <Trash2 size={18}  />
+              <Trash2 size={14}  />
               
             </Button>
           </div>
