@@ -52,6 +52,19 @@ const Verification = () => {
     }
   }, [dispatch, profileId]);
 
+  useEffect(() => {
+    console.log('profileId:', profileId);
+    if (profileId) {
+      dispatch(getVerificationStatus(profileId));
+    }
+  }, [dispatch, profileId]);
+
+  // Debug: log profileData and verification_details after every update
+  useEffect(() => {
+    console.log('profileData:', profileData);
+    console.log('verification_details:', profileData?.verification_details);
+  }, [profileData]);
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -349,6 +362,13 @@ const Verification = () => {
     return <span className="text-gray-500 font-medium">Not Uploaded</span>;
   };
 
+  // Always use verification_details from Redux
+  const details = profileData?.verification_details;
+
+  if (!details) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -389,19 +409,19 @@ const Verification = () => {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#5A8DB8]/10 to-[#5A8DB8]/5">
                 <span className="text-lg font-semibold text-black">+50 Proven Proof</span>
                 <div className="h-1 w-1 rounded-full bg-[#5A8DB8]/40"></div>
-                {(govIdPending || profileData?.verification_details?.government_id) && (
+                {(govIdPending || details?.government_id) && (
                   <div className="flex items-center gap-2">
                     {govIdPending
                       ? getStatusIcon(true, false)
                       : getStatusIcon(
-                          profileData?.verification_details?.government_id?.uploaded ?? false,
-                          profileData?.verification_details?.government_id?.verified ?? false
+                          !!details?.government_id?.uploaded,
+                          !!details?.government_id?.verified
                         )}
                     {govIdPending
                       ? getStatusText(true, false)
                       : getStatusText(
-                          profileData?.verification_details?.government_id?.uploaded ?? false,
-                          profileData?.verification_details?.government_id?.verified ?? false
+                          !!details?.government_id?.uploaded,
+                          !!details?.government_id?.verified
                         )}
                   </div>
                 )}
@@ -506,19 +526,19 @@ const Verification = () => {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#5A8DB8]/10 to-[#5A8DB8]/5">
                 <span className="text-lg font-semibold text-black">+25 Proven Proof</span>
                 <div className="h-1 w-1 rounded-full bg-[#5A8DB8]/40"></div>
-                {(addressPending || profileData?.verification_details?.address_proof) && (
+                {(addressPending || details?.address_proof) && (
                   <div className="flex items-center gap-2">
                     {addressPending
                       ? getStatusIcon(true, false)
                       : getStatusIcon(
-                          profileData?.verification_details?.address_proof?.uploaded ?? false,
-                          profileData?.verification_details?.address_proof?.verified ?? false
+                          !!details?.address_proof?.uploaded,
+                          !!details?.address_proof?.verified
                         )}
                     {addressPending
                       ? getStatusText(true, false)
                       : getStatusText(
-                          profileData?.verification_details?.address_proof?.uploaded ?? false,
-                          profileData?.verification_details?.address_proof?.verified ?? false
+                          !!details?.address_proof?.uploaded,
+                          !!details?.address_proof?.verified
                         )}
                   </div>
                 )}
@@ -623,41 +643,52 @@ const Verification = () => {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#5A8DB8]/10 to-[#5A8DB8]/5">
                 <span className="text-lg font-semibold text-black">+25 Proven Proof</span>
                 <div className="h-1 w-1 rounded-full bg-[#5A8DB8]/40"></div>
-                {profileData?.verification_details?.mobile && (
+                {details?.mobile && (
                   <div className="flex items-center gap-2">
                     {getStatusIcon(
-                      profileData.verification_details.mobile.provided,
-                      profileData.verification_details.mobile.verified
+                      !!details?.mobile?.provided,
+                      !!details?.mobile?.verified
                     )}
                     {getStatusText(
-                      profileData.verification_details.mobile.provided,
-                      profileData.verification_details.mobile.verified
+                      !!details?.mobile?.provided,
+                      !!details?.mobile?.verified
                     )}
                   </div>
                 )}
               </div>
             </div>
 
-            <p className="text-sm text-black/70 mb-6">Enter your mobile number to receive a verification code</p>
+            <p className="text-sm text-black/70 mb-6">
+              {details?.mobile?.verified
+                ? 'Your mobile number has been verified successfully'
+                : 'Enter your mobile number to receive a verification code'}
+            </p>
             
             <div className="space-y-4">
               <PhoneInput
                 country={'ph'}
                 value={phoneNumber}
                 onChange={setPhoneNumber}
-                inputClass="w-full !h-11 text-sm border-[#5A8DB8]/20 bg-white/60 backdrop-blur-sm focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300"
+                disabled={details?.mobile?.verified}
+                inputClass="w-full !h-11 text-sm border-[#5A8DB8]/20 bg-white/60 backdrop-blur-sm focus:border-[#5A8DB8] focus:ring-2 focus:ring-[#5A8DB8]/20 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 containerClass="w-full"
-                buttonClass="!border-[#5A8DB8]/20 !h-11"
+                buttonClass="!border-[#5A8DB8]/20 !h-11 disabled:opacity-50"
                 dropdownClass="!border-[#5A8DB8]/20"
               />
-              <Button 
-                variant="outline" 
-                className="w-full border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300 flex items-center gap-2"
-                onClick={handlePhoneSubmit}
-              >
-                <ArrowRight className="w-5 h-5" />
-                Validate my mobile number
-              </Button>
+              {!details?.mobile?.verified ? (
+                <Button 
+                  variant="outline" 
+                  className="w-full border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:text-black transition-all duration-300 flex items-center gap-2"
+                  onClick={handlePhoneSubmit}
+                >
+                  <ArrowRight className="w-5 h-5" />
+                  Validate my mobile number
+                </Button>
+              ) : (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-700 font-medium">✓ Mobile number verified</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

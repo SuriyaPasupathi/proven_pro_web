@@ -274,7 +274,11 @@ const createProfileSlice = createSlice({
         if (state.profileData) {
           state.profileData = {
             ...state.profileData,
-            ...action.payload
+            ...action.payload,
+            verification_details: {
+              ...state.profileData.verification_details,
+              ...action.payload.verification_details,
+            }
           };
         }
       })
