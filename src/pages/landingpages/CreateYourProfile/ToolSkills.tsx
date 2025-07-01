@@ -192,12 +192,12 @@ const ToolSkills: React.FC = () => {
               </Button>
               <div className="mt-3 flex flex-wrap gap-2">
                 {form.primary_tools.map((tool) => (
-                  <div key={tool.id} className="flex items-center gap-1 bg-[#5A8DB8]/10 text-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
-                    <span>{tool.name}</span>
+                  <div key={tool.id} className="flex items-center justify-between gap-2 bg-[#5A8DB8]/10 text-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm min-w-0">
+                    <span className="truncate">{tool.name}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(tool.id, 'primary_tools')}
-                      className="text-[#5A8DB8] hover:text-red-500 transition-colors duration-300"
+                      className="flex-shrink-0 text-[#5A8DB8] hover:text-red-500 transition-colors duration-300 ml-1 font-bold text-lg leading-none"
                     >
                       ×
                     </button>
@@ -219,12 +219,12 @@ const ToolSkills: React.FC = () => {
               </Button>
               <div className="mt-3 flex flex-wrap gap-2">
                 {form.technical_skills.map((skill) => (
-                  <div key={skill.id} className="flex items-center gap-1 bg-[#5A8DB8]/10 text-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
-                    <span>{skill.name}</span>
+                  <div key={skill.id} className="flex items-center justify-between gap-2 bg-[#5A8DB8]/10 text-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm min-w-0">
+                    <span className="truncate">{skill.name}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(skill.id, 'technical_skills')}
-                      className="text-[#5A8DB8] hover:text-red-500 transition-colors duration-300"
+                      className="flex-shrink-0 text-[#5A8DB8] hover:text-red-500 transition-colors duration-300 ml-1 font-bold text-lg leading-none"
                     >
                       ×
                     </button>
@@ -246,12 +246,12 @@ const ToolSkills: React.FC = () => {
               </Button>
               <div className="mt-3 flex flex-wrap gap-2">
                 {form.soft_skills.map((skill) => (
-                  <div key={skill.id} className="flex items-center gap-1 bg-[#5A8DB8]/10 text-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
-                    <span>{skill.name}</span>
+                  <div key={skill.id} className="flex items-center justify-between gap-2 bg-[#5A8DB8]/10 text-black px-3 py-1.5 rounded-full text-sm font-medium shadow-sm min-w-0">
+                    <span className="truncate">{skill.name}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(skill.id, 'soft_skills')}
-                      className="text-[#5A8DB8] hover:text-red-500 transition-colors duration-300"
+                      className="flex-shrink-0 text-[#5A8DB8] hover:text-red-500 transition-colors duration-300 ml-1 font-bold text-lg leading-none"
                     >
                       ×
                     </button>

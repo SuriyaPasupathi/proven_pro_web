@@ -694,7 +694,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   // Update the renderCertification function to include preview button
   const renderCertification = (cert: Certification, index: number) => (
     <div key={index} className="relative group">
-      <div className="">
+      <div className="relative">
         {isEditMode && (
           <div className="absolute top-3 right-3 xs:top-4 xs:right-4 flex gap-2 z-10">
             <Button
@@ -703,7 +703,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white border border-white/50 transition-all duration-300 hover:scale-110"
               onClick={() => handleOpenCertDialog(cert)}
             >
-              <Pencil size={18} className=" mr-1" />
+              <Pencil size={18}  />
               
             </Button>
             <Button
@@ -712,7 +712,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               className="h-7 w-7 xs:h-8 xs:w-8 sm:h-9 sm:w-9 rounded-full bg-white text-red-600 border border-white/50 transition-all duration-300 hover:scale-110"
               onClick={() => handleDeleteClick('certification', cert.certifications_id)}
             >
-              <Trash2 size={18} className=" mr-1" />
+              <Trash2 size={18}  />
               
             </Button>
           </div>
@@ -836,7 +836,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     )}
                   </div>
                   {isEditMode && (
-                    <div className="absolute top-2 right-2 xs:top-3 xs:right-3 flex gap-2 z-10">
+                    <div className="absolute  top-2 right-2 xs:top-3 xs:right-3 flex gap-2 z-10">
                       <Button
                         variant="ghost"
                         size="icon"

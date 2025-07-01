@@ -1,4 +1,4 @@
-import { ChevronDown, Loader2, ChevronUp, Plus,  Pencil, CheckCircle2, X } from 'lucide-react';
+import { Loader2, Plus, Pencil, CheckCircle2, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useEditMode } from '../../context/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -33,7 +33,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
 
   // Convert tools input to array
@@ -258,12 +257,17 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                 </Button>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {tools.map((tool, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
-                      <span>{tool}
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200" onClick={() => handleRemoveTool(tool, true)} disabled={isLoading}>
-                        <X className="h-3.5 w-3.5" />
+                    <div key={index} className="flex items-center justify-between gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200 min-w-0">
+                      <span className="truncate text-sm font-medium">{tool}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-5 w-5 mt-1 flex-shrink-0 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 ml-1" 
+                        onClick={() => handleRemoveTool(tool, true)} 
+                        disabled={isLoading}
+                      >
+                        <X className="h-3 w-3" />
                       </Button>
-                      </span>
                     </div>
                   ))}
                 </div>
@@ -425,41 +429,22 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
           </h3>
           <div className="flex flex-wrap gap-2">
             {tools.length > 0 ? (
-              tools
-                .slice(0, isExpanded ? undefined : 2)
-                .map((tool, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-black">{tool}</span>
-                    </div>
+              tools.map((tool, index) => (
+                <div 
+                  key={index}
+                  className="flex items-center gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-[#5A8DB8]/10"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-black">{tool}</span>
                   </div>
-                ))
+                </div>
+              ))
             ) : (
               <p className="text-gray-500">No tools added yet</p>
             )}
           </div>
         </div>
       </div>
-      
-      {tools.length > 2 && (
-        <div className="mt-6">
-          <Button 
-            variant="ghost" 
-            className="text-black hover:text-black hover:bg-[#5A8DB8]/10 rounded-xl px-4 py-2"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            <span className="mr-2">{isExpanded ? 'Show less' : 'Show all tools'}</span>
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

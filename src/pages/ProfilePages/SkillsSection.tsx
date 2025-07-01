@@ -326,12 +326,17 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 </Button>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.technical_skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
-                      <span>{skill}
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200" onClick={() => handleRemoveSkill(skill, 'technical_skills', true)} disabled={isLoading}>
-                        <X className="h-3.5 w-3.5" />
+                    <div key={index} className="flex items-center justify-between gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200 min-w-0">
+                      <span className="truncate text-sm font-medium">{skill}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-5 w-5 mt-1 flex-shrink-0 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 ml-1" 
+                        onClick={() => handleRemoveSkill(skill, 'technical_skills', true)} 
+                        disabled={isLoading}
+                      >
+                        <X className="h-3 w-3" />
                       </Button>
-                      </span>
                     </div>
                   ))}
                 </div>
@@ -350,12 +355,17 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                 </Button>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.soft_skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
-                      <span>{skill}
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200" onClick={() => handleRemoveSkill(skill, 'soft_skills', true)} disabled={isLoading}>
-                        <X className="h-3.5 w-3.5" />
+                    <div key={index} className="flex items-center justify-between gap-2 bg-gradient-to-r from-[#5A8DB8]/5 to-[#3C5979]/5 text-black px-3 py-1.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200 min-w-0">
+                      <span className="truncate text-sm font-medium">{skill}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-5 w-5 flex-shrink-0 text-black hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 ml-1" 
+                        onClick={() => handleRemoveSkill(skill, 'soft_skills', true)} 
+                        disabled={isLoading}
+                      >
+                        <X className="h-3 w-3" />
                       </Button>
-                      </span>
                     </div>
                   ))}
                 </div>
