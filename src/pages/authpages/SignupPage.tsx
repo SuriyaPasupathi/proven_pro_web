@@ -477,7 +477,7 @@ export function SignUpForm() {
                   disabled={isLoading}
                 />
                 <label htmlFor="marketing" className="text-sm text-gray-600">
-                   Yes, I agree to receive updates, newsletters, and promotional emails from ProvenPro.
+                   I agree to receive updates, newsletters, and promotional emails from ProvenPro.
                 </label>
               </div>
 
