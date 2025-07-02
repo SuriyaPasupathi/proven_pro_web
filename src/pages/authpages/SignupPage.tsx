@@ -57,10 +57,7 @@ const formSchema = z
         message: 'Username must be at least 3 characters',
       })
       .refine((value) => !/\s/.test(value), {
-        message: 'Username cannot contain spaces. Use letters, numbers, or underscores.',
-      })
-      .refine((value) => /^[A-Za-z0-9_]+$/.test(value), {
-        message: 'Username must contain only letters, numbers, or underscores.',
+        message: 'Username cannot contain spaces.',
       }),
     password: passwordSchema,
     confirmPassword: z.string(),
@@ -104,8 +101,7 @@ export function SignUpForm() {
   // Check if username is valid
   const isUsernameValid = username && 
     username.length >= 3 && 
-    !/\s/.test(username) && 
-    /^[A-Za-z0-9_]+$/.test(username);
+    !/\s/.test(username);
 
   // Check if email is valid
   const isEmailValid = email && 
@@ -122,7 +118,6 @@ export function SignUpForm() {
       console.log('Username validation check:', {
         username,
         hasSpaces: /\s/.test(username),
-        isValidFormat: /^[A-Za-z0-9_]+$/.test(username),
         length: username.length,
         isUsernameValid
       });
@@ -293,14 +288,12 @@ export function SignUpForm() {
                       />
                     </FormControl>
                     <div className="text-xs text-gray-500 mt-1">
-                      Use only letters, numbers, and underscores. No spaces allowed.
+                      Minimum 3 characters. No spaces allowed.
                     </div>
                     {username && (
                       <div className="text-xs mt-1">
                         {/\s/.test(username) ? (
                           <span className="text-red-500 font-medium">❌ Contains spaces - Cannot create account</span>
-                        ) : !/^[A-Za-z0-9_]+$/.test(username) ? (
-                          <span className="text-red-500 font-medium">❌ Invalid characters - Cannot create account</span>
                         ) : username.length < 3 ? (
                           <span className="text-red-500 font-medium">❌ Too short - Cannot create account</span>
                         ) : (

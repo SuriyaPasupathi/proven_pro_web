@@ -49,6 +49,7 @@ interface ProfileStatusResponse {
 
 interface ErrorResponse {
   message?: string;
+  error?: string;
   status?: number;
   code?: string;
 }
@@ -809,6 +810,117 @@ export const deleteItem = createAsyncThunk(
         // Handle other error responses
         return rejectWithValue({
           message: axiosError.response.data?.message || 'Failed to delete item',
+          status: axiosError.response.status,
+          code: 'DELETE_ERROR'
+        });
+      }
+
+      // Handle non-Axios errors
+      return rejectWithValue({
+        message: 'An unexpected error occurred',
+        code: 'UNKNOWN_ERROR'
+      });
+    }
+  }
+);
+
+export const deleteVideoIntro = createAsyncThunk(
+  'profile/deleteVideoIntro',
+  async (userId: string, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      console.log('Delete video intro request for user:', userId); // Debug log
+      
+      const response = await axios.delete(
+        `${baseUrl}delete-video-intro/${userId}/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          validateStatus: (status) => {
+            // Accept 200, 204, and 404 as valid responses
+            return status === 200 || status === 204 || status === 404;
+          }
+        }
+      );
+
+      console.log('Delete video intro response:', response); // Debug log
+
+      // Check if the response is successful
+      if (response.status === 204 || response.status === 200) {
+        return { 
+          success: true, 
+          message: response.data?.message || 'Video intro deleted successfully',
+          userId 
+        };
+      }
+
+      // If we get here, something unexpected happened
+      return rejectWithValue({
+        message: 'Unexpected response from server',
+        status: response.status,
+        code: 'UNEXPECTED_RESPONSE'
+      });
+    } catch (error) {
+      console.error('Delete video intro error:', error);
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<ErrorResponse>;
+        
+        // Handle 500 Internal Server Error
+        if (axiosError.response?.status === 500) {
+          return rejectWithValue({
+            message: 'Server error occurred. Please try again later.',
+            status: 500,
+            code: 'SERVER_ERROR'
+          });
+        }
+
+        // Handle specific error cases
+        if (axiosError.response?.status === 404) {
+          return rejectWithValue({
+            message: 'User not found',
+            status: 404,
+            code: 'NOT_FOUND'
+          });
+        }
+
+        if (axiosError.response?.status === 400) {
+          return rejectWithValue({
+            message: axiosError.response.data?.error || 'No video intro to delete',
+            status: 400,
+            code: 'BAD_REQUEST'
+          });
+        }
+
+        if (axiosError.response?.status === 401) {
+          return rejectWithValue({
+            message: 'Unauthorized. Please log in again.',
+            status: 401,
+            code: 'UNAUTHORIZED'
+          });
+        }
+
+        if (axiosError.response?.status === 403) {
+          return rejectWithValue({
+            message: 'You do not have permission to delete this video intro',
+            status: 403,
+            code: 'FORBIDDEN'
+          });
+        }
+
+        // Handle network errors
+        if (!axiosError.response) {
+          return rejectWithValue({
+            message: 'Network error. Please check your connection.',
+            code: 'NETWORK_ERROR'
+          });
+        }
+
+        // Handle other error responses
+        return rejectWithValue({
+          message: axiosError.response.data?.error || axiosError.response.data?.message || 'Failed to delete video intro',
           status: axiosError.response.status,
           code: 'DELETE_ERROR'
         });

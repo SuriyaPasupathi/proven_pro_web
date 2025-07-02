@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
+import { useDeleteVideoIntro } from '@/hooks/useDeleteVideoIntro';
 import { Label } from "@/components/ui/label";
 import { Pencil, Plus, Trash2, Eye } from 'lucide-react';
 import SectionLock from '../../components/SectionLock';
@@ -110,6 +111,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
     error: deleteError
   } = useDeleteItem();
 
+  // Add video deletion hook
+  const {
+    deleteVideoIntro
+  } = useDeleteVideoIntro();
+
   // Update handleDeleteClick to use the new hook
   const handleDeleteClick = (type: 'image' | 'video' | 'certification', certId?: string) => {
     if (!profileData.id) {
@@ -152,6 +158,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
       return;
     }
 
+    // Show loading toast
+    const loadingToast = toast.loading(`Deleting ${deleteType}...`);
+
     try {
       if (deleteType === 'certification' && certificationToDelete) {
         // Optimistically update the UI first
@@ -170,6 +179,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
         // If deletion was successful, the optimistic update is already in place
         if (result?.success) {
+          toast.dismiss(loadingToast);
           toast.success("Certification deleted successfully!");
         } else {
           // If deletion failed, revert the optimistic update
@@ -177,40 +187,34 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             ...reduxProfileData,
             certifications: profileData.certifications
           }));
+          toast.dismiss(loadingToast);
           toast.error(result?.message || "Failed to delete certification");
         }
+      } else if (deleteType === 'video') {
+        // Use the dedicated video deletion hook
+        const success = await deleteVideoIntro(profileData.id);
+        if (success) {
+          // The Redux state is already updated by the hook
+          // No need for additional UI updates
+          toast.dismiss(loadingToast);
+          // Success toast is already handled in the hook
+        } else {
+          toast.dismiss(loadingToast);
+          // Error toast is already handled in the hook
+        }
       } else {
-        // For other types (image, video), use the delete endpoint
-        const result = await handleDelete(
-          deleteType === 'image' ? 'profile_pic' : 'video_intro', 
-          profileData.id
-        );
+        // For image type, use the delete endpoint
+        const result = await handleDelete('profile_pic', profileData.id);
 
         // If deletion was successful, update the UI
         if (result?.success) {
           const formData = new FormData();
-
-          switch (deleteType) {
-            case 'image':
-              formData.append('profile_pic', '');
-              dispatch(updateProfileData({
-                ...reduxProfileData,
-                profile_pic: '',
-                profile_pic_url: ''
-              }));
-              break;
-
-            case 'video':
-              formData.append('video_intro', '');
-              formData.append('video_description', '');
-              dispatch(updateProfileData({
-                ...reduxProfileData,
-                video_intro: '',
-                video_intro_url: '',
-                video_description: ''
-              }));
-              break;
-          }
+          formData.append('profile_pic', '');
+          dispatch(updateProfileData({
+            ...reduxProfileData,
+            profile_pic: '',
+            profile_pic_url: ''
+          }));
 
           // Update the profile with the changes
           await dispatch(updateProfile({
@@ -218,9 +222,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
             profileId: profileData.id
           }));
 
-          toast.success(result.message || `${deleteType.charAt(0).toUpperCase() + deleteType.slice(1)} deleted successfully!`);
+          toast.dismiss(loadingToast);
+          toast.success(result.message || 'Image deleted successfully!');
         } else {
-          toast.error(result?.message || `Failed to delete ${deleteType}`);
+          toast.dismiss(loadingToast);
+          toast.error(result?.message || 'Failed to delete image');
         }
       }
     } catch (err) {
@@ -232,6 +238,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           certifications: profileData.certifications
         }));
       }
+      toast.dismiss(loadingToast);
       toast.error(deleteError || error.message || `Failed to delete ${deleteType}`);
     } finally {
       closeDeleteDialog();
@@ -836,25 +843,15 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     )}
                   </div>
                   {isEditMode && (
-                    <div className="absolute  top-2 right-2 xs:top-3 xs:right-3 flex gap-2 z-10">
+                    <div className="absolute  top-3 right-2 xs:top-3 xs:right-3 flex gap-2 z-10">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 bg-white/90 rounded-full shadow hover:bg-gray-100"
+                        className="h-7 w-7 mb-1"
                         onClick={() => setIsImageDialogOpen(true)}
                       >
                         <Pencil size={18} />
                       </Button>
-                      {(profileData.profile_pic_url || profileData.profile_pic) && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 bg-white/90 rounded-full shadow hover:bg-gray-100 text-red-500"
-                          onClick={() => handleDeleteClick('image')}
-                        >
-                          <Trash2 size={18} />
-                        </Button>
-                      )}
                     </div>
                   )}
                 </div>
@@ -892,36 +889,50 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
         {/* Video Introduction */}
         <SectionLock requiredPlan="premium" title="Premium Features">
-          {(profileData.video_intro || profileData.video_intro_url) && (
-            <div className="relative w-full  max-w-lg mx-auto">
-              <div className="absolute inset-0 bg-white xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
-              <div className="relative w-full mx-auto">
-                <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
-                  <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-6">
-                    <div className="flex items-center gap-1 xs:gap-2">
-                      <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-gray-800">Video Introduction (Optional)</h3>
-                    </div>
-                    {isEditMode && (
-                      <div className="flex gap-1 xs:gap-2">
+          <div className="relative w-full max-w-lg mx-auto">
+            <div className="absolute inset-0 bg-white xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
+            <div className="relative w-full mx-auto">
+              <div className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+                <div className="flex items-center justify-between mb-3 xs:mb-4 sm:mb-6">
+                  <div className="flex items-center gap-1 xs:gap-2">
+                    <h3 className="font-semibold text-sm xs:text-base sm:text-lg md:text-xl text-gray-800">Video Introduction (Optional)</h3>
+                  </div>
+                  {isEditMode && (
+                    <div className="flex gap-1 xs:gap-2">
+                      {(profileData.video_intro || profileData.video_intro_url) ? (
+                        <>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
+                            onClick={handleOpenVideoDialog}
+                          >
+                            <Pencil size={18} className=" mr-1" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-300"
+                            onClick={() => handleDeleteClick('video')}
+                          >
+                            <Trash2 size={18} className=" mr-1" />
+                          </Button>
+                        </>
+                      ) : (
                         <Button 
                           variant="ghost" 
                           size="icon"
                           className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-[#5A8DB8] hover:bg-[#5A8DB8]/10 transition-colors duration-300"
                           onClick={handleOpenVideoDialog}
                         >
-                          <Pencil size={18} className=" mr-1" />
+                          <Plus size={18} className=" mr-1" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-5 w-5 xs:h-6 xs:w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 xl:h-10 xl:w-10 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-300"
-                          onClick={() => handleDeleteClick('video')}
-                        >
-                          <Trash2 size={18} className=" mr-1" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                {(profileData.video_intro || profileData.video_intro_url) ? (
                   <div className="space-y-3 xs:space-y-4 sm:space-y-6">
                     <div className="relative bg-gray-100 rounded-lg xs:rounded-xl aspect-video overflow-x-auto group hover:shadow-md transition-shadow duration-300">
                       <video 
@@ -939,10 +950,28 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                       </div>
                     )}
                   </div>
-                </div>
+                ) : (
+                  <div className="text-center py-8 xs:py-10 sm:py-12 bg-gradient-to-br from-white/95 to-gray-50/80 rounded-xl sm:rounded-2xl border border-[#5A8DB8]/15">
+                    <div className="p-4 xs:p-5 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#5A8DB8]/10 to-[#5A8DB8]/5 inline-block mb-4 xs:mb-5">
+                      <div className="h-8 w-8 xs:w-10 xs:h-10 text-[#5A8DB8] mx-auto" />
+                    </div>
+                    <p className="text-gray-600 text-sm xs:text-base sm:text-lg font-medium mb-4 xs:mb-5">No video introduction added yet</p>
+                    {isEditMode && (
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        className="text-[#5A8DB8] hover:text-[#3C5979] hover:bg-[#5A8DB8]/10 transition-colors duration-300 border-[#5A8DB8]/30 text-sm xs:text-base font-medium"
+                        onClick={handleOpenVideoDialog}
+                      >
+                        <Plus size={18} className="text-[#5A8DB8] mr-1" />
+                        Add Video Introduction
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
         </SectionLock>
         
 

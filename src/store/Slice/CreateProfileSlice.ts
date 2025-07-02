@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, getProfileReviewsPublic, deleteItem, searchUsers, verifyShareToken, subscribeToPlan } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, getProfileReviewsPublic, deleteItem, deleteVideoIntro, searchUsers, verifyShareToken, subscribeToPlan } from '../Services/CreateProfileService';
 import { ProfileData } from '../../types/profile';
 
 interface ProfileError {
@@ -52,6 +52,8 @@ interface CreateProfileState {
   verificationDetails: VerificationDetails | null;
   deleteLoading: boolean;
   deleteSuccess: boolean;
+  deleteVideoLoading: boolean;
+  deleteVideoSuccess: boolean;
   searchResults: Array<{
     id: string;
     username: string;
@@ -88,6 +90,8 @@ const initialState: CreateProfileState = {
   verificationDetails: null,
   deleteLoading: false,
   deleteSuccess: false,
+  deleteVideoLoading: false,
+  deleteVideoSuccess: false,
   searchResults: [],
   searchLoading: false,
   searchError: null,
@@ -394,6 +398,30 @@ const createProfileSlice = createSlice({
       .addCase(deleteItem.rejected, (state, action) => {
         state.deleteLoading = false;
         state.deleteSuccess = false;
+        state.error = action.payload as ProfileError;
+      })
+      .addCase(deleteVideoIntro.pending, (state) => {
+        state.deleteVideoLoading = true;
+        state.error = null;
+        state.deleteVideoSuccess = false;
+      })
+      .addCase(deleteVideoIntro.fulfilled, (state, action) => {
+        state.deleteVideoLoading = false;
+        state.deleteVideoSuccess = true;
+        state.error = null;
+        // Update the profile data to remove video intro
+        if (state.profileData) {
+          state.profileData = {
+            ...state.profileData,
+            video_intro: undefined,
+            video_intro_url: undefined,
+            video_description: ''
+          };
+        }
+      })
+      .addCase(deleteVideoIntro.rejected, (state, action) => {
+        state.deleteVideoLoading = false;
+        state.deleteVideoSuccess = false;
         state.error = action.payload as ProfileError;
       })
       .addCase(searchUsers.pending, (state) => {
