@@ -607,9 +607,9 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
       )}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] bg-gradient-to-br from-white/95 to-white/80 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-3xl shadow-2xl transition-all duration-300 overflow-hidden flex flex-col">
           <div className="absolute inset-0 bg-gradient-to-br from-[#5A8DB8]/5 to-[#70a4d8]/5 pointer-events-none"></div>
-          <DialogHeader className="space-y-4 relative">
+          <DialogHeader className="space-y-4 relative flex-shrink-0">
             <div className="flex items-center justify-between">
               <DialogTitle className="text-2xl font-semibold text-black">
                 {editingItem ? 'Edit Project' : 'Add Project'}
@@ -617,7 +617,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
             </div>
             <div className="h-1 w-full bg-gradient-to-r from-[#5A8DB8]/20 via-[#70a4d8]/20 to-[#5A8DB8]/20 rounded-full"></div>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-6 relative">
+          <form onSubmit={handleSubmit} className="space-y-6 relative flex-1 overflow-y-auto px-6">
             <div className="space-y-2 group">
               <label htmlFor="project_title" className="font-medium mb-1.5 text-sm text-black">
                 Project Title
@@ -710,7 +710,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
               )}
             </div>
 
-            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10">
+            <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-[#5A8DB8]/10 flex-shrink-0">
               <Button
                 type="button"
                 variant="outline"
