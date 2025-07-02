@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import provenLogo from '../../../../assets/provenlogo.png';
+import provenLogo from '../../../../assets/logo.png';
 
 const portfolioImages = [
   'https://images.unsplash.com/photo-1464983953574-0892a716854b?w=400&h=300&fit=crop',
@@ -25,10 +25,7 @@ const PremiumPlanDailog: React.FC<PremiumPlanDialogProps> = ({ open, onClose }) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-30 px-1 sm:px-2">
-      {/* Premium Plan Title at top left */}
-      <div className="fixed top-4 left-4 sm:top-8 sm:left-8 z-50 text-lg sm:text-xl md:text-2xl font-semibold text-gray-700">
-        Premium Plan
-      </div>
+     
       <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl p-0 sm:p-0 md:p-0 relative mx-auto overflow-y-auto max-h-[98vh] border border-gray-300">
         {/* Navbar */}
         <div className="flex flex-col sm:flex-row items-center justify-between px-2 sm:px-6 py-2 sm:py-3 border-b border-gray-200 bg-[#F7F9FB] rounded-t-lg gap-2 sm:gap-0">

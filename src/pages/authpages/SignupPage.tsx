@@ -74,6 +74,7 @@ export function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToMarketing, setAgreedToMarketing] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
@@ -110,7 +111,7 @@ export function SignUpForm() {
     email.length <= 254;
 
   // Check if form is valid
-  const isFormValid = formState.isValid && isUsernameValid && isEmailValid && passwordsMatch && agreedToTerms;
+  const isFormValid = formState.isValid && isUsernameValid && isEmailValid && passwordsMatch && agreedToTerms && agreedToMarketing;
 
   // Debug logging for validation
   useEffect(() => {
@@ -464,6 +465,27 @@ export function SignUpForm() {
                   </button>
                 </label>
               </div>
+
+              {/* Marketing Email Checkbox */}
+              <div className="flex items-start space-x-3 py-2">
+                <input
+                  id="marketing"
+                  type="checkbox"
+                  checked={agreedToMarketing}
+                  onChange={() => setAgreedToMarketing(!agreedToMarketing)}
+                  className="mt-1 h-5 w-5 text-[#3C5979] border-gray-300 rounded focus:ring-[#3C5979]"
+                  disabled={isLoading}
+                />
+                <label htmlFor="marketing" className="text-sm text-gray-600">
+                   Yes, I agree to receive updates, newsletters, and promotional emails from ProvenPro.
+                </label>
+              </div>
+
+              {!agreedToMarketing && formState.isSubmitted && (
+                <div className="text-xs text-red-500 mt-1">
+                  You must agree to receive updates and promotional emails to create an account.
+                </div>
+              )}
 
               <Button
                 type="submit"

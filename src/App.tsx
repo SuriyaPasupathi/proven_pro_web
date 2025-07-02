@@ -36,6 +36,8 @@ import SeeExample from './pages/landingpages/LandingPreview/SeeExample';
 import BasicExample from './pages/landingpages/LandingPreview/SeeExamplePage/FreePlan';
 import StandardExample from './pages/landingpages/LandingPreview/SeeExamplePage/StandardPlan';
 import PremiumExample from './pages/landingpages/LandingPreview/SeeExamplePage/PremiumPlan';
+import TermsConditions from './components/termsconditions/termscondtions';
+import PrivacyPolicy from './components/termsconditions/privacypolicy';
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
 const { theme } = useTheme();
@@ -71,6 +73,8 @@ function App() {
               <Route path="/plans" element={<Plans />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/share/:shareToken" element={<ShareProfilePage />} />
+              <Route path="/terms" element={<TermsConditions />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
 
               {/* Auth Routes */}
               <Route path="/signup" element={<SignUpForm />} />
