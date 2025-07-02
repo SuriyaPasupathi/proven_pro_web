@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Mail, Clock, RefreshCw } from "lucide-react";
+import { Mail, Clock, RefreshCw, AlertCircle } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import { toast } from "react-hot-toast";
@@ -11,6 +11,7 @@ const CODE_LENGTH = 6;
 
 const CheckEmailCode: React.FC = () => {
   const [code, setCode] = useState(Array(CODE_LENGTH).fill(""));
+  const [formError, setFormError] = useState<string>("");
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -76,6 +77,12 @@ const CheckEmailCode: React.FC = () => {
 
   const handleChange = (value: string, idx: number) => {
     if (!/^[0-9]?$/.test(value)) return;
+    
+    // Clear form error when user starts typing
+    if (formError) {
+      setFormError("");
+    }
+    
     const newCode = [...code];
     newCode[idx] = value;
     setCode(newCode);
@@ -109,20 +116,23 @@ const CheckEmailCode: React.FC = () => {
     console.log('Form submitted');
     console.log('Current state:', { email: finalEmail, code: code.join(''), loading, verified, otpExpired });
     
+    // Clear any previous form errors
+    setFormError("");
+    
     // Check if OTP has expired
     if (otpExpired) {
-      toast.error("OTP has expired. Please request a new verification code.");
+      setFormError("OTP has expired. Please request a new verification code.");
       return;
     }
     
     const otp = code.join("");
     if (otp.length !== CODE_LENGTH) {
-      toast.error("Please enter all 6 digits of the verification code");
+      setFormError("Please enter all 6 digits of the verification code");
       return;
     }
 
     if (!finalEmail) {
-      toast.error("Email not found");
+      setFormError("Email not found");
       return;
     }
 
@@ -135,11 +145,11 @@ const CheckEmailCode: React.FC = () => {
         toast.success("Email verified successfully!");
         navigate("/verified-email");
       } else {
-        toast.error(result.message || "Verification failed. Please try again.");
+        setFormError(result.message || "Verification failed. Please try again.");
       }
     } catch (error: any) {
       console.error('Verification error:', error);
-      toast.error(error.message || 'Verification failed. Please try again.');
+      setFormError(error.message || 'Verification failed. Please try again.');
     }
   };
 
@@ -221,7 +231,7 @@ const CheckEmailCode: React.FC = () => {
                 onKeyDown={e => handleKeyDown(e, idx)}
                 onPaste={handlePaste}
                 className={`w-10 h-12 sm:w-12 sm:h-14 md:w-14 md:h-16 text-2xl sm:text-3xl text-center border-2 rounded-lg focus:outline-none transition ${
-                  otpExpired 
+                  formError || otpExpired
                     ? 'border-red-300 bg-red-50 text-red-600' 
                     : 'border-[#6C63FF] focus:border-[#3C5979]'
                 }`}
@@ -231,6 +241,14 @@ const CheckEmailCode: React.FC = () => {
               />
             ))}
           </div>
+          
+          {/* Error Message Display */}
+          {formError && (
+            <div className="w-full mb-4 flex items-center gap-2 px-3 py-2 bg-red-50 border border-red-200 rounded-lg">
+              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+              <span className="text-sm text-red-600">{formError}</span>
+            </div>
+          )}
           <Button
             type="submit"
             className={`w-full mb-3 sm:mb-4 text-sm sm:text-base ${
