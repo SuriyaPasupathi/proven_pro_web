@@ -6,6 +6,7 @@ import { FaStar, FaGem, FaRocket } from 'react-icons/fa';
 import FreePlanDailog from './SeeExamplePage/FreePlanDailog';
 import StandardPlanDailog from './SeeExamplePage/StandardPlanDailog';
 import PremiumPlanDailog from './SeeExamplePage/PremiumPlanDailog';
+import standardPlanImg from '../../../assets/standardplan.jpg';
 
 interface ProfileCardProps {
   image: string;
@@ -120,7 +121,7 @@ const SeeExample: React.FC = () => {
       onSelect: () => setShowFreeDialog(true),
     },
     {
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+      image: standardPlanImg,
       title: 'Standard Example',
       subtitle: 'Front End Developer',
       description:
