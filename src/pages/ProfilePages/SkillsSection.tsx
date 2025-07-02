@@ -146,18 +146,26 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   };
 
   const handleAddSkill = (skill: Skill, field: 'technical_skills' | 'soft_skills') => {
-    console.log('Adding skill:', skill, 'to field:', field);
+    console.log('Toggling skill:', skill, 'in field:', field);
     setForm(prev => {
       const currentValues = prev[field];
-      if (!currentValues.includes(skill.name)) {
-        const newValues = [...currentValues, skill.name];
-        console.log('New values for', field, ':', newValues);
-        return {
-          ...prev,
-          [field]: newValues
-        };
+      const skillIndex = currentValues.indexOf(skill.name);
+      
+      let newValues;
+      if (skillIndex === -1) {
+        // Skill not found, add it
+        newValues = [...currentValues, skill.name];
+        console.log('Adding skill to', field, ':', newValues);
+      } else {
+        // Skill found, remove it
+        newValues = currentValues.filter((_, index) => index !== skillIndex);
+        console.log('Removing skill from', field, ':', newValues);
       }
-      return prev;
+      
+      return {
+        ...prev,
+        [field]: newValues
+      };
     });
   };
 
@@ -513,14 +521,14 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
             </div>
           </div>
           <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               onClick={() => setIsTechnicalSkillsOpen(false)}
               className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
             >
               Cancel
-            </Button>
+            </Button> */}
             <Button
               type="button"
               onClick={() => setIsTechnicalSkillsOpen(false)}
@@ -569,14 +577,14 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
             </div>
           </div>
           <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               onClick={() => setIsSoftSkillsOpen(false)}
               className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
             >
               Cancel
-            </Button>
+            </Button> */}
             <Button
               type="button"
               onClick={() => setIsSoftSkillsOpen(false)}

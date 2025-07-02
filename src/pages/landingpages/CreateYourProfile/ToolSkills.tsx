@@ -115,13 +115,23 @@ const ToolSkills: React.FC = () => {
         ...skill,
         name: skill.name.trim()
       };
-      if (!currentValues.some(s => s.id === cleanSkill.id)) {
+      
+      // Check if skill already exists
+      const existingSkillIndex = currentValues.findIndex(s => s.id === cleanSkill.id);
+      
+      if (existingSkillIndex === -1) {
+        // Skill not found, add it
         return {
           ...prev,
           [field]: [...currentValues, cleanSkill]
         };
+      } else {
+        // Skill found, remove it (toggle off)
+        return {
+          ...prev,
+          [field]: currentValues.filter((_, index) => index !== existingSkillIndex)
+        };
       }
-      return prev;
     });
   };
 
@@ -356,21 +366,24 @@ const ToolSkills: React.FC = () => {
                   <div className="h-8 w-8 animate-spin text-[#5A8DB8] border-2 border-[#5A8DB8]/20 border-t-[#5A8DB8] rounded-full" />
                 </div>
               ) : (
-                getSkillsArray(dropdownSkills).map((tool: Skill) => (
-                  <Button
-                    key={tool.id}
-                    type="button"
-                    variant={form.primary_tools.some(t => t.id === tool.id) ? "default" : "outline"}
-                    className={`w-full justify-start rounded-xl transition-all duration-300 ${
-                      form.primary_tools.some(t => t.id === tool.id)
-                        ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white"
-                        : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black"
-                    }`}
-                    onClick={() => handleAddItem(tool, 'primary_tools')}
-                  >
-                    {tool.name}
-                  </Button>
-                ))
+                getSkillsArray(dropdownSkills).map((tool: Skill) => {
+                  const isSelected = form.primary_tools.some(t => t.id === tool.id);
+                  return (
+                    <Button
+                      key={tool.id}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      className={`w-full justify-start rounded-xl transition-all duration-300 ${
+                        isSelected
+                          ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white"
+                          : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black"
+                      }`}
+                      onClick={() => handleAddItem(tool, 'primary_tools')}
+                    >
+                      {tool.name}
+                    </Button>
+                  );
+                })
               )}
             </div>
             <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
@@ -407,21 +420,24 @@ const ToolSkills: React.FC = () => {
                   <div className="h-8 w-8 animate-spin text-[#5A8DB8] border-2 border-[#5A8DB8]/20 border-t-[#5A8DB8] rounded-full" />
                 </div>
               ) : (
-                getSkillsArray(dropdownSkills).map((skill: Skill) => (
-                  <Button
-                    key={skill.id}
-                    type="button"
-                    variant={form.technical_skills.some(s => s.id === skill.id) ? "default" : "outline"}
-                    className={`w-full justify-start rounded-xl transition-all duration-300 ${
-                      form.technical_skills.some(s => s.id === skill.id)
-                        ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white"
-                        : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black"
-                    }`}
-                    onClick={() => handleAddItem(skill, 'technical_skills')}
-                  >
-                    {skill.name}
-                  </Button>
-                ))
+                getSkillsArray(dropdownSkills).map((skill: Skill) => {
+                  const isSelected = form.technical_skills.some(s => s.id === skill.id);
+                  return (
+                    <Button
+                      key={skill.id}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      className={`w-full justify-start rounded-xl transition-all duration-300 ${
+                        isSelected
+                          ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white"
+                          : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black"
+                      }`}
+                      onClick={() => handleAddItem(skill, 'technical_skills')}
+                    >
+                      {skill.name}
+                    </Button>
+                  );
+                })
               )}
             </div>
             <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
@@ -458,21 +474,24 @@ const ToolSkills: React.FC = () => {
                   <div className="h-8 w-8 animate-spin text-[#5A8DB8] border-2 border-[#5A8DB8]/20 border-t-[#5A8DB8] rounded-full" />
                 </div>
               ) : (
-                getSkillsArray(dropdownSkills).map((skill: Skill) => (
-                  <Button
-                    key={skill.id}
-                    type="button"
-                    variant={form.soft_skills.some(s => s.id === skill.id) ? "default" : "outline"}
-                    className={`w-full justify-start rounded-xl transition-all duration-300 ${
-                      form.soft_skills.some(s => s.id === skill.id)
-                        ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white"
-                        : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black"
-                    }`}
-                    onClick={() => handleAddItem(skill, 'soft_skills')}
-                  >
-                    {skill.name}
-                  </Button>
-                ))
+                getSkillsArray(dropdownSkills).map((skill: Skill) => {
+                  const isSelected = form.soft_skills.some(s => s.id === skill.id);
+                  return (
+                    <Button
+                      key={skill.id}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      className={`w-full justify-start rounded-xl transition-all duration-300 ${
+                        isSelected
+                          ? "bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white"
+                          : "bg-white border-2 border-[#5A8DB8]/20 hover:bg-[#5A8DB8]/5 text-black"
+                      }`}
+                      onClick={() => handleAddItem(skill, 'soft_skills')}
+                    >
+                      {skill.name}
+                    </Button>
+                  );
+                })
               )}
             </div>
             <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">

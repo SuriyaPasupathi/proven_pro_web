@@ -73,12 +73,12 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         <p className="text-gray-500 text-sm mb-4 text-center">{description}</p>
         <div className="flex w-full gap-2 mt-auto">
           <button
-            className={`flex-1 px-3 py-2 rounded-lg font-medium cursor-default shadow-sm whitespace-nowrap text-xs sm:text-sm transition-all duration-200 ${
+            className={`flex-1 px-3 py-2 rounded-lg font-medium cursor-pointer shadow-sm whitespace-nowrap text-xs sm:text-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
               highlight 
-                ? 'bg-yellow-50 text-yellow-600 border border-yellow-200' 
-                : 'bg-[#E6F0FA] text-[#5A8DB8] border border-[#5A8DB8]'
+                ? 'bg-yellow-50 text-yellow-600 border border-yellow-200 hover:bg-yellow-100' 
+                : 'bg-[#E6F0FA] text-[#5A8DB8] border border-[#5A8DB8] hover:bg-[#D1E5F5]'
             }`}
-            disabled
+            onClick={onSelect}
           >
             {planLabel}
           </button>

@@ -1,5 +1,4 @@
 import React from 'react';
-import profileImg from '../../../../assets/client.jpg';
 import provenLogo from '../../../../assets/provenlogo.png';
 
 interface StandardPlanDialogProps {
@@ -8,7 +7,7 @@ interface StandardPlanDialogProps {
 }
 
 const StandardPlanDailog: React.FC<StandardPlanDialogProps> = ({ open, onClose }) => {
-  const profileUrl = "https://www.mytutsworld.com/john-d-aj11137p";
+  const profileUrl = "https://provenpro.net/john-d-aj11137p?";
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 px-2 sm:px-4 lg:px-6">
@@ -44,7 +43,7 @@ const StandardPlanDailog: React.FC<StandardPlanDialogProps> = ({ open, onClose }
           {/* Left Side: Profile Image and Card */}
           <div className="flex flex-col items-center lg:w-1/3 w-full">
             <div className="w-32 h-40 sm:w-40 sm:h-48 md:w-48 md:h-56 lg:w-56 lg:h-64 rounded-lg overflow-hidden mb-3 sm:mb-4 border border-gray-200 shadow-md">
-              <img src={profileImg} alt="Profile" className="object-cover w-full h-full" />
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" alt="Profile" className="object-cover w-full h-full" />
             </div>
             <div className="bg-gray-100 rounded-lg p-2 sm:p-3 md:p-4 text-center text-xs sm:text-sm mb-3 sm:mb-4 shadow-sm">
               "With extensive experience in UX/UI design, I specialize in user research, wireframing, prototyping, and visual design to create intuitive, engaging digital experiences."

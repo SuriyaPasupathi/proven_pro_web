@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import profileImg from '../../../../assets/client.jpg';
 
 interface FreePlanDialogProps {
   open: boolean;
@@ -8,7 +7,7 @@ interface FreePlanDialogProps {
 
 const FreePlanDailog: React.FC<FreePlanDialogProps> = ({ open, onClose }) => {
   const [copied, setCopied] = useState(false);
-  const profileUrl = "http://www.mytutsworld.com/john-d-aj11137p";
+  const profileUrl = "https://provenpro.net/john-d-aj11137p?";
   if (!open) return null;
 
   const handleCopy = () => {
@@ -36,7 +35,7 @@ const FreePlanDailog: React.FC<FreePlanDialogProps> = ({ open, onClose }) => {
           {/* Left Side: Profile Image and Card */}
           <div className="flex flex-col items-center md:w-1/3 w-full">
             <div className="w-32 h-40 sm:w-48 sm:h-56 rounded-lg overflow-hidden mb-4 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
-              <img src={profileImg} alt="Profile" className="object-cover w-full h-full" />
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop" alt="Profile" className="object-cover w-full h-full" />
             </div>
             <div className="bg-gray-100 rounded-lg p-3 sm:p-4 text-center text-xs sm:text-sm mb-4 shadow-sm hover:shadow-md transition-all duration-300">
               "With extensive experience in UX/UI design, I specialize in user research, wireframing, prototyping, and visual design to create intuitive, engaging digital experiences."

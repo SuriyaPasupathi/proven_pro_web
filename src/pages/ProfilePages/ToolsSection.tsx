@@ -111,15 +111,22 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   };
 
   const handleAddTool = (tool: Skill) => {
-    console.log('Adding tool:', tool);
+    console.log('Toggling tool:', tool);
     setTools(prev => {
       const currentValues = prev;
-      if (!currentValues.includes(tool.name)) {
+      const toolIndex = currentValues.indexOf(tool.name);
+      
+      if (toolIndex === -1) {
+        // Tool not found, add it
         const newValues = [...currentValues, tool.name];
-        console.log('New tools values:', newValues);
+        console.log('Adding tool to tools:', newValues);
+        return newValues;
+      } else {
+        // Tool found, remove it (toggle off)
+        const newValues = currentValues.filter((_, index) => index !== toolIndex);
+        console.log('Removing tool from tools:', newValues);
         return newValues;
       }
-      return prev;
     });
   };
 
@@ -383,33 +390,36 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                   <Loader2 className="h-6 w-6 animate-spin text-[#5A8DB8]" />
                 </div>
               ) : (
-                getSkillsArray(dropdownSkills).map((tool: Skill) => (
-                  <Button
-                    key={tool.id}
-                    type="button"
-                    variant={tools.includes(tool.name) ? "default" : "outline"}
-                    className={`w-full justify-start ${
-                      tools.includes(tool.name)
-                        ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
-                        : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black'
-                    } rounded-xl`}
-                    onClick={() => handleAddTool(tool)}
-                  >
-                    {tool.name}
-                  </Button>
-                ))
+                getSkillsArray(dropdownSkills).map((tool: Skill) => {
+                  const isSelected = tools.includes(tool.name);
+                  return (
+                    <Button
+                      key={tool.id}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      className={`w-full justify-start ${
+                        isSelected
+                          ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
+                          : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black'
+                      } rounded-xl`}
+                      onClick={() => handleAddTool(tool)}
+                    >
+                      {tool.name}
+                    </Button>
+                  );
+                })
               )}
             </div>
           </div>
           <DialogFooter className="flex justify-end gap-3 pt-6 border-t border-[#5A8DB8]/10">
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               onClick={() => setIsToolsOpen(false)}
               className="border-[#5A8DB8]/20 text-black hover:bg-[#5A8DB8]/10 hover:border-[#5A8DB8]/30 rounded-xl px-6"
             >
               Cancel
-            </Button>
+            </Button> */}
             <Button
               type="button"
               onClick={() => setIsToolsOpen(false)}

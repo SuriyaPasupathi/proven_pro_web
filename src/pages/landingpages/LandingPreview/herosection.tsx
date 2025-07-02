@@ -20,7 +20,7 @@ export default function Hero() {
         
         {/* Left: Text */}
         <div className="w-full md:w-1/2 text-center md:text-left">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-snug sm:leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-5xl font-bold leading-snug sm:leading-tight">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5A8DB8] to-[#3C5979]">
               Boost Your Online Career
             </span>
@@ -57,7 +57,7 @@ export default function Hero() {
 
         {/* Right: Image mockup */}
         <div className="w-full md:w-1/2 flex justify-center items-center">
-          <div className="relative group w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[400px] xl:max-w-[440px]">
+          <div className="relative group w-full max-w-[280px] sm:max-w-[320px] md:max-w-[400px] lg:max-w-[500px] xl:max-w-[600px] 2xl:max-w-[700px]">
             <div className="absolute -inset-1  opacity-25 transition duration-300"></div>
             <img
               src={image}

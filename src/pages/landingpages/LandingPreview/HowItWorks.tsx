@@ -1,5 +1,5 @@
 // components/HowItWorks.tsx
-import image from "../../../assets/Works.jpg";
+import image from "../../../assets/Works.png";
 
 const steps = [
   {
