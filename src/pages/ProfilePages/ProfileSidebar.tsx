@@ -101,6 +101,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   // Add new state for tracking if we're adding a new certification
   const [isAddingNewCert, setIsAddingNewCert] = useState(false);
 
+  // Video validation state
+  const [videoError, setVideoError] = useState<string>("");
+
   // Replace the delete states with useDeleteItem hook
   const {
     isDeleteDialogOpen,
@@ -397,12 +400,31 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
   };
 
   const handleVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Clear previous errors
+    setVideoError("");
+    
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.size > 100 * 1024 * 1024) { // 100MB limit
-        toast.error('Video size should be less than 100MB');
+      
+      // Check file size (max 100MB)
+      if (file.size > 100 * 1024 * 1024) {
+        setVideoError("Video file size should be less than 100MB");
         return;
       }
+      
+      // Check file type
+      if (!file.type.startsWith("video/")) {
+        setVideoError("Please upload a valid video file");
+        return;
+      }
+      
+      // Check for specific video formats
+      const allowedTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv', 'video/webm'];
+      if (!allowedTypes.includes(file.type)) {
+        setVideoError("Please upload a video file in MP4, AVI, MOV, WMV, FLV, or WebM format");
+        return;
+      }
+      
       setSelectedVideo(file);
     }
   };
@@ -421,6 +443,13 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
 
   const handleVideoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate video before submission
+    if (videoError) {
+      toast.error("Please fix the video upload error before proceeding");
+      return;
+    }
+    
     try {
       if (!profileData.id) {
         toast.error("Profile ID is missing");
@@ -462,6 +491,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         setIsVideoDialogOpen(false);
         setSelectedVideo(null);
         setVideoForm({ video_description: '' });
+        setVideoError(""); // Clear any errors
       }
     } catch (err) {
       const error = err as { message: string; code?: string };
@@ -1206,6 +1236,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
           if (!open) {
             setSelectedVideo(null);
             setVideoForm({ video_description: '' });
+            setVideoError(""); // Clear errors when dialog closes
           }
           setIsVideoDialogOpen(open);
         }}>
@@ -1223,7 +1254,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
               <div className="border-2 border-dashed border-[#5A8DB8]/30 rounded-xl p-6 sm:p-8 text-center bg-gradient-to-br from-white/60 to-white/40 backdrop-blur-sm hover:border-[#5A8DB8]/40 transition-all duration-300">
                 <input
                   type="file"
-                  accept="video/*"
+                  accept="video/mp4,video/avi,video/mov,video/wmv,video/flv,video/webm"
                   ref={videoInputRef}
                   className="hidden"
                   onChange={handleVideoFileChange}
@@ -1245,6 +1276,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                     No video selected
                   </div>
                 )}
+                {videoError && (
+                  <div className="text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg border border-red-200 mb-4 text-center">
+                    {videoError}
+                  </div>
+                )}
                 <Button
                   type="button"
                   variant="outline"
@@ -1255,7 +1291,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
                   {isVideoUpdating ? 'Uploading...' : 'Choose Video'}
                 </Button>
                 <p className="text-sm text-black">
-                  Recommended: MP4 format, max 100MB
+                  Recommended: MP4, AVI, MOV, WMV, FLV, WebM format, max 100MB
                 </p>
               </div>
               <div className="space-y-2">

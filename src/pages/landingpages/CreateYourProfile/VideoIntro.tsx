@@ -24,6 +24,7 @@ const VideoIntro: React.FC = () => {
     video_description: "",
   });
 
+  const [videoError, setVideoError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
@@ -35,16 +36,28 @@ const VideoIntro: React.FC = () => {
   const progressPercent = getStepProgress(CURRENT_STEP, subscriptionType as SubscriptionType);
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Clear previous errors
+    setVideoError("");
+    
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
+      
       // Check file size (max 100MB)
       if (selectedFile.size > 100 * 1024 * 1024) {
-        toast.error("Video file size should be less than 100MB");
+        setVideoError("Video file size should be less than 100MB");
         return;
       }
+      
       // Check file type
       if (!selectedFile.type.startsWith("video/")) {
-        toast.error("Please upload a valid video file");
+        setVideoError("Please upload a valid video file");
+        return;
+      }
+      
+      // Check for specific video formats
+      const allowedTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv', 'video/webm'];
+      if (!allowedTypes.includes(selectedFile.type)) {
+        setVideoError("Please upload a video file in MP4, AVI, MOV, WMV, FLV, or WebM format");
         return;
       }
       
@@ -65,6 +78,12 @@ const VideoIntro: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate video before submission
+    if (videoError) {
+      toast.error("Please fix the video upload error before proceeding");
+      return;
+    }
     
     try {
       const formData = new FormData();
@@ -137,7 +156,7 @@ const VideoIntro: React.FC = () => {
           >
             <input
               type="file"
-              accept="video/mp4,video/*"
+              accept="video/mp4,video/avi,video/mov,video/wmv,video/flv,video/webm"
               ref={fileInputRef}
               className="hidden"
               onChange={handleVideoChange}
@@ -154,11 +173,16 @@ const VideoIntro: React.FC = () => {
               Upload Video
             </Button>
             <p className="text-black/70 text-sm text-center max-w-md">
-              Upload a short video introduction (max 100MB, MP4 preferred)
+              Upload a short video introduction (max 100MB, MP4, AVI, MOV, WMV, FLV, WebM)
             </p>
             {form.video_intro && (
               <div className="mt-4 text-sm text-black bg-[#5A8DB8]/10 px-4 py-2 rounded-full break-all max-w-full text-center font-medium">
                 {form.video_intro.name}
+              </div>
+            )}
+            {videoError && (
+              <div className="mt-4 text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg border border-red-200 max-w-full text-center">
+                {videoError}
               </div>
             )}
           </div>
