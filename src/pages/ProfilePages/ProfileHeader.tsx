@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 // import {
 //   Tooltip,
 //   TooltipContent,
@@ -224,7 +224,6 @@ const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
   profileData,
 }) => {
   const [email, setEmail] = useState('');
-  const { toast } = useToast();
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -239,19 +238,12 @@ const ShareProfileDialog: React.FC<ShareProfileDialogProps> = ({
         user_id: profileData.id 
       })).unwrap();
       
-      toast({
-        title: "Profile shared successfully",
-        description: "The recipient will receive an email with the profile link",
-      });
+      toast.success("Profile shared successfully! The recipient will receive an email with the profile link");
       setEmail('');
       onClose();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to share profile';
-      toast({
-        title: "Error sharing profile",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast.error(`Error sharing profile: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -415,33 +407,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
-  const { toast } = useToast();
 
   const copyToClipboard = async () => {
     const profileUrl = profileData.profile_url || "https://www.mytrustworld.com/profile-d-ae111378";
     try {
       await navigator.clipboard.writeText(profileUrl);
-      toast({
-        title: "Copied to clipboard",
-        description: "Profile URL has been copied to your clipboard",
-      });
+      toast.success("Profile URL has been copied to your clipboard");
     } catch (err) {
-      toast({
-        title: "Failed to copy",
-        description: "Please try copying the URL manually",
-        variant: "destructive",
-      });
+      toast.error("Failed to copy. Please try copying the URL manually");
     }
   };
 
   const handleSaveProfile = async (data: Partial<ProfileData>) => {
     try {
       if (!profileData.id) {
-        toast({
-          title: "Error",
-          description: "Profile ID is required for updates",
-          variant: "destructive",
-        });
+        toast.error("Profile ID is required for updates");
         return;
       }
       const updateData = {
@@ -462,10 +442,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
 
   const handleReviewSubmit = (review: { rating: number; content: string; name: string; company?: string }) => {
     console.log('Review submitted:', review);
-    toast({
-      title: "Review submitted",
-      description: "Thank you for your review!",
-    });
+    toast.success("Thank you for your review!");
   };
 
   return (
@@ -551,7 +528,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
                   variant="outline"
                   size="sm"
                   className="sm:w-auto w-full flex-shrink-0 flex items-center justify-center"
-                  onClick={() => setIsShareDialogOpen(true)}
+                  onClick={() => {
+                    setIsShareDialogOpen(true);
+                    toast.info("Opening share dialog...");
+                  }}
                 >
                   <Share2 className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
                   <span className="hidden sm:inline">Share</span>
