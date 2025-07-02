@@ -405,7 +405,7 @@ const createProfileSlice = createSlice({
         state.error = null;
         state.deleteVideoSuccess = false;
       })
-      .addCase(deleteVideoIntro.fulfilled, (state, action) => {
+      .addCase(deleteVideoIntro.fulfilled, (state) => {
         state.deleteVideoLoading = false;
         state.deleteVideoSuccess = true;
         state.error = null;
