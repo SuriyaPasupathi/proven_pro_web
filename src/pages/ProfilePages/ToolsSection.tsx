@@ -34,6 +34,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isToolsOpen, setIsToolsOpen] = useState(false);
+  const [tempTools, setTempTools] = useState<string[]>([]); // Temporary tools for selection dialog
 
   // Convert tools input to array
   const getToolsArray = (input: string[] | string): string[] => {
@@ -90,8 +91,10 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
   useEffect(() => {
     if (isToolsOpen) {
       dispatch(fetchSkills('primary'));
+      // Initialize tempTools with current tools when dialog opens
+      setTempTools([...tools]);
     }
-  }, [isToolsOpen, dispatch]);
+  }, [isToolsOpen, dispatch, tools]);
 
   const getSkillsArray = (skills: any): Skill[] => {
     if (!skills) return [];
@@ -112,19 +115,19 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
 
   const handleAddTool = (tool: Skill) => {
     console.log('Toggling tool:', tool);
-    setTools(prev => {
+    setTempTools(prev => {
       const currentValues = prev;
       const toolIndex = currentValues.indexOf(tool.name);
       
       if (toolIndex === -1) {
         // Tool not found, add it
         const newValues = [...currentValues, tool.name];
-        console.log('Adding tool to tools:', newValues);
+        console.log('Adding tool to tempTools:', newValues);
         return newValues;
       } else {
         // Tool found, remove it (toggle off)
         const newValues = currentValues.filter((_, index) => index !== toolIndex);
-        console.log('Removing tool from tools:', newValues);
+        console.log('Removing tool from tempTools:', newValues);
         return newValues;
       }
     });
@@ -374,7 +377,13 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       </Dialog>
 
       {/* Tools Selection Dialog */}
-      <Dialog open={isToolsOpen} onOpenChange={setIsToolsOpen}>
+      <Dialog open={isToolsOpen} onOpenChange={(open) => {
+        setIsToolsOpen(open);
+        if (!open) {
+          // Reset tempTools to current tools when dialog is closed without clicking Done
+          setTempTools([...tools]);
+        }
+      }}>
         <DialogContent className="sm:max-w-[600px] bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
@@ -391,7 +400,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
                 </div>
               ) : (
                 getSkillsArray(dropdownSkills).map((tool: Skill) => {
-                  const isSelected = tools.includes(tool.name);
+                  const isSelected = tempTools.includes(tool.name);
                   return (
                     <Button
                       key={tool.id}
@@ -422,7 +431,10 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
             </Button> */}
             <Button
               type="button"
-              onClick={() => setIsToolsOpen(false)}
+              onClick={() => {
+                setTools(tempTools); // Apply the temporary selections to actual tools
+                setIsToolsOpen(false);
+              }}
               className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />

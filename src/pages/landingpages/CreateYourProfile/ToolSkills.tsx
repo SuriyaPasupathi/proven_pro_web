@@ -42,6 +42,9 @@ const ToolSkills: React.FC = () => {
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [isSkillsOpen, setIsSkillsOpen] = useState(false);
   const [isSoftSkillsOpen, setIsSoftSkillsOpen] = useState(false);
+  const [tempTools, setTempTools] = useState<Skill[]>([]); // Temporary tools for selection dialog
+  const [tempTechnicalSkills, setTempTechnicalSkills] = useState<Skill[]>([]); // Temporary technical skills for selection dialog
+  const [tempSoftSkills, setTempSoftSkills] = useState<Skill[]>([]); // Temporary soft skills for selection dialog
 
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
@@ -56,20 +59,26 @@ const ToolSkills: React.FC = () => {
   useEffect(() => {
     if (isToolsOpen) {
       dispatch(fetchSkills('primary'));
+      // Initialize tempTools with current form tools when dialog opens
+      setTempTools([...form.primary_tools]);
     }
-  }, [isToolsOpen, dispatch]);
+  }, [isToolsOpen, dispatch, form.primary_tools]);
 
   useEffect(() => {
     if (isSkillsOpen) {
       dispatch(fetchSkills('technical'));
+      // Initialize tempTechnicalSkills with current form technical skills when dialog opens
+      setTempTechnicalSkills([...form.technical_skills]);
     }
-  }, [isSkillsOpen, dispatch]);
+  }, [isSkillsOpen, dispatch, form.technical_skills]);
 
   useEffect(() => {
     if (isSoftSkillsOpen) {
       dispatch(fetchSkills('soft'));
+      // Initialize tempSoftSkills with current form soft skills when dialog opens
+      setTempSoftSkills([...form.soft_skills]);
     }
-  }, [isSoftSkillsOpen, dispatch]);
+  }, [isSoftSkillsOpen, dispatch, form.soft_skills]);
 
   // Pre-fill form with existing data if available
   useEffect(() => {
@@ -109,30 +118,48 @@ const ToolSkills: React.FC = () => {
   };
 
   const handleAddItem = (skill: Skill, field: keyof FormData) => {
-    setForm(prev => {
-      const currentValues = prev[field] as Skill[];
-      const cleanSkill = {
-        ...skill,
-        name: skill.name.trim()
-      };
-      
-      // Check if skill already exists
-      const existingSkillIndex = currentValues.findIndex(s => s.id === cleanSkill.id);
-      
-      if (existingSkillIndex === -1) {
-        // Skill not found, add it
-        return {
-          ...prev,
-          [field]: [...currentValues, cleanSkill]
-        };
-      } else {
-        // Skill found, remove it (toggle off)
-        return {
-          ...prev,
-          [field]: currentValues.filter((_, index) => index !== existingSkillIndex)
-        };
-      }
-    });
+    const cleanSkill = {
+      ...skill,
+      name: skill.name.trim()
+    };
+    
+    if (field === 'primary_tools') {
+      setTempTools(prev => {
+        const existingSkillIndex = prev.findIndex(s => s.id === cleanSkill.id);
+        
+        if (existingSkillIndex === -1) {
+          // Skill not found, add it
+          return [...prev, cleanSkill];
+        } else {
+          // Skill found, remove it (toggle off)
+          return prev.filter((_, index) => index !== existingSkillIndex);
+        }
+      });
+    } else if (field === 'technical_skills') {
+      setTempTechnicalSkills(prev => {
+        const existingSkillIndex = prev.findIndex(s => s.id === cleanSkill.id);
+        
+        if (existingSkillIndex === -1) {
+          // Skill not found, add it
+          return [...prev, cleanSkill];
+        } else {
+          // Skill found, remove it (toggle off)
+          return prev.filter((_, index) => index !== existingSkillIndex);
+        }
+      });
+    } else if (field === 'soft_skills') {
+      setTempSoftSkills(prev => {
+        const existingSkillIndex = prev.findIndex(s => s.id === cleanSkill.id);
+        
+        if (existingSkillIndex === -1) {
+          // Skill not found, add it
+          return [...prev, cleanSkill];
+        } else {
+          // Skill found, remove it (toggle off)
+          return prev.filter((_, index) => index !== existingSkillIndex);
+        }
+      });
+    }
   };
 
   const handleRemoveItem = (skillId: number, field: keyof FormData) => {
@@ -353,7 +380,13 @@ const ToolSkills: React.FC = () => {
         </form>
 
         {/* Tools Dialog */}
-        <Dialog open={isToolsOpen} onOpenChange={setIsToolsOpen}>
+        <Dialog open={isToolsOpen} onOpenChange={(open) => {
+          setIsToolsOpen(open);
+          if (!open) {
+            // Reset tempTools to current form tools when dialog is closed without clicking Done
+            setTempTools([...form.primary_tools]);
+          }
+        }}>
           <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-sm">
             <DialogHeader>
               <DialogTitle className="text-black">
@@ -367,7 +400,7 @@ const ToolSkills: React.FC = () => {
                 </div>
               ) : (
                 getSkillsArray(dropdownSkills).map((tool: Skill) => {
-                  const isSelected = form.primary_tools.some(t => t.id === tool.id);
+                  const isSelected = tempTools.some(t => t.id === tool.id);
                   return (
                     <Button
                       key={tool.id}
@@ -397,7 +430,10 @@ const ToolSkills: React.FC = () => {
               </Button>
               <Button
                 type="button"
-                onClick={() => setIsToolsOpen(false)}
+                onClick={() => {
+                  setForm(prev => ({ ...prev, primary_tools: tempTools })); // Apply the temporary selections to actual form
+                  setIsToolsOpen(false);
+                }}
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition px-4 py-2 rounded-xl"
               >
                 Done
@@ -407,7 +443,13 @@ const ToolSkills: React.FC = () => {
         </Dialog>
 
         {/* Skills Dialog */}
-        <Dialog open={isSkillsOpen} onOpenChange={setIsSkillsOpen}>
+        <Dialog open={isSkillsOpen} onOpenChange={(open) => {
+          setIsSkillsOpen(open);
+          if (!open) {
+            // Reset tempTechnicalSkills to current form technical skills when dialog is closed without clicking Done
+            setTempTechnicalSkills([...form.technical_skills]);
+          }
+        }}>
           <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-sm">
             <DialogHeader>
               <DialogTitle className="text-black">
@@ -421,7 +463,7 @@ const ToolSkills: React.FC = () => {
                 </div>
               ) : (
                 getSkillsArray(dropdownSkills).map((skill: Skill) => {
-                  const isSelected = form.technical_skills.some(s => s.id === skill.id);
+                  const isSelected = tempTechnicalSkills.some(s => s.id === skill.id);
                   return (
                     <Button
                       key={skill.id}
@@ -451,7 +493,10 @@ const ToolSkills: React.FC = () => {
               </Button>
               <Button
                 type="button"
-                onClick={() => setIsSkillsOpen(false)}
+                onClick={() => {
+                  setForm(prev => ({ ...prev, technical_skills: tempTechnicalSkills })); // Apply the temporary selections to actual form
+                  setIsSkillsOpen(false);
+                }}
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition px-4 py-2 rounded-xl"
               >
                 Done
@@ -461,7 +506,13 @@ const ToolSkills: React.FC = () => {
         </Dialog>
 
         {/* Soft Skills Dialog */}
-        <Dialog open={isSoftSkillsOpen} onOpenChange={setIsSoftSkillsOpen}>
+        <Dialog open={isSoftSkillsOpen} onOpenChange={(open) => {
+          setIsSoftSkillsOpen(open);
+          if (!open) {
+            // Reset tempSoftSkills to current form soft skills when dialog is closed without clicking Done
+            setTempSoftSkills([...form.soft_skills]);
+          }
+        }}>
           <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-sm">
             <DialogHeader>
               <DialogTitle className="text-black">
@@ -475,7 +526,7 @@ const ToolSkills: React.FC = () => {
                 </div>
               ) : (
                 getSkillsArray(dropdownSkills).map((skill: Skill) => {
-                  const isSelected = form.soft_skills.some(s => s.id === skill.id);
+                  const isSelected = tempSoftSkills.some(s => s.id === skill.id);
                   return (
                     <Button
                       key={skill.id}
@@ -505,7 +556,10 @@ const ToolSkills: React.FC = () => {
               </Button>
               <Button
                 type="button"
-                onClick={() => setIsSoftSkillsOpen(false)}
+                onClick={() => {
+                  setForm(prev => ({ ...prev, soft_skills: tempSoftSkills })); // Apply the temporary selections to actual form
+                  setIsSoftSkillsOpen(false);
+                }}
                 className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition px-4 py-2 rounded-xl"
               >
                 Done

@@ -48,6 +48,8 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isTechnicalSkillsOpen, setIsTechnicalSkillsOpen] = useState(false);
   const [isSoftSkillsOpen, setIsSoftSkillsOpen] = useState(false);
+  const [tempTechnicalSkills, setTempTechnicalSkills] = useState<string[]>([]); // Temporary technical skills for selection dialog
+  const [tempSoftSkills, setTempSoftSkills] = useState<string[]>([]); // Temporary soft skills for selection dialog
   const [form, setForm] = useState<SkillsForm>({
     technical_skills: [],
     soft_skills: [],
@@ -119,14 +121,18 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   useEffect(() => {
     if (isTechnicalSkillsOpen) {
       dispatch(fetchSkills('technical'));
+      // Initialize tempTechnicalSkills with current technical skills when dialog opens
+      setTempTechnicalSkills([...form.technical_skills]);
     }
-  }, [isTechnicalSkillsOpen, dispatch]);
+  }, [isTechnicalSkillsOpen, dispatch, form.technical_skills]);
 
   useEffect(() => {
     if (isSoftSkillsOpen) {
       dispatch(fetchSkills('soft'));
+      // Initialize tempSoftSkills with current soft skills when dialog opens
+      setTempSoftSkills([...form.soft_skills]);
     }
-  }, [isSoftSkillsOpen, dispatch]);
+  }, [isSoftSkillsOpen, dispatch, form.soft_skills]);
 
   const getSkillsArray = (skills: any): Skill[] => {
     if (!skills) return [];
@@ -147,26 +153,44 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
 
   const handleAddSkill = (skill: Skill, field: 'technical_skills' | 'soft_skills') => {
     console.log('Toggling skill:', skill, 'in field:', field);
-    setForm(prev => {
-      const currentValues = prev[field];
-      const skillIndex = currentValues.indexOf(skill.name);
-      
-      let newValues;
-      if (skillIndex === -1) {
-        // Skill not found, add it
-        newValues = [...currentValues, skill.name];
-        console.log('Adding skill to', field, ':', newValues);
-      } else {
-        // Skill found, remove it
-        newValues = currentValues.filter((_, index) => index !== skillIndex);
-        console.log('Removing skill from', field, ':', newValues);
-      }
-      
-      return {
-        ...prev,
-        [field]: newValues
-      };
-    });
+    
+    if (field === 'technical_skills') {
+      setTempTechnicalSkills(prev => {
+        const currentValues = prev;
+        const skillIndex = currentValues.indexOf(skill.name);
+        
+        let newValues;
+        if (skillIndex === -1) {
+          // Skill not found, add it
+          newValues = [...currentValues, skill.name];
+          console.log('Adding skill to tempTechnicalSkills:', newValues);
+        } else {
+          // Skill found, remove it
+          newValues = currentValues.filter((_, index) => index !== skillIndex);
+          console.log('Removing skill from tempTechnicalSkills:', newValues);
+        }
+        
+        return newValues;
+      });
+    } else if (field === 'soft_skills') {
+      setTempSoftSkills(prev => {
+        const currentValues = prev;
+        const skillIndex = currentValues.indexOf(skill.name);
+        
+        let newValues;
+        if (skillIndex === -1) {
+          // Skill not found, add it
+          newValues = [...currentValues, skill.name];
+          console.log('Adding skill to tempSoftSkills:', newValues);
+        } else {
+          // Skill found, remove it
+          newValues = currentValues.filter((_, index) => index !== skillIndex);
+          console.log('Removing skill from tempSoftSkills:', newValues);
+        }
+        
+        return newValues;
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -486,7 +510,13 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       </Dialog>
 
       {/* Technical Skills Dialog */}
-      <Dialog open={isTechnicalSkillsOpen} onOpenChange={setIsTechnicalSkillsOpen}>
+      <Dialog open={isTechnicalSkillsOpen} onOpenChange={(open) => {
+        setIsTechnicalSkillsOpen(open);
+        if (!open) {
+          // Reset tempTechnicalSkills to current form technical skills when dialog is closed without clicking Done
+          setTempTechnicalSkills([...form.technical_skills]);
+        }
+      }}>
         <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
@@ -506,9 +536,9 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                   <Button
                     key={skill.id}
                     type="button"
-                    variant={form.technical_skills.includes(skill.name) ? "default" : "outline"}
+                    variant={tempTechnicalSkills.includes(skill.name) ? "default" : "outline"}
                     className={`w-full justify-start ${
-                      form.technical_skills.includes(skill.name)
+                      tempTechnicalSkills.includes(skill.name)
                         ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
                         : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black'
                     } rounded-xl`}
@@ -531,7 +561,10 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
             </Button> */}
             <Button
               type="button"
-              onClick={() => setIsTechnicalSkillsOpen(false)}
+              onClick={() => {
+                setForm(prev => ({ ...prev, technical_skills: tempTechnicalSkills })); // Apply the temporary selections to actual form
+                setIsTechnicalSkillsOpen(false);
+              }}
               className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />
@@ -542,7 +575,13 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       </Dialog>
 
       {/* Soft Skills Dialog */}
-      <Dialog open={isSoftSkillsOpen} onOpenChange={setIsSoftSkillsOpen}>
+      <Dialog open={isSoftSkillsOpen} onOpenChange={(open) => {
+        setIsSoftSkillsOpen(open);
+        if (!open) {
+          // Reset tempSoftSkills to current form soft skills when dialog is closed without clicking Done
+          setTempSoftSkills([...form.soft_skills]);
+        }
+      }}>
         <DialogContent className="w-full max-w-xs sm:max-w-md md:max-w-lg bg-white/90 backdrop-blur-xl border border-[#5A8DB8]/20 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="space-y-4">
             <div className="flex items-center gap-4">
@@ -562,9 +601,9 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
                   <Button
                     key={skill.id}
                     type="button"
-                    variant={form.soft_skills.includes(skill.name) ? "default" : "outline"}
+                    variant={tempSoftSkills.includes(skill.name) ? "default" : "outline"}
                     className={`w-full justify-start ${
-                      form.soft_skills.includes(skill.name)
+                      tempSoftSkills.includes(skill.name)
                         ? 'bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white'
                         : 'bg-white/80 backdrop-blur-sm border border-[#5A8DB8]/20 hover:border-[#5A8DB8] text-black'
                     } rounded-xl`}
@@ -587,7 +626,10 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
             </Button> */}
             <Button
               type="button"
-              onClick={() => setIsSoftSkillsOpen(false)}
+              onClick={() => {
+                setForm(prev => ({ ...prev, soft_skills: tempSoftSkills })); // Apply the temporary selections to actual form
+                setIsSoftSkillsOpen(false);
+              }}
               className="bg-gradient-to-r from-[#5A8DB8] to-[#3C5979] text-white hover:from-[#3C5979] hover:to-[#5A8DB8] rounded-xl shadow-lg hover:shadow-xl px-6"
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />
