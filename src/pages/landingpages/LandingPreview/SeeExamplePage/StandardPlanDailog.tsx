@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import provenLogo from '../../../../assets/logo.png';
 import standardPlanImg from '../../../../assets/standardplan.jpg';
+import { useNavigate } from 'react-router-dom';
 
 interface StandardPlanDialogProps {
   open: boolean;
@@ -8,6 +9,7 @@ interface StandardPlanDialogProps {
 }
 
 const StandardPlanDailog: React.FC<StandardPlanDialogProps> = ({ open, onClose }) => {
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const profileUrl = "https://provenpro.net/john-d-ea1d1133u/";
   if (!open) return null;
@@ -167,7 +169,9 @@ const StandardPlanDailog: React.FC<StandardPlanDialogProps> = ({ open, onClose }
         </div>
           {/* Footer Button */}
           <div className="flex justify-center mt-6 sm:mt-8 mb-6">
-              <button className="px-6 sm:px-8 py-2 rounded bg-[#5A8DB8] hover:bg-[#3C5979] text-white font-semibold text-sm sm:text-base transition-all duration-200 shadow-sm hover:shadow-md w-full max-w-xs">
+              <button className="px-6 sm:px-8 py-2 rounded bg-[#5A8DB8] hover:bg-[#3C5979] text-white font-semibold text-sm sm:text-base transition-all duration-200 shadow-sm hover:shadow-md w-full max-w-xs"
+               onClick={() => navigate('/login')}
+               >
                 Select Standard
               </button>
             </div>

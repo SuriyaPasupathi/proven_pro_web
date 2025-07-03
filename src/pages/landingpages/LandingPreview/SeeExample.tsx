@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../../components/layout/header';
 import Footer from './Footer';
 import { FaStar, FaGem, FaRocket } from 'react-icons/fa';
-// import { useNavigate } from 'react-router-dom';
 import FreePlanDailog from './SeeExamplePage/FreePlanDailog';
 import StandardPlanDailog from './SeeExamplePage/StandardPlanDailog';
 import PremiumPlanDailog from './SeeExamplePage/PremiumPlanDailog';
@@ -17,7 +17,8 @@ interface ProfileCardProps {
   selectLabel: string;
   badge: React.ReactNode;
   highlight?: boolean;
-  onSelect?: () => void;
+  onPlanClick?: () => void;
+  onSelectClick?: () => void;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
@@ -29,7 +30,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   selectLabel,
   badge,
   highlight,
-  onSelect,
+  onPlanClick,
+  onSelectClick,
 }) => {
   let borderClass = 'border-gray-200';
   let cardStyle = {};
@@ -79,7 +81,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 ? 'bg-yellow-50 text-yellow-600 border border-yellow-200 hover:bg-yellow-100' 
                 : 'bg-[#E6F0FA] text-[#5A8DB8] border border-[#5A8DB8] hover:bg-[#D1E5F5]'
             }`}
-            onClick={onSelect}
+            onClick={onPlanClick}
           >
             {planLabel}
           </button>
@@ -90,7 +92,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 : 'bg-[#5A8DB8] hover:bg-[#3C5979]'
             }`}
             style={{ border: highlight ? '1px solid #FFD700' : '1px solid #5A8DB8' }}
-            onClick={onSelect}
+            onClick={onSelectClick}
           >
             {selectLabel}
           </button>
@@ -101,6 +103,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 };
 
 const SeeExample: React.FC = () => {
+  const navigate = useNavigate();
   const [showFreeDialog, setShowFreeDialog] = useState(false);
   const [showStandardDialog, setShowStandardDialog] = useState(false);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
@@ -118,7 +121,8 @@ const SeeExample: React.FC = () => {
         </span>
       ),
       highlight: false,
-      onSelect: () => setShowFreeDialog(true),
+      onPlanClick: () => setShowFreeDialog(true),
+      onSelectClick: () => navigate('/login'),
     },
     {
       image: standardPlanImg,
@@ -134,7 +138,8 @@ const SeeExample: React.FC = () => {
         </span>
       ),
       highlight: false,
-      onSelect: () => setShowStandardDialog(true),
+      onPlanClick: () => setShowStandardDialog(true),
+      onSelectClick: () => navigate('/login'),
     },
     {
       image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop',
@@ -150,7 +155,8 @@ const SeeExample: React.FC = () => {
         </span>
       ),
       highlight: true,
-      onSelect: () => setShowPremiumDialog(true),
+      onPlanClick: () => setShowPremiumDialog(true),
+      onSelectClick: () => navigate('/login'),
     },
   ];
 
