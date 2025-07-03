@@ -556,8 +556,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
                 </Button>
               </div>
             )}
-            <div className="space-y-2 sm:space-y-3">
-              <div className="text-center">
+            <div className="flex flex-row items-center gap-6 sm:gap-8">
+              {/* Left: Rating, Stars, Label, Review Count */}
+              <div className="flex flex-col items-center min-w-[100px]">
                 <div className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-xl sm:rounded-2xl text-gray-900">
                   <span className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-900">
                     {profileData.rating?.toFixed(1) || "5.0"}
@@ -569,7 +570,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
                     const starFill = getStarFill(star, rating);
                     const isFilled = star <= rating;
                     const isHalfFilled = star > rating && star - rating < 1;
-                    
                     return (
                       <Star
                         key={star}
@@ -582,9 +582,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
                     );
                   })}
                 </div>
-                
                 <p className="text-xs sm:text-sm text-gray-600 mb-1">{profileData.reviews?.length || 0} reviews</p>
-                {/* Rating Label */}
                 <div className="text-xs sm:text-sm font-medium" style={{ color: getStarColor(profileData.rating || 0) }}>
                   {(() => {
                     const rating = profileData.rating || 0;
@@ -600,10 +598,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
                     return 'No Rating';
                   })()}
                 </div>
-                
-               
               </div>
-              <div className="space-y-1 sm:space-y-2">
+              {/* Right: Rating Distribution */}
+              <div className="flex-1 space-y-1 sm:space-y-2">
                 {calculateRatingDistribution(profileData.reviews).map((rating, index) => (
                   <div key={index} className="flex items-center gap-1 sm:gap-2">
                     <span className="text-xs sm:text-sm text-gray-600 min-w-[25px] sm:min-w-[30px] md:min-w-[35px]">{rating.label}</span>
