@@ -57,8 +57,9 @@ const AccountSettings: React.FC = () => {
       setShowEmailDialog(false);
       setShowOtpDialog(true);
       setOtpSent(true);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send verification code';
+    } catch (err: any) {
+      // Handle the error response from the backend
+      const errorMessage = err?.message || 'Failed to send verification code';
       setEmailError(errorMessage);
     }
   };
@@ -73,8 +74,9 @@ const AccountSettings: React.FC = () => {
       setShowOtpDialog(false);
       setOtp('');
       setOtpSent(false);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Invalid verification code';
+    } catch (err: any) {
+      // Handle the error response from the backend
+      const errorMessage = err?.message || 'Invalid verification code';
       setOtpError(errorMessage);
     }
   };
@@ -85,8 +87,9 @@ const AccountSettings: React.FC = () => {
       await dispatch(requestEmailChange(newEmail)).unwrap();
       setOtpSent(true);
       setEmailSuccess('Verification code resent successfully');
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to resend verification code';
+    } catch (err: any) {
+      // Handle the error response from the backend
+      const errorMessage = err?.message || 'Failed to resend verification code';
       setOtpError(errorMessage);
     }
   };
@@ -105,8 +108,9 @@ const AccountSettings: React.FC = () => {
       setPasswordSuccess('Password changed successfully!');
       setCurrentPassword('');
       setNewPassword('');
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to change password';
+    } catch (err: any) {
+      // Handle the error response from the backend
+      const errorMessage = err?.message || 'Failed to change password';
       setPasswordError(errorMessage);
     }
   };

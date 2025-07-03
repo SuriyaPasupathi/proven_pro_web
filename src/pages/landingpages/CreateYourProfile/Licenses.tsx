@@ -400,7 +400,7 @@ const Licenses: React.FC = () => {
           )}
 
           {/* Navigation Buttons */}
-          <div className="flex justify-end gap-4 mt-8">
+          <div className="flex justify-between gap-4 mt-8">
             <Button
               type="button"
               variant="outline"
@@ -410,22 +410,45 @@ const Licenses: React.FC = () => {
             >
               Back
             </Button>
-            <Button
-              type="submit"
-              className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  Save and Continue
-                </>
-              )}
-            </Button>
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="border-2 border-gray-300 text-gray-600 hover:bg-gray-50 transition flex items-center gap-2 px-6 py-2 rounded-xl"
+                onClick={() => {
+                  // Navigate to the next available step
+                  const nextStep = getNextAvailableStep(CURRENT_STEP, subscriptionType as SubscriptionType);
+                  if (nextStep) {
+                    navigate(nextStep.path);
+                  } else {
+                    // If no next step, navigate to profile page
+                    const profileId = localStorage.getItem('userProfileId');
+                    if (profileId) {
+                      navigate(`/profile/${profileId}`);
+                    }
+                  }
+                }}
+                disabled={loading}
+              >
+                Skip
+              </Button>
+              <Button
+                type="submit"
+                className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition flex items-center gap-2 px-6 py-2 rounded-xl shadow-lg hover:shadow-xl"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    Save and Continue
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </form>
       </div>

@@ -244,9 +244,15 @@ export function SignUpForm() {
       {/* Left: Hero Image and Logo */}
       <div className="hidden lg:flex w-1/2 flex-col bg-gradient-to-br from-[#3C5979] to-[#2C3E50] justify-center items-center p-8 lg:p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
-        <div className="flex items-center gap-3 mb-12 self-start z-10">
-          <img src={logo} alt="ProvenPro Logo" className="w-10 h-10 lg:w-12 lg:h-12" />
-          <span className="text-2xl lg:text-3xl font-bold text-white">Proven<span className="font-light">Pro</span></span>
+        <div className="flex items-center gap-3 mb-12 self-start z-10"
+        >
+          <button
+            className="flex items-center gap-3"
+            onClick={() => navigate('/')}
+          >
+            <img src={logo} alt="ProvenPro Logo" className="w-10 h-10 lg:w-12 lg:h-12" />
+            <span className="text-2xl lg:text-3xl font-bold text-white">Proven<span className="font-light">Pro</span></span>
+          </button>
         </div>
         <div className="relative z-10">
           <img

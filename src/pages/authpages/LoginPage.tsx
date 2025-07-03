@@ -142,8 +142,13 @@ export function LoginForm() {
       <div className="flex flex-col justify-center items-center w-full lg:w-1/2 px-4 sm:px-8 lg:px-12 py-8 lg:py-12">
         {/* Logo and Brand */}
         <div className="flex items-center gap-3 mb-8 self-start">
-          <img src={logo} alt="ProvenPro Logo" className="w-10 h-10 lg:w-12 lg:h-12" />
-          <span className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[#3C5979] to-[#2C3E50] bg-clip-text text-transparent">Proven<span className="font-light">Pro</span></span>
+          <button
+            className="flex items-center gap-3"
+            onClick={() => navigate('/')}
+          >
+            <img src={logo} alt="ProvenPro Logo" className="w-10 h-10 lg:w-12 lg:h-12" />
+            <span className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[#3C5979] to-[#2C3E50] bg-clip-text text-transparent">Proven<span className="font-light">Pro</span></span>
+          </button>
         </div>
 
         <div className="w-full max-w-md">
