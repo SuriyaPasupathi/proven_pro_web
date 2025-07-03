@@ -918,7 +918,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         </div>
 
         {/* Video Introduction */}
-        <SectionLock requiredPlan="premium" title="Premium Features">
+        <SectionLock requiredPlan="premium" title="Premium Features" profileData={profileData}>
           <div className="relative w-full max-w-lg mx-auto">
             <div className="absolute inset-0 bg-white xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
             <div className="relative w-full mx-auto">
@@ -1006,7 +1006,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ profileData }) => {
         
 
         {/* Certifications */}
-        <SectionLock requiredPlan="premium" title="Premium Features">
+        <SectionLock requiredPlan="premium" title="Premium Features" profileData={profileData}>
           <div className="relative w-full max-w-lg mx-auto">
             <div className="absolute inset-0 bg-white xs:rounded-xl sm:rounded-2xl opacity-10 blur-xl"></div>
             <div className="relative w-full mx-auto">

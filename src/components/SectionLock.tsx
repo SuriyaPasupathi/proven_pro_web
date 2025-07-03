@@ -3,16 +3,21 @@ import { useSelector } from 'react-redux';
 import { Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../store/store';
+import { ProfileData } from '../types/profile';
 
 interface SectionLockProps {
   requiredPlan: 'standard' | 'premium';
   title: string;
   children: React.ReactNode;
+  profileData?: ProfileData; // Optional prop for shared profiles
 }
 
-const SectionLock: React.FC<SectionLockProps> = ({ requiredPlan, title, children }) => {
-  const { profileData } = useSelector((state: RootState) => state.createProfile);
+const SectionLock: React.FC<SectionLockProps> = ({ requiredPlan, title, children, profileData: propProfileData }) => {
+  const { profileData: reduxProfileData } = useSelector((state: RootState) => state.createProfile);
   const navigate = useNavigate();
+  
+  // Use prop profileData if provided (for shared profiles), otherwise use Redux store data
+  const profileData = propProfileData || reduxProfileData;
   const subscriptionType = profileData?.subscription_type || 'free';
   const locked = (requiredPlan === 'premium' && subscriptionType !== 'premium') ||
                  (requiredPlan === 'standard' && !['standard', 'premium'].includes(subscriptionType));

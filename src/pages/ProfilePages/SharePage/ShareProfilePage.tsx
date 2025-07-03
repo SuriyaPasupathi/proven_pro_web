@@ -13,6 +13,7 @@ import ToolsSection from '../ToolsSection';
 import { ThemeProvider } from '../ThemeProvider';
 import ShareNavbar from './ShareNavbar';
 import { ProfileData } from '../../../types/profile';
+import SectionLock from '../../../components/SectionLock';
 
 const ShareProfilePage = () => {
   const { profileId, shareToken } = useParams();
@@ -162,20 +163,24 @@ const ShareProfilePage = () => {
               <div className="space-y-6 sm:space-y-8 md:space-y-12 mt-4 sm:mt-6 md:mt-8 mb-8 sm:mb-10">
                 {profile.categories && profile.categories.length > 0 && (
                   <>
-                    <ServicesSection 
-                      categories={profile.categories}
-                      services_categories={profile.services_categories}
-                      services_description={profile.services_description}
-                      rate_range={profile.rate_range}
-                      availability={profile.availability}
-                    />
+                    <SectionLock requiredPlan="standard" title="Standard Features" profileData={profile}>
+                      <ServicesSection 
+                        categories={profile.categories}
+                        services_categories={profile.services_categories}
+                        services_description={profile.services_description}
+                        rate_range={profile.rate_range}
+                        availability={profile.availability}
+                      />
+                    </SectionLock>
                     <div className="border-t border-gray-200"></div>
                   </>
                 )}
 
                 {profile.work_experiences && profile.work_experiences.length > 0 && (
                   <>
-                    <ExperienceSection experiences={profile.work_experiences} />
+                    <SectionLock requiredPlan="standard" title="Standard Features" profileData={profile}>
+                      <ExperienceSection experiences={profile.work_experiences} />
+                    </SectionLock>
                     <div className="border-t border-gray-200"></div>
                   </>
                 )}
@@ -183,27 +188,33 @@ const ShareProfilePage = () => {
                 {((profile.technical_skills && profile.technical_skills.length > 0) || 
                   (profile.soft_skills && profile.soft_skills.length > 0)) && (
                   <>
-                    <SkillsSection 
-                      technical_skills={profile.technical_skills}
-                      soft_skills={profile.soft_skills}
-                      skills_description={profile.skills_description}
-                    />
+                    <SectionLock requiredPlan="standard" title="Standard Features" profileData={profile}>
+                      <SkillsSection 
+                        technical_skills={profile.technical_skills}
+                        soft_skills={profile.soft_skills}
+                        skills_description={profile.skills_description}
+                      />
+                    </SectionLock>
                     <div className="border-t border-gray-200"></div>
                   </>
                 )}
 
                 {profile.primary_tools && profile.primary_tools.length > 0 && (
                   <>
-                    <ToolsSection primary_tools={profile.primary_tools} />
+                    <SectionLock requiredPlan="standard" title="Standard Features" profileData={profile}>
+                      <ToolsSection primary_tools={profile.primary_tools} />
+                    </SectionLock>
                     <div className="border-t border-gray-200"></div>
                   </>
                 )}
 
                 {profile.portfolio && profile.portfolio.length > 0 && (
-                  <PortfolioSection 
-                    projects={profile.portfolio}
-                    portfolio={profile.portfolio}
-                  />
+                  <SectionLock requiredPlan="premium" title="Premium Features" profileData={profile}>
+                    <PortfolioSection 
+                      projects={profile.portfolio}
+                      portfolio={profile.portfolio}
+                    />
+                  </SectionLock>
                 )}
               </div>
             </div>
