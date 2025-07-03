@@ -36,7 +36,10 @@ export default function Footer() {
             <a href="#" className="text-sm hover:text-white/90 transition-colors duration-300">Privacy</a>
             <a href="#" className="text-sm hover:text-white/90 transition-colors duration-300">Contact</a>
           </div>
-          <div className="text-[10px] sm:text-xs text-white/80 text-center">© 2025 ProvenPro. All rights reserved.</div>
+          <div className="flex flex-col items-center text-[10px] sm:text-xs text-white/80 text-center">
+            <span>© 2025 ProvenPro. All rights reserved.</span>
+            <span className="text-[10px] text-white/70 mt-1 font-bold">V0.001 beta</span>
+          </div>
         </div>
       </footer>
 
@@ -119,7 +122,12 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center text-xs gap-3 sm:gap-4 text-white/80 px-2 sm:px-0 relative z-10">
-          <div className="text-[10px] sm:text-xs md:text-sm">© 2025 ProvenPro.com All rights reserved.</div>
+          <div className="flex flex-col items-start text-[10px] sm:text-xs md:text-sm">
+            <span>© 2025 ProvenPro.com All rights reserved.</span>
+          </div>
+          <div className="flex flex-col items-start text-[10px] sm:text-xs md:text-sm">
+            <span className="text-[10px] sm:text-xs md:text-sm text-white/70 mt-1 font-bold">V0.001 beta</span>
+          </div>
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
             <a href="#" className="text-[10px] sm:text-xs md:text-sm hover:text-white/90 transition-colors duration-300">Privacy Policy</a>
             <a href="#" className="text-[10px] sm:text-xs md:text-sm hover:text-white/90 transition-colors duration-300">Terms of Service</a>
