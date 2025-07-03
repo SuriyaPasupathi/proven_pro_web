@@ -556,7 +556,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
                 </Button>
               </div>
             )}
-            <div className="flex flex-row items-center gap-6 sm:gap-8">
+            <div className="flex flex-row items-center gap-6 sm:gap-8 mt-5">
               {/* Left: Rating, Stars, Label, Review Count */}
               <div className="flex flex-col items-center min-w-[100px]">
                 <div className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-xl sm:rounded-2xl text-gray-900">
