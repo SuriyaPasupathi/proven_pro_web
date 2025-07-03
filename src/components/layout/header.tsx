@@ -12,16 +12,7 @@ import { clearSearchResults } from "@/store/Slice/CreateProfileSlice";
 import { useDebounce } from "../../hooks/useDebounce";
 import { RootState } from "@/store/store";
 
-interface SearchUser {
-  id: string;
-  username: string;
-  bio: string;
-  primary_tools: string[];
-  technical_skills: string[];
-  max_individual_rating: number;
-  total_reviews: number;
-  avg_rating: number;
-}
+
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -134,7 +125,7 @@ export default function Header() {
                 ) : searchError ? (
                   <div className="p-3 sm:p-4 text-center text-sm text-red-500">{searchError.message}</div>
                 ) : (
-                  searchResults.map((user: SearchUser) => (
+                  searchResults.map((user) => (
                     <div
                       key={user.id}
                       className="p-2.5 sm:p-3 hover:bg-gray-50/80 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-200"
@@ -180,7 +171,7 @@ export default function Header() {
               ) : searchError ? (
                 <div className="p-3 text-center text-sm text-red-500">{searchError.message}</div>
               ) : (
-                searchResults.map((user: SearchUser) => (
+                searchResults.map((user) => (
                   <div
                     key={user.id}
                     className="p-2.5 hover:bg-gray-50/80 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-200"
