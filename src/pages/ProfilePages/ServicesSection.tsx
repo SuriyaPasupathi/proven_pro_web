@@ -332,7 +332,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
       
       <div className="relative flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
-          <h2 className="text-xl xs:text-4xl font-bold">
+          <h2 className="text-2xl font-bold">
             Services
           </h2>
         </div>

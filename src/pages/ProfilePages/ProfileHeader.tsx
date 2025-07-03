@@ -474,7 +474,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900 mb-1">Profile Verified</h3>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-1">Profile Verified</h2>
                       <p className="text-gray-600 text-xs sm:text-sm">Complete your profile verification</p>
                     </div>
                   </div>
@@ -504,9 +504,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
 
             {/* Public profile & URL section */}
             <div className="mb-6">
-              <label className="block text-3xl font-bold text-[#222] mb-2">
+              <h2 className="block text-2xl font-bold text-[#222] mb-2">
                 Public profile & URL
-              </label>
+              </h2>
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"

@@ -216,7 +216,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ primary_tools = [] }) => {
       
       <div className="relative flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
-          <h2 className="text-xl xs:text-4xl font-bold text-black">
+          <h2 className="text-2xl font-bold text-black">
             Tools
           </h2>
         </div>

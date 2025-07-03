@@ -295,7 +295,7 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
       
       <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 sm:gap-0">
         <div className="flex items-center gap-3 sm:gap-4">
-          <h2 className="text-xl xs:text-4xl font-bold text-black">
+          <h2 className="text-2xl font-bold text-black">
             Skills
           </h2>
         </div>

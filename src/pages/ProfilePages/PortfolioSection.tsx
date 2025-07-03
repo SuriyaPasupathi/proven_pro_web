@@ -440,7 +440,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ contactId }) => {
   return (
     <div className="border-b border-[#5A8DB8]/20 pb-4 xs:pb-6 sm:pb-8">
       <div className="flex justify-between items-center mb-4 xs:mb-6">
-        <h2 className="text-xl xs:text-2xl font-bold text-black">
+        <h2 className="text-2xl font-bold text-black">
           Portfolio
         </h2>
         {isEditMode && (
