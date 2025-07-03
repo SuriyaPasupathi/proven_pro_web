@@ -552,7 +552,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
                   className=" bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 "
                 >
                   <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
-                  See Public Review
+                  See Public View
                 </Button>
               </div>
             )}
