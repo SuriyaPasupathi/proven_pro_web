@@ -546,10 +546,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
           <div className="w-full lg:w-80 flex-shrink-0">
             {/* Public Review Button - Only show when viewing someone else's profile */}
             {isPublicView && (
-              <div className="flex justify-center mb-4">
+              <div className="flex justify-center mb-4 w-full">
                 <Button
                   // onClick={() => setIsReviewDialogOpen(true)}
-                  className="w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 "
+                  className=" bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 "
                 >
                   <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
                   See Public Review
