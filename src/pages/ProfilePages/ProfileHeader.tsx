@@ -549,70 +549,73 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
               <div className="flex justify-center mb-4">
                 <Button
                   // onClick={() => setIsReviewDialogOpen(true)}
-                  className="w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 rounded-lg"
+                  className="w-auto bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 "
                 >
                   <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
                   See Public Review
                 </Button>
               </div>
             )}
-            <div className="flex flex-row items-center gap-6 sm:gap-8 mt-5">
-              {/* Left: Rating, Stars, Label, Review Count */}
-              <div className="flex flex-col items-center min-w-[100px]">
-                <div className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-xl sm:rounded-2xl text-gray-900">
-                  <span className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-900">
-                    {profileData.rating?.toFixed(1) || "5.0"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-1">
-                  {[1, 2, 3, 4, 5].map((star) => {
-                    const rating = profileData.rating || 0;
-                    const starFill = getStarFill(star, rating);
-                    const isFilled = star <= rating;
-                    const isHalfFilled = star > rating && star - rating < 1;
-                    return (
-                      <Star
-                        key={star}
-                        className={`h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all duration-300`}
-                        style={{
-                          fill: isFilled ? starFill.fill : isHalfFilled ? starFill.fill : starFill.fill,
-                          color: isFilled ? starFill.color : isHalfFilled ? starFill.color : starFill.color
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-                <p className="text-xs sm:text-sm text-gray-600 mb-1">{profileData.reviews?.length || 0} reviews</p>
-                <div className="text-xs sm:text-sm font-medium" style={{ color: getStarColor(profileData.rating || 0) }}>
-                  {(() => {
-                    const rating = profileData.rating || 0;
-                    if (rating >= 5.0) return 'Exceptional';
-                    if (rating >= 4.5) return 'Excellent';
-                    if (rating >= 4.0) return 'Very Good';
-                    if (rating >= 3.5) return 'Good to Very Good';
-                    if (rating >= 3.0) return 'Good';
-                    if (rating >= 2.5) return 'Fair to Good';
-                    if (rating >= 2.0) return 'Fair';
-                    if (rating >= 1.5) return 'Poor to Fair';
-                    if (rating >= 1.0) return 'Poor';
-                    return 'No Rating';
-                  })()}
-                </div>
-              </div>
-              {/* Right: Rating Distribution */}
-              <div className="flex-1 space-y-1 sm:space-y-2">
-                {calculateRatingDistribution(profileData.reviews).map((rating, index) => (
-                  <div key={index} className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-xs sm:text-sm text-gray-600 min-w-[25px] sm:min-w-[30px] md:min-w-[35px]">{rating.label}</span>
-                    <div className="flex-1 h-1 sm:h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full bg-gradient-to-r ${rating.color} transition-all duration-500`}
-                        style={{ width: `${rating.value}%` }}
-                      />
-                    </div>
-                    <span className="text-xs sm:text-sm text-gray-600 min-w-[15px] sm:min-w-[20px] md:min-w-[25px]">{rating.value}%</span>
+            {/* Card-style container for rating and distribution */}
+            <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 sm:p-6 my-6">
+              <div className="flex flex-row items-center gap-6 sm:gap-8">
+                {/* Left: Rating, Stars, Label, Review Count */}
+                <div className="flex flex-col items-center min-w-[100px]">
+                  <div className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-xl sm:rounded-2xl text-gray-900">
+                    <span className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-900">
+                      {profileData.rating?.toFixed(1) || "5.0"}
+                    </span>
                   </div>
-                ))}
+                  <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-1">
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const rating = profileData.rating || 0;
+                      const starFill = getStarFill(star, rating);
+                      const isFilled = star <= rating;
+                      const isHalfFilled = star > rating && star - rating < 1;
+                      return (
+                        <Star
+                          key={star}
+                          className={`h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all duration-300`}
+                          style={{
+                            fill: isFilled ? starFill.fill : isHalfFilled ? starFill.fill : starFill.fill,
+                            color: isFilled ? starFill.color : isHalfFilled ? starFill.color : starFill.color
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">{profileData.reviews?.length || 0} reviews</p>
+                  <div className="text-xs sm:text-sm font-medium" style={{ color: getStarColor(profileData.rating || 0) }}>
+                    {(() => {
+                      const rating = profileData.rating || 0;
+                      if (rating >= 5.0) return 'Exceptional';
+                      if (rating >= 4.5) return 'Excellent';
+                      if (rating >= 4.0) return 'Very Good';
+                      if (rating >= 3.5) return 'Good to Very Good';
+                      if (rating >= 3.0) return 'Good';
+                      if (rating >= 2.5) return 'Fair to Good';
+                      if (rating >= 2.0) return 'Fair';
+                      if (rating >= 1.5) return 'Poor to Fair';
+                      if (rating >= 1.0) return 'Poor';
+                      return 'No Rating';
+                    })()}
+                  </div>
+                </div>
+                {/* Right: Rating Distribution */}
+                <div className="flex-1 space-y-1 sm:space-y-2">
+                  {calculateRatingDistribution(profileData.reviews).map((rating, index) => (
+                    <div key={index} className="flex items-center gap-1 sm:gap-2">
+                      <span className="text-xs sm:text-sm text-gray-600 min-w-[25px] sm:min-w-[30px] md:min-w-[35px]">{rating.label}</span>
+                      <div className="flex-1 h-1 sm:h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full bg-gradient-to-r ${rating.color} transition-all duration-500`}
+                          style={{ width: `${rating.value}%` }}
+                        />
+                      </div>
+                      <span className="text-xs sm:text-sm text-gray-600 min-w-[15px] sm:min-w-[20px] md:min-w-[25px]">{rating.value}%</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
