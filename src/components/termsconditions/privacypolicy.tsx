@@ -516,7 +516,7 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({
   ];
 
   return (
-    <div className="max-w-4xl mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+    <div className="w-11/12 mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       {/* Back Button */}
       <div className="flex items-center">
         <Button

@@ -60,13 +60,18 @@ interface SearchUsersResponse {
     id: string;
     username: string;
     bio: string;
-    primary_tools: string[];
-    technical_skills: string[];
-    max_individual_rating: number;
+    description: string;
+    rating: number;
     total_reviews: number;
     avg_rating: number;
     profile_pic?: string;
   }>;
+  pagination?: {
+    total_count: number;
+    current_offset: number;
+    limit: number;
+    has_more: boolean;
+  };
 }
 
 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';

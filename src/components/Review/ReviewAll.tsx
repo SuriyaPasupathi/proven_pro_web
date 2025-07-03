@@ -14,6 +14,8 @@ const ReviewAll: React.FC = () => {
   const [sortBy, setSortBy] = useState('rating');
   const [search, setSearch] = useState('');
   const [showSort, setShowSort] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const dispatch = useAppDispatch();
   const { searchResults, searchLoading } = useAppSelector((state) => state.createProfile);
   const debouncedSearch = useDebounce(search, 300);
@@ -21,12 +23,16 @@ const ReviewAll: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        await dispatch(searchUsers({ 
+        setCurrentPage(1);
+        const result = await dispatch(searchUsers({ 
           search: debouncedSearch || undefined,
-          limit: 20,
+          limit: 12,
           offset: 0,
           min_rating: 0
         })).unwrap();
+        
+        // Check if there are more results using backend pagination data
+        setHasMore(result.pagination?.has_more ?? (result.data.length === 12));
       } catch (error) {
         console.error('Failed to fetch users:', error);
       }
@@ -34,6 +40,26 @@ const ReviewAll: React.FC = () => {
 
     fetchUsers();
   }, [debouncedSearch, dispatch]);
+
+  const loadMoreUsers = async () => {
+    if (searchLoading || !hasMore) return;
+    
+    try {
+      const offset = currentPage * 12;
+      const result = await dispatch(searchUsers({ 
+        search: debouncedSearch || undefined,
+        limit: 12,
+        offset: offset,
+        min_rating: 0
+      })).unwrap();
+      
+      // Check if there are more results using backend pagination data
+      setHasMore(result.pagination?.has_more ?? (result.data.length === 12));
+      setCurrentPage(prev => prev + 1);
+    } catch (error) {
+      console.error('Failed to load more users:', error);
+    }
+  };
 
   const filtered = searchResults
     .map(user => ({
@@ -150,21 +176,46 @@ const ReviewAll: React.FC = () => {
             <p className="mt-1 sm:mt-2 text-xs sm:text-sm md:text-base text-gray-500">Try adjusting your search criteria</p>
           </div>
         ) : (
-          <div className="space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 xl:space-y-12">
-            {filtered.map((freelancer, idx) => (
-              <React.Fragment key={freelancer.id}>
-                <div className="relative">
-                  <FreelancerCard
-                    freelancer={freelancer}
-                    totalReviews={freelancer.totalReviews}
-                  />
-                </div>
-                {idx !== filtered.length - 1 && (
-                  <hr className="border-t border-gray-300 mx-2 sm:mx-0" />
-                )}
-              </React.Fragment>
-            ))}
-          </div>
+          <>
+            <div className="space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10 xl:space-y-12">
+              {filtered.map((freelancer, idx) => (
+                <React.Fragment key={freelancer.id}>
+                  <div className="relative">
+                    <FreelancerCard
+                      freelancer={freelancer}
+                      totalReviews={freelancer.totalReviews}
+                    />
+                  </div>
+                  {idx !== filtered.length - 1 && (
+                    <hr className="border-t border-gray-300 mx-2 sm:mx-0" />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+            
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="flex flex-col items-center mt-8 sm:mt-10 md:mt-12 lg:mt-16 gap-4">
+                <button
+                  onClick={loadMoreUsers}
+                  disabled={searchLoading}
+                  className="px-6 sm:px-8 py-3 sm:py-4 bg-[#5A8DB8] text-white rounded-lg shadow-lg hover:bg-[#4a7da8] transition-all duration-200 font-medium text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#5A8DB8] focus:ring-opacity-50"
+                >
+                  {searchLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    'Load More Users'
+                  )}
+                </button>
+                <p className="text-sm text-gray-500">
+                  Showing {filtered.length} users • Page {currentPage}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

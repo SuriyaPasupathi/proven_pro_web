@@ -38,6 +38,7 @@ import StandardExample from './pages/landingpages/LandingPreview/SeeExamplePage/
 import PremiumExample from './pages/landingpages/LandingPreview/SeeExamplePage/PremiumPlan';
 import TermsConditions from './components/termsconditions/termscondtions';
 import PrivacyPolicy from './components/termsconditions/privacypolicy';
+import About from './components/layout/aboutus';
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
 const { theme } = useTheme();
@@ -75,6 +76,7 @@ function App() {
               <Route path="/share/:shareToken" element={<ShareProfilePage />} />
               <Route path="/terms" element={<TermsConditions />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/about" element={<About />} />
 
               {/* Auth Routes */}
               <Route path="/signup" element={<SignUpForm />} />

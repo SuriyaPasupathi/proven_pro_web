@@ -129,7 +129,7 @@ const FreelancerCard: React.FC<Props> = ({ freelancer, totalReviews }) => {
                 {totalReviews} {totalReviews === 1 ? 'review' : 'reviews'}
               </span>
             </div>
-            {/* Social Links as text */}
+            {/* Social Links as text
             <div className="mt-2 space-y-0.5">
               {freelancer.linkedin && (
                 <div className="text-xs text-[#6B6B6B] font-normal">
@@ -170,7 +170,7 @@ const FreelancerCard: React.FC<Props> = ({ freelancer, totalReviews }) => {
                   </a>
                 </div>
               )}
-            </div>
+            </div> */}
           </div>
           {/* Menu Button, right-aligned, vertically centered, visible on mobile, hover on desktop */}
           <div className="relative flex-shrink-0 ml-2 sm:ml-4 flex items-center h-full">

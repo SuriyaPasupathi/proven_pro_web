@@ -58,11 +58,11 @@ interface CreateProfileState {
     id: string;
     username: string;
     bio: string;
-    primary_tools: string[];
-    technical_skills: string[];
-    max_individual_rating: number;
+    description: string;
+    rating: number;
     total_reviews: number;
     avg_rating: number;
+    profile_pic?: string;
   }>;
   searchLoading: boolean;
   searchError: ProfileError | null;
@@ -430,7 +430,12 @@ const createProfileSlice = createSlice({
       })
       .addCase(searchUsers.fulfilled, (state, action) => {
         state.searchLoading = false;
-        state.searchResults = action.payload.data;
+        // If offset is 0, replace results (new search), otherwise append (pagination)
+        if (action.meta.arg.offset === 0) {
+          state.searchResults = action.payload.data;
+        } else {
+          state.searchResults = [...state.searchResults, ...action.payload.data];
+        }
         state.searchError = null;
       })
       .addCase(searchUsers.rejected, (state, action) => {

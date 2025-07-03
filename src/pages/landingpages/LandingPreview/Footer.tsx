@@ -83,8 +83,8 @@ export default function Footer() {
           <div className="flex-1 min-w-[140px] sm:min-w-[160px] md:min-w-[180px] mb-4 sm:mb-6 md:mb-0">
             <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base md:text-lg">Quick Links</h4>
             <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm md:text-base">
-              <li><a href="#" className="hover:text-white/90 transition-colors duration-300">About Us</a></li>
-              <li><a href="#" className="hover:text-white/90 transition-colors duration-300">Contact Us</a></li>
+                <li><a href="/about" className="hover:text-white/90 transition-colors duration-300">About Us</a></li>
+              <li><a href="/contact" className="hover:text-white/90 transition-colors duration-300">Contact Us</a></li>
               <li><a href="#" className="hover:text-white/90 transition-colors duration-300">Blog Posts</a></li>
             </ul>
           </div>
@@ -129,9 +129,9 @@ export default function Footer() {
             <span className="text-[10px] sm:text-xs md:text-sm text-white/70 mt-1 font-bold">V0.001 beta</span>
           </div>
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
-            <a href="#" className="text-[10px] sm:text-xs md:text-sm hover:text-white/90 transition-colors duration-300">Privacy Policy</a>
-            <a href="#" className="text-[10px] sm:text-xs md:text-sm hover:text-white/90 transition-colors duration-300">Terms of Service</a>
-            <a href="#" className="text-[10px] sm:text-xs md:text-sm hover:text-white/90 transition-colors duration-300">Cookies Settings</a>
+            <a href="/privacy" className="text-[10px] sm:text-xs md:text-sm hover:text-white/90 transition-colors duration-300">Privacy Policy</a>
+            <a href="/terms" className="text-[10px] sm:text-xs md:text-sm hover:text-white/90 transition-colors duration-300">Terms of Service</a>
+            <a href="/" className="text-[10px] sm:text-xs md:text-sm hover:text-white/90 transition-colors duration-300">Cookies Settings</a>
           </div>
         </div>
       </footer>
