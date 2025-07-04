@@ -557,13 +557,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
           <div className="w-full lg:w-80 flex-shrink-0">
             {/* Public Review Button - Only show when viewing someone else's profile */}
             {isPublicView && (
-              <div className="flex flex-col gap-2 mb-4 w-full">
-                <Button
-                  onClick={() => navigate(`/public-view/${profileData.id}/share`)}
-                  className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5"
-                >
-                  See Public View
-                </Button>
+              <div className="flex flex-col gap-2 mb-4 w-full ">
+               
                 {/* Share button for public view - only show if user has permission to share and not viewing a shared profile */}
                 {profileData.subscription_type !== 'free' && !shareToken && (
                   <Button
@@ -572,8 +567,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
                       setIsShareDialogOpen(true);
                       toast.info("Opening share dialog...");
                     }}
-                    className="border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 w-full transition-all duration-300 flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5"
-                  >
+                    className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 xs:gap-2 text-xs xs:text-sm sm:text-base"
+                    >
                     <Share2 className="h-4 w-4" />
                     Share Profile
                   </Button>
