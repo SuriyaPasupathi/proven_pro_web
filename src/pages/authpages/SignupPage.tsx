@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import herosectionImg from '@/assets/herosection.png';
+import herosectionImg from '@/assets/Hero_Image.png';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 import { GoogleLogin } from '@react-oauth/google';

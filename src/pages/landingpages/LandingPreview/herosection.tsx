@@ -1,6 +1,6 @@
 // components/HeroSection.tsx
 import { Button } from "@/components/ui/button";
-import image from "../../../assets/herosection.png";
+import image from "../../../assets/Hero_Image.png";
 import { useNavigate } from "react-router-dom";
 
 export default function Hero() {

@@ -14,7 +14,7 @@ import { postUserCredentials } from '@/store/Services/AuthService';
 import { loginUser } from '@/store/Services/LoginService';
 import { checkProfileStatus } from '@/store/Services/CreateProfileService';
 import logo from '@/assets/logo.png';
-import herosectionImg from '@/assets/herosection.png';
+import herosectionImg from '@/assets/Hero_Image.png';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { Eye, EyeOff } from 'lucide-react';
