@@ -548,10 +548,21 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
             {isPublicView && (
               <div className="flex justify-center mb-4 w-full">
                 <Button
-                  // onClick={() => setIsReviewDialogOpen(true)}
+                  
                   className=" bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 "
                 >
-                  <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+                  See Public View
+                </Button>
+              </div>
+            )}
+            
+            {/* View Public Profile Button - Only show when viewing own profile */}
+            {!isPublicView && profileData.profile_url && (
+              <div className="flex justify-center mb-4 w-full">
+                <Button
+                  
+                  className=" bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 "
+                >
                   See Public View
                 </Button>
               </div>
@@ -621,7 +632,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
           </div>
         </div>
         {/* Review Carousel Section - Full Width */}
-        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-16">
+        <div className=" ">
           <ReviewCarousel reviews={profileData.reviews?.map(review => ({
             id: review.id,
             name: review.reviewer_name,
