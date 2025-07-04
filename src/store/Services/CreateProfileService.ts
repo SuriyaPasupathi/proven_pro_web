@@ -1066,3 +1066,72 @@ export const subscribeToPlan = createAsyncThunk(
     }
   }
 );
+
+export const getPublicProfile = createAsyncThunk(
+  'profile/getPublicProfile',
+  async (userId: string, { rejectWithValue }) => {
+    try {
+      console.log('getPublicProfile - userId received:', userId);
+      console.log('getPublicProfile - userId type:', typeof userId);
+      console.log('getPublicProfile - userId length:', userId?.length);
+      
+      // Validate UUID format
+      if (!userId || userId.length !== 36) {
+        console.error('getPublicProfile - Invalid userId format:', userId);
+        return rejectWithValue({
+          message: 'Invalid user ID format',
+          code: 'INVALID_USER_ID'
+        });
+      }
+      
+      console.log('getPublicProfile - API URL:', `${baseUrl}request-profile-share/?action=view_mode&user_id=${userId}`);
+      
+      const response = await axios.get(
+        `${baseUrl}request-profile-share/?action=view_mode&user_id=${userId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('getPublicProfile - API response status:', response.status);
+      console.log('getPublicProfile - API response data:', response.data);
+
+      // Transform the response data to match the expected profile structure
+      const profileData = response.data;
+      const transformedData = {
+        ...profileData,
+        id: userId,
+        verification_details: {
+          government_id: {
+            uploaded: profileData.gov_id_document || false,
+            verified: profileData.gov_id_verified || false,
+            percentage: profileData.gov_id_verified ? 100 : 0
+          },
+          address_proof: {
+            uploaded: profileData.address_document || false,
+            verified: profileData.address_verified || false,
+            percentage: profileData.address_verified ? 100 : 0
+          },
+          mobile: {
+            provided: !!profileData.mobile,
+            verified: profileData.mobile_verified || false,
+            percentage: profileData.mobile_verified ? 100 : 0
+          }
+        }
+      };
+
+      console.log('getPublicProfile - transformed data:', transformedData);
+      return transformedData;
+    } catch (error) {
+      console.error('Get public profile error:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('getPublicProfile - Axios error response:', error.response?.data);
+        console.error('getPublicProfile - Axios error status:', error.response?.status);
+      }
+      const profileError = handleProfileError(error);
+      return rejectWithValue(profileError);
+    }
+  }
+);

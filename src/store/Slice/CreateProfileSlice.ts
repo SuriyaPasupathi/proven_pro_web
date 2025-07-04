@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, getProfileReviewsPublic, deleteItem, deleteVideoIntro, searchUsers, verifyShareToken, subscribeToPlan } from '../Services/CreateProfileService';
+import { createUserProfile, getProfile, logout, checkProfileStatus, updateProfile, uploadVerificationDocument, requestMobileVerification, verifyMobileOTP, getVerificationStatus, shareProfile, requestEmailChange, verifyEmailOTP, changePassword, submitProfileReview, getProfileReviews, getProfileReviewsPublic, deleteItem, deleteVideoIntro, searchUsers, verifyShareToken, subscribeToPlan, getPublicProfile } from '../Services/CreateProfileService';
 import { ProfileData } from '../../types/profile';
 
 interface ProfileError {
@@ -68,6 +68,8 @@ interface CreateProfileState {
   searchError: ProfileError | null;
   subscriptionLoading: boolean;
   subscriptionSuccess: boolean;
+  publicProfileLoading: boolean;
+  publicProfileError: ProfileError | null;
 }
 
 const initialState: CreateProfileState = {
@@ -97,6 +99,8 @@ const initialState: CreateProfileState = {
   searchError: null,
   subscriptionLoading: false,
   subscriptionSuccess: false,
+  publicProfileLoading: false,
+  publicProfileError: null,
 };
 
 const createProfileSlice = createSlice({
@@ -483,6 +487,19 @@ const createProfileSlice = createSlice({
         state.subscriptionLoading = false;
         state.subscriptionSuccess = false;
         state.error = action.payload as ProfileError;
+      })
+      .addCase(getPublicProfile.pending, (state) => {
+        state.publicProfileLoading = true;
+        state.publicProfileError = null;
+      })
+      .addCase(getPublicProfile.fulfilled, (state, action) => {
+        state.publicProfileLoading = false;
+        state.profileData = action.payload;
+        state.error = null;
+      })
+      .addCase(getPublicProfile.rejected, (state, action) => {
+        state.publicProfileLoading = false;
+        state.publicProfileError = action.payload as ProfileError;
       });
   },
 });

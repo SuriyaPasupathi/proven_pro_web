@@ -23,6 +23,8 @@ import { toast } from "sonner";
 // } from "@/components/ui/tooltip";
 import ReviewDialog from './ReviewDialog';
 import ReviewCarousel from './ReviewCarousel';
+import { useNavigate } from 'react-router-dom';
+
 
 
 
@@ -407,7 +409,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
-
+  const [showPublicProfileSection, setShowPublicProfileSection] = useState(true);
+  const navigate = useNavigate();
   const copyToClipboard = async () => {
     const profileUrl = profileData.profile_url || "https://www.mytrustworld.com/profile-d-ae111378";
     try {
@@ -502,66 +505,91 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profileData, isPublicView
             {/* Horizontal divider */}
             <div className="border-t border-black my-6 sm:my-8"></div>
 
-            {/* Public profile & URL section */}
-            <div className="mb-6">
-              <h2 className="block text-2xl font-bold text-[#222] mb-2">
-                Public profile & URL
-              </h2>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={profileData.profile_url || 'https://www.mytrustworld.com/profile-d-ae111378'}
-                  className="flex-1 px-3 py-2 rounded border border-gray-300 bg-gray-50 text-sm sm:text-base font-mono text-gray-700"
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="sm:w-auto w-full flex-shrink-0 flex items-center justify-center"
-                  onClick={copyToClipboard}
-                >
-                  <Copy className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
-                  <span className="hidden sm:inline">Copy URL</span>
-                  <span className="sm:hidden">Copy</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="sm:w-auto w-full flex-shrink-0 flex items-center justify-center"
-                  onClick={() => {
-                    setIsShareDialogOpen(true);
-                    toast.info("Opening share dialog...");
-                  }}
-                >
-                  <Share2 className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
-                  <span className="hidden sm:inline">Share</span>
-                  <span className="sm:hidden">Share</span>
-                </Button>
+            {/* Public profile & URL section - Only show when not in public view and section is not hidden */}
+            {!isPublicView && showPublicProfileSection && (
+              <div className="mb-6">
+                <h2 className="block text-2xl font-bold text-[#222] mb-2">
+                  Public profile & URL
+                </h2>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={profileData.profile_url || 'https://www.mytrustworld.com/profile-d-ae111378'}
+                    className="flex-1 px-3 py-2 rounded border border-gray-300 bg-gray-50 text-sm sm:text-base font-mono text-gray-700"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="sm:w-auto w-full flex-shrink-0 flex items-center justify-center"
+                    onClick={copyToClipboard}
+                  >
+                    <Copy className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
+                    <span className="hidden sm:inline">Copy URL</span>
+                    <span className="sm:hidden">Copy</span>
+                  </Button>
+                  {/* Hide share button when viewing a shared profile (shareToken is present) */}
+                  {!shareToken && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="sm:w-auto w-full flex-shrink-0 flex items-center justify-center"
+                      onClick={() => {
+                        setIsShareDialogOpen(true);
+                        toast.info("Opening share dialog...");
+                      }}
+                    >
+                      <Share2 className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
+                      <span className="hidden sm:inline">Share</span>
+                      <span className="sm:hidden">Share</span>
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="border-t border-black my-6 sm:my-8 mb-4"></div>
+            )}
+            {/* Only show border if public profile section is visible */}
+            {!isPublicView && showPublicProfileSection && (
+              <div className="border-t border-black my-6 sm:my-8 mb-4"></div>
+            )}
           </div>
 
           {/* Right Column: Rating Section */}
           <div className="w-full lg:w-80 flex-shrink-0">
             {/* Public Review Button - Only show when viewing someone else's profile */}
             {isPublicView && (
-              <div className="flex justify-center mb-4 w-full">
+              <div className="flex flex-col gap-2 mb-4 w-full">
                 <Button
-                  
-                  className=" bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 "
+                  onClick={() => navigate(`/public-view/${profileData.id}/share`)}
+                  className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5"
                 >
                   See Public View
                 </Button>
+                {/* Share button for public view - only show if user has permission to share and not viewing a shared profile */}
+                {profileData.subscription_type !== 'free' && !shareToken && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsShareDialogOpen(true);
+                      toast.info("Opening share dialog...");
+                    }}
+                    className="border-[#5A8DB8]/30 text-[#5A8DB8] hover:bg-[#5A8DB8]/10 w-full transition-all duration-300 flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5"
+                  >
+                    <Share2 className="h-4 w-4" />
+                    Share Profile
+                  </Button>
+                )}
               </div>
             )}
             
             {/* View Public Profile Button - Only show when viewing own profile */}
             {!isPublicView && profileData.profile_url && (
-              <div className="flex justify-center mb-4 w-full">
+              <div className="flex flex-col gap-2 mb-4 w-full">
                 <Button
-                  
-                  className=" bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5 "
+                  onClick={() => {
+                    setShowPublicProfileSection(false);
+                    navigate(`/public-view/${profileData.id}/share`);
+                  }}
+                  className="bg-[#5A8DB8] hover:bg-[#3C5979] text-white w-full transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-2 text-xs sm:text-sm py-2 sm:py-2.5"
                 >
                   See Public View
                 </Button>

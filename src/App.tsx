@@ -39,6 +39,7 @@ import PremiumExample from './pages/landingpages/LandingPreview/SeeExamplePage/P
 import TermsConditions from './components/termsconditions/termscondtions';
 import PrivacyPolicy from './components/termsconditions/privacypolicy';
 import About from './components/layout/aboutus';
+import PublicView from './pages/ProfilePages/PublicView';
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
 const { theme } = useTheme();
@@ -104,6 +105,7 @@ function App() {
                 {/* Profile Routes */}
                 <Route path="/profile" element={<Navigate to={`/profile/${localStorage.getItem('userProfileId')}`} replace />} />
                 <Route path="/profile/:profileId" element={<Profile />} />
+                <Route path="/public-view/:profileId/share" element={<PublicView />} />
                 <Route path="/share-profile/:profileId/:shareToken" element={<ShareProfilePage />} />
                 <Route path="/profile/account-settings/:profileId" element={<AccountSettings />} />
                 <Route path="/profile/verification/:profileId" element={<Verification />} />
